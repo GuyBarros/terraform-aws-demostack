@@ -1,0 +1,25 @@
+/**
+provider "vault" {
+  # It is strongly recommended to configure this provider through the
+  # environment variables described above, so that each user can have
+  # separate credentials set in the environment.
+  #
+  # This will default to using $VAULT_ADDR
+  # But can be set explicitly
+  # address = "https://vault.example.net:8200"
+  # address = "https://${aws_alb.vault.dns_name}:8200"
+   token = "root"
+}
+
+resource "vault_generic_secret" "example" {
+  path = "kv/nodejs/jwt"
+
+  data_json = <<EOT
+{
+  "seed":   "mamamia",
+  "ttlindays": 14
+}
+EOT
+}
+
+*/

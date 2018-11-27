@@ -1,0 +1,33 @@
+{
+    "service": {
+      "name": "angularjs",
+      "port": 3000,
+      "connect": {
+        "proxy": {
+          "config": {
+            "upstreams": [{
+               "destination_name": "nodejs",
+               "local_bind_address": "0.0.0.0",
+               "local_bind_port": 5000
+            }]
+          }
+        }
+      }
+    },
+    "checks": [
+       {
+        "id": "angular",
+        "name": "web server up and running",
+        "tcp": "localhost:3000",
+        "interval": "30s",
+        "timeout": "1s"
+      },
+       {
+        "id": "api",
+        "name": "HTTP API on port 3000",
+        "http": "https://localhost:3000/",
+        "interval": "30s",
+        "timeout": "1s"
+      }
+    ]
+  }

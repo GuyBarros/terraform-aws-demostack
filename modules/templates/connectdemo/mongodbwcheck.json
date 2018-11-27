@@ -1,0 +1,19 @@
+
+
+
+{
+  "service": {
+    "name": "mongodb",
+    "port": 27017,
+    "checks": [
+      {
+        "args": ["/etc/consul.d/mongo_is_master.sh"],
+        "interval": "10s"
+      }
+    ],
+    "connect": {
+      "proxy": {
+      }
+    }
+  }
+}

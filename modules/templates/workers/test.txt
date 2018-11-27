@@ -1,0 +1,17 @@
+ sudo nano mongod.conf
+
+ sudo cp mongod.conf /etc/mongod.conf
+
+ sudo systemctl restart mongod
+
+ 
+ cfg = {"_id" : "consuldemo", "members" : [{"_id" : 0,"host" : "[10.1.1.32]:27017"}]}
+
+ rs.initiate(cfg)
+
+ rs.add("10.1.2.23:27017")
+
+ rs.add("10.1.1.202:27017")
+
+
+ db.createUser( {    user: "demo",    pwd: "demo",     roles: [ { role: "readWrite", db: "demo" } ]  });

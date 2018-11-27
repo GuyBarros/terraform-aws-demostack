@@ -1,0 +1,25 @@
+{
+    "service":{
+        "name": "mongodb",
+        "port": 27017,
+        "connect": {
+          "proxy": {}
+        }
+    },
+    "checks": [
+       {
+        "id": "mongodb",
+        "name": "mongo sever up and runnin",
+        "tcp": "localhost:27017",
+        "interval": "30s",
+        "timeout": "1s"
+      },
+      {
+        "id": "mongodbismaster",
+        "name": "Mongo Repliation up and running",
+        "args": ["/etc/consul.d/mongo_is_master.sh"],
+        "interval": "30s",
+        "timeout": "1s"
+      }
+    ]
+}

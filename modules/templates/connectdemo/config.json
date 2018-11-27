@@ -1,0 +1,48 @@
+{
+    "acl_datacenter": "dc1",
+    "acl_master_token": "${consul_master_token}",
+    "acl_token": "${consul_master_token}",
+    "advertise_addr": "$(private_ip)",
+    "advertise_addr_wan": "$(public_ip)",
+    "bootstrap_expect": ${consul_servers},
+    "bind_addr": "$(private_ip)",
+    "data_dir": "/mnt/consul",
+    "disable_update_check": true,
+    "encrypt": "${consul_gossip_key}",
+    "leave_on_terminate": true,
+    "node_name": "${node_name}",
+    "raft_protocol": 3,
+    "retry_join": [
+        "provider=aws tag_key=${consul_join_tag_key} tag_value=${consul_join_tag_value}"
+    ],
+    "server": true,
+    "ui": true,
+    "addresses": {
+        "http": "127.0.0.1",
+        "https": "$(private_ip)"
+    },
+    "ports": {
+        "http": 8500,
+        "https": 8533
+    },
+    "key_file": "/etc/ssl/certs/me.key",
+    "cert_file": "/etc/ssl/certs/me.crt",
+    "ca_file": "/usr/local/share/ca-certificates/01-me.crt",
+    "verify_incoming": true,
+    "verify_outgoing": true,
+    "verify_server_hostname": true,
+    "connect": {
+        "enabled": true,
+        "proxy": {
+            "allow_managed_root": true
+        },
+        "proxy_defaults": {
+            "daemon_command": [
+                "/usr/local/bin/consul",
+                "connect",
+                "proxy",
+                "-http-addr=127.0.0.1:8533"
+            ]
+        }
+    }
+}
