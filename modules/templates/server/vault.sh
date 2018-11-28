@@ -258,6 +258,10 @@ consul lock tmp/vault/create-nomad-role "$(cat <<"EOF"
     capabilities = ["update"]
   }
 
+  path "auth/token/revoke-accessor" {
+    capabilities = ["update"]
+  }
+
   path "auth/token/roles/nomad-cluster" {
     capabilities = ["read"]
   }
