@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -e
+#!/usr/bin/env bash 
+set -ex
 
 echo "==> Vault (server)"
 # Vault expects the key to be concatenated with the CA
@@ -239,20 +239,13 @@ fi
 
 
 echo "--> Attempting to create nomad role"
-consul lock tmp/vault/create-nomad-role "$(cat <<"EOF"
-  set -e
 
-  if consul kv get tmp/vault/nomad-setup &>/dev/null; then
-    echo "--> Vault Nomad is configured"
-    exit 0
-  fi
-
+  echo "--> Adding Nomad policy"
   echo "--> Retrieving root token..."
-  export VAULT_ADDR="https://127.0.0.1:8200"
+  export VAULT_ADDR="https://active.vault.service.consul:8200"
   export VAULT_SKIP_VERIFY=true
   consul kv get service/vault/root-token | vault login -
 
-  echo "--> Adding Nomad policy"
   vault policy write nomad-server - <<EOR
   path "auth/token/create/nomad-cluster" {
     capabilities = ["update"]
@@ -293,34 +286,9 @@ EOR
     period=259200 \
     renewable=true \
     orphan=false \
-    disallowed_policies=nomad-server \
+    policy=nomad-server \
     explicit_max_ttl=0
-
-  echo "--> Marking Vault Nomad setup complete"
-  consul kv put tmp/vault/nomad-setup
-EOF
-)"
-
-echo "--> Attempting to create default root token"
-consul lock tmp/vault/create-root-token "$(cat <<"EOF"
-  set -e
-
-  if consul kv get tmp/vault/created-root &>/dev/null; then
-    echo "--> Vault root token already exists"
-    exit 0
-  fi
-
-  echo "--> Retrieving initial root token..."
-  export VAULT_ADDR="https://127.0.0.1:8200"
-  export VAULT_SKIP_VERIFY=true
-  consul kv get service/vault/root-token | vault login -
-
-  echo "--> Creating new root token..."
-  vault token create \
-    -id="${vault_root_token}" \
-    -display-name="training-root" \
-    -orphan
-EOF
-)"
+ 
+  
 
 echo "==> Vault is done!"

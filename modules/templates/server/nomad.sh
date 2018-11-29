@@ -8,10 +8,12 @@ install_from_url "nomad" "${nomad_url}"
 
 echo "--> Generating Vault token..."
 export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
-NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
-  VAULT_ADDR="https://127.0.0.1:8200" \
+  NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
+  VAULT_ADDR="https://active.vault.service.consul:8200" \
   VAULT_SKIP_VERIFY=true \
   vault token create -field=token -policy=nomad-server -period=72h)"
+
+consul kv put service/vault/nomad-token $NOMAD_VAULT_TOKEN
 
 echo "--> Writing configuration"
 sudo mkdir -p /mnt/nomad
