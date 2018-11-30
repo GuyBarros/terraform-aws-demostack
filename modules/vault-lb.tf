@@ -1,8 +1,8 @@
 resource "aws_alb" "vault" {
   name = "${var.namespace}-vault"
 
-  security_groups = ["${aws_security_group.consuldemo.id}"]
-  subnets         = ["${aws_subnet.consuldemo.*.id}"]
+  security_groups = ["${aws_security_group.demostack.id}"]
+  subnets         = ["${aws_subnet.demostack.*.id}"]
 
   tags {
     Name           = "${var.namespace}-vault"
@@ -17,7 +17,7 @@ resource "aws_alb_target_group" "vault" {
   name = "${var.namespace}-vault"
 
   port     = "8200"
-  vpc_id   = "${aws_vpc.consuldemo.id}"
+  vpc_id   = "${aws_vpc.demostack.id}"
   protocol = "HTTPS"
 
   health_check {
