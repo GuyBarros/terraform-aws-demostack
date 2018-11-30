@@ -1,8 +1,8 @@
 resource "aws_alb" "fabio" {
   name = "${var.namespace}-fabio"
 
-  security_groups = ["${aws_security_group.consuldemo.id}"]
-  subnets         = ["${aws_subnet.consuldemo.*.id}"]
+  security_groups = ["${aws_security_group.demostack.id}"]
+  subnets         = ["${aws_subnet.demostack.*.id}"]
 
   tags {
     Name           = "${var.namespace}-fabio"
@@ -16,7 +16,7 @@ resource "aws_alb" "fabio" {
 resource "aws_alb_target_group" "fabio" {
   name     = "${var.namespace}-fabio"
   port     = "9999"
-  vpc_id   = "${aws_vpc.consuldemo.id}"
+  vpc_id   = "${aws_vpc.demostack.id}"
   protocol = "HTTP"
 
   health_check {
@@ -33,7 +33,7 @@ resource "aws_alb_target_group" "fabio" {
 resource "aws_alb_target_group" "fabio-ui" {
   name     = "${var.namespace}-fabio-ui"
   port     = "9998"
-  vpc_id   = "${aws_vpc.consuldemo.id}"
+  vpc_id   = "${aws_vpc.demostack.id}"
   protocol = "HTTP"
 
   health_check {

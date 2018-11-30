@@ -17,10 +17,10 @@ data "template_file" "workers_iam_policy" {
   vars {
     identity          = "${element(aws_iam_user.workers.*.name, count.index)}"
     region            = "${var.region}"
-    owner_id          = "${aws_security_group.consuldemo.owner_id}"
+    owner_id          = "${aws_security_group.demostack.owner_id}"
     ami_id            = "${data.aws_ami.ubuntu.id}"
-    subnet_id         = "${element(aws_subnet.consuldemo.*.id, count.index)}"
-    security_group_id = "${aws_security_group.consuldemo.id}"
+    subnet_id         = "${element(aws_subnet.demostack.*.id, count.index)}"
+    security_group_id = "${aws_security_group.demostack.id}"
   }
 }
 
@@ -78,8 +78,8 @@ data "template_file" "workers" {
     terraform_url     = "${var.terraform_url}"
     region            = "${var.region}"
     ami_id            = "${data.aws_ami.ubuntu.id}"
-    subnet_id         = "${element(aws_subnet.consuldemo.*.id, count.index)}"
-    security_group_id = "${aws_security_group.consuldemo.id}"
+    subnet_id         = "${element(aws_subnet.demostack.*.id, count.index)}"
+    security_group_id = "${aws_security_group.demostack.id}"
     access_key        = "${element(aws_iam_access_key.workers.*.id, count.index)}"
     secret_key        = "${element(aws_iam_access_key.workers.*.secret, count.index)}"
 
@@ -142,11 +142,11 @@ resource "aws_instance" "workers" {
 
   ami           = "${data.aws_ami.ubuntu.id}"
   instance_type = "${var.instance_type_worker}"
-  key_name      = "${aws_key_pair.consuldemo.id}"
+  key_name      = "${aws_key_pair.demostack.id}"
 
-  subnet_id              = "${element(aws_subnet.consuldemo.*.id, count.index)}"
+  subnet_id              = "${element(aws_subnet.demostack.*.id, count.index)}"
   iam_instance_profile   = "${element(aws_iam_instance_profile.workers.*.name, count.index)}"
-  vpc_security_group_ids = ["${aws_security_group.consuldemo.id}"]
+  vpc_security_group_ids = ["${aws_security_group.demostack.id}"]
 
   tags {
     Name       = "${var.namespace}-workers-${count.index}"
@@ -183,7 +183,7 @@ resource "aws_instance" "workers" {
 /**
 
 rs.initiate({
-   _id : "consuldemo",
+   _id : "demostack",
 members:   [
     { _id: 0,  host : "10.1.1.253:27017"},
     { _id: 1,  host : "10.1.2.208:27017"},

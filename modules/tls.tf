@@ -66,11 +66,9 @@ resource "tls_cert_request" "server" {
     "localhost",
   ]
 
-  /*
-  ip_addresses = [
-    "127.0.0.1",
-  ]
-  */
+  
+  // ip_addresses = ["${aws_eip.server_ips.*.public_ip }"]
+   
 }
 
 # Server certificate
@@ -135,6 +133,8 @@ resource "tls_cert_request" "workers" {
     "127.0.0.1",
   ]
   */
+  // ip_addresses = ["${aws_eip.server_ips.*.public_ip }"]
+  
 }
 
 # Client certificate

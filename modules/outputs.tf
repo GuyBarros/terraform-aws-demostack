@@ -31,7 +31,7 @@ output "vault_ui" {
 }
 
 output "vpc_id" {
-  value = "${aws_vpc.consuldemo.id}"
+  value = "${aws_vpc.demostack.id}"
 }
 
 /*

@@ -19,19 +19,19 @@ sudo npm install -g nodemon
 echo "--> Done installing common npm dependencies"
 
 echo "create consul demo directory"
-sudo mkdir /consuldemo
+sudo mkdir /demostack
 echo "Git pull nodejs demo"
- cd /consuldemo
+ cd /demostack
  sudo git clone https://github.com/GuyBarros/mean_cluster_backend
- cd /consuldemo/mean_cluster_backend
+ cd /demostack/mean_cluster_backend
  echo "install the Nodejs package"
  npm install 
 
 
 echo "-->  Git pull AngularJs demo"
- cd /consuldemo
+ cd /demostack
  sudo git clone https://github.com/GuyBarros/mean_cluster
- cd /consuldemo/mean_cluster
+ cd /demostack/mean_cluster
  echo "--> install the Nodejs package"
  sudo npm install 
  echo "--> Bower install"
@@ -39,7 +39,7 @@ echo "-->  Git pull AngularJs demo"
 
 
 echo "-->  Git pull Nomad Jobs"
- cd /consuldemo
+ cd /demostack
  sudo git clone https://github.com/GuyBarros/nomad_jobs
 
 echo "==> Consul Connect Demo Setup is Done!"

@@ -22,7 +22,7 @@ sudo mkdir -p /etc/vault.d
 sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 
 
-cluster_name = "${namespace}-consuldemo"
+cluster_name = "${namespace}-demostack"
 
 storage "consul" {
   path = "vault/"
@@ -33,6 +33,8 @@ listener "tcp" {
   tls_cert_file = "/etc/vault.d/tls/vault.crt"
   tls_key_file  = "/etc/ssl/certs/me.key"
 }
+
+api_addr = "https://$(public_ip):8200"
 
 
 
@@ -148,7 +150,7 @@ echo "--> Writing configuration"
 sudo mkdir -p /etc/vault.d
 sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 
-cluster_name = "${namespace}-consuldemo"
+cluster_name = "${namespace}-demostack"
 
 storage "consul" {
   path = "vault/"
@@ -158,6 +160,7 @@ listener "tcp" {
   address       = "0.0.0.0:8200"
   tls_cert_file = "/etc/vault.d/tls/vault.crt"
   tls_key_file  = "/etc/ssl/certs/me.key"
+   tls-skip-verify = true
 }
 
 seal "awskms" {
@@ -165,6 +168,7 @@ seal "awskms" {
   kms_key_id = "${kmskey}"
 }
 
+api_addr = "https://$(public_ip):8200"
 
 ui = true
 

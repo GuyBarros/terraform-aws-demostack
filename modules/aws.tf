@@ -23,7 +23,7 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_vpc" "consuldemo" {
+resource "aws_vpc" "demostack" {
   cidr_block           = "${var.vpc_cidr_block}"
   enable_dns_hostnames = true
 
@@ -36,8 +36,8 @@ resource "aws_vpc" "consuldemo" {
   }
 }
 
-resource "aws_internet_gateway" "consuldemo" {
-  vpc_id = "${aws_vpc.consuldemo.id}"
+resource "aws_internet_gateway" "demostack" {
+  vpc_id = "${aws_vpc.demostack.id}"
 
   tags {
     Name           = "${var.namespace}"
@@ -49,16 +49,16 @@ resource "aws_internet_gateway" "consuldemo" {
 }
 
 resource "aws_route" "internet_access" {
-  route_table_id         = "${aws_vpc.consuldemo.main_route_table_id}"
+  route_table_id         = "${aws_vpc.demostack.main_route_table_id}"
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "${aws_internet_gateway.consuldemo.id}"
+  gateway_id             = "${aws_internet_gateway.demostack.id}"
 }
 
 data "aws_availability_zones" "available" {}
 
-resource "aws_subnet" "consuldemo" {
+resource "aws_subnet" "demostack" {
   count                   = "${length(var.cidr_blocks)}"
-  vpc_id                  = "${aws_vpc.consuldemo.id}"
+  vpc_id                  = "${aws_vpc.demostack.id}"
   availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
   cidr_block              = "${var.cidr_blocks[count.index]}"
   map_public_ip_on_launch = true
@@ -72,9 +72,9 @@ resource "aws_subnet" "consuldemo" {
   }
 }
 
-resource "aws_security_group" "consuldemo" {
+resource "aws_security_group" "demostack" {
   name_prefix = "${var.namespace}"
-  vpc_id      = "${aws_vpc.consuldemo.id}"
+  vpc_id      = "${aws_vpc.demostack.id}"
 
   ingress {
     from_port   = 0
@@ -91,7 +91,7 @@ resource "aws_security_group" "consuldemo" {
   }
 }
 
-resource "aws_key_pair" "consuldemo" {
+resource "aws_key_pair" "demostack" {
   key_name   = "${var.namespace}"
   public_key = "${var.public_key}"
 }
@@ -114,7 +114,7 @@ resource "aws_iam_instance_profile" "consul-join" {
   role = "${aws_iam_role.consul-join.name}"
 }
 
-resource "aws_kms_key" "consulDemoVaultKeys" {
+resource "aws_kms_key" "demostackVaultKeys" {
   description             = "KMS for the Consul Demo Vault"
   deletion_window_in_days = 10
 
@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "vault-server" {
       "kms:Decrypt",
       "kms:DescribeKey",
     ]
-   resources = ["${aws_kms_key.consulDemoVaultKeys.arn}"]
+   resources = ["${aws_kms_key.demostackVaultKeys.arn}"]
   }
    statement 
     {
@@ -151,4 +151,17 @@ data "aws_iam_policy_document" "vault-server" {
      actions = [ "ec2:DescribeInstances",]
       resources = [ "*" ]
     }
+}
+
+resource "aws_eip" "server_ips" {
+   count = "${var.servers}"
+    vpc = true
+    tags {
+    Name           = "${var.namespace}-server_ip-${count.index}"
+    owner          = "${var.owner}"
+    created-by     = "${var.created-by}"
+    sleep-at-night = "${var.sleep-at-night}"
+    TTL            = "${var.TTL}"
+    ConsulJoin     = "${local.consul_join_tag_value}"
+  }
 }

@@ -1,7 +1,13 @@
-variable "region" {
+variable "primary_region" {
   description = "The region to create resources."
   default     = "eu-west-2"
 }
+
+variable "secondary_region" {
+  description = "The region to create resources."
+  default     = "eu-west-2"
+}
+
 
 variable "servers" {
   description = "The number of data servers (consul, nomad, etc)."
@@ -78,7 +84,7 @@ variable "vault_ent_url" {
   default     = "https://s3-us-west-2.amazonaws.com/hc-enterprise-binaries/vault/ent/0.11.1/vault-enterprise_0.11.1%2Bent_linux_amd64.zip"
 }
 
-variable "primarynamespace" {
+variable "primary_namespace" {
   description = <<EOH
 The namespace to create the virtual training lab. This should describe the
 training and must be unique to all current trainings. IAM users, workstations,
@@ -91,7 +97,7 @@ EOH
   default = "primaryconnectdemo"
 }
 
-variable "secondarynamespace" {
+variable "secondary_namespace" {
   description = <<EOH
 The namespace to create the virtual training lab. This should describe the
 training and must be unique to all current trainings. IAM users, workstations,
