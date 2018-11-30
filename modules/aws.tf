@@ -152,16 +152,3 @@ data "aws_iam_policy_document" "vault-server" {
       resources = [ "*" ]
     }
 }
-
-resource "aws_eip" "server_ips" {
-   count = "${var.servers}"
-    vpc = true
-    tags {
-    Name           = "${var.namespace}-server_ip-${count.index}"
-    owner          = "${var.owner}"
-    created-by     = "${var.created-by}"
-    sleep-at-night = "${var.sleep-at-night}"
-    TTL            = "${var.TTL}"
-    ConsulJoin     = "${local.consul_join_tag_value}"
-  }
-}

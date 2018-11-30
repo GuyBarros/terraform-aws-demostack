@@ -59,7 +59,8 @@ data "template_file" "workers" {
   vars {
     namespace = "${var.namespace}"
     node_name = "${element(aws_iam_user.workers.*.name, count.index)}"
-    me_ca     = "${tls_self_signed_cert.root.cert_pem}"
+    #me_ca     = "${tls_self_signed_cert.root.cert_pem}"
+    me_ca         =  "${var.ca_cert_pem}"
     me_cert   = "${element(tls_locally_signed_cert.workers.*.cert_pem, count.index)}"
     me_key    = "${element(tls_private_key.workers.*.private_key_pem, count.index)}"
 

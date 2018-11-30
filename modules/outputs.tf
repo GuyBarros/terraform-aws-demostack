@@ -1,17 +1,17 @@
 output "consul_servers" {
-  value = ["${aws_instance.server.*.public_ip}"]
+  value = ["${aws_instance.server.*.public_dns}"]
 }
 
 output "nomad_workers_server" {
-  value = ["${aws_instance.workers.*.public_ip}"]
+  value = ["${aws_instance.workers.*.public_dns}"]
 }
 
 output "nomad_workers_consul_ui" {
-  value = "${formatlist("http://%s:8500/", aws_instance.workers.*.public_ip,)}"
+  value = "${formatlist("http://%s:8500/", aws_instance.workers.*.public_dns,)}"
 }
 
 output "nomad_workers_ui" {
-  value = "${formatlist("http://%s:3000/", aws_instance.workers.*.public_ip)}"
+  value = "${formatlist("http://%s:3000/", aws_instance.workers.*.public_dns)}"
 }
 
 output "fabio_lb" {

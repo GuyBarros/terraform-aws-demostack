@@ -23,7 +23,8 @@ data "template_file" "server" {
     kmskey        = "${aws_kms_key.demostackVaultKeys.id}"
     namespace     = "${var.namespace}"
     node_name     = "${var.namespace}-server-${count.index}"
-    me_ca         = "${tls_self_signed_cert.root.cert_pem}"
+   # me_ca         = "${tls_self_signed_cert.root.cert_pem}"
+    me_ca         =  "${var.ca_cert_pem}"
     me_cert       = "${element(tls_locally_signed_cert.server.*.cert_pem, count.index)}"
     me_key        = "${element(tls_private_key.server.*.private_key_pem, count.index)}"
 
@@ -73,7 +74,6 @@ resource "aws_instance" "server" {
   ami           = "${data.aws_ami.ubuntu.id}"
   instance_type = "${var.instance_type_server}"
   key_name      = "${aws_key_pair.demostack.id}"
-  associate_public_ip_address = true
 
   subnet_id              = "${element(aws_subnet.demostack.*.id, count.index)}"
   iam_instance_profile   = "${aws_iam_instance_profile.consul-join.name}"
