@@ -284,13 +284,21 @@ echo "--> Attempting to create nomad role"
   }
 EOR
 
+
+  vault policy write test - <<EOF
+  path "secret/*" {
+    capabilities = ["create", "read", "update", "delete", "list"]
+}
+EOF
+
+
   echo "--> Creating Nomad token role"
   vault write auth/token/roles/nomad-cluster \
     name=nomad-cluster \
     period=259200 \
     renewable=true \
     orphan=false \
-    policy=nomad-server \
+    disallowed_policies=nomad-server \
     explicit_max_ttl=0
  
   
