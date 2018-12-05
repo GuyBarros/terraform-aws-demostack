@@ -42,7 +42,7 @@ module "primarycluster" {
   ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
 }
 
-/*
+
 module "secondarycluster" {
   source              = "./modules"
   owner               = "${var.owner}"
@@ -80,7 +80,7 @@ module "secondarycluster" {
   ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
   ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
 }
-*/
+
 
 # Root private key
 resource "tls_private_key" "root" {

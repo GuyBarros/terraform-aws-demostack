@@ -33,7 +33,7 @@ output "primary_vault_ui" {
 
 
 // Secondary
-/*
+
 output "secondary_nomad_workers_server" {
   value = ["${module.secondarycluster.nomad_workers_server}"]
 }
@@ -65,6 +65,6 @@ output "secondary_vault_lb" {
 output "secondary_vault_ui" {
   value = "${module.secondarycluster.vault_ui}"
 }
-*/
+
 
 
