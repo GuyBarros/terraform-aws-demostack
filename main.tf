@@ -37,9 +37,9 @@ module "primarycluster" {
   cidr_blocks         = "${var.cidr_blocks}"
   instance_type_server= "${var.instance_type_server}"
   instance_type_worker= "${var.instance_type_worker}"
-  ca_key_algorithm   = "${tls_private_key.root.algorithm}"
-  ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
-  ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
+  ca_key_algorithm   = "${module.rootcertificate.ca_key_algorithm}"
+  ca_private_key_pem = "${module.rootcertificate.ca_private_key_pem}"
+  ca_cert_pem        = "${module.rootcertificate.ca_cert_pem}"
 }
 
 
@@ -76,35 +76,18 @@ module "secondarycluster" {
   cidr_blocks         = "${var.cidr_blocks}"
   instance_type_server= "${var.instance_type_server}"
   instance_type_worker= "${var.instance_type_worker}"
-  ca_key_algorithm   = "${tls_private_key.root.algorithm}"
-  ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
-  ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
+  ca_key_algorithm   = "${module.rootcertificate.ca_key_algorithm}"
+  ca_private_key_pem = "${module.rootcertificate.ca_private_key_pem}"
+  ca_cert_pem        = "${module.rootcertificate.ca_cert_pem}"
 }
 
-
-# Root private key
-resource "tls_private_key" "root" {
-  algorithm   = "ECDSA"
+module "rootcertificate" {
+  source              = "github.com/GuyBarros/terraform-tls-certificate"
+  version = "0.0.1"
+  algorithm = "ECDSA"
   ecdsa_curve = "P521"
-}
-
-# Root certificate
-resource "tls_self_signed_cert" "root" {
-  key_algorithm   = "${tls_private_key.root.algorithm}"
-  private_key_pem = "${tls_private_key.root.private_key_pem}"
-
-  subject {
-    common_name  = "service.consul"
-    organization = "HashiCorp Consul Connect Demo"
-  }
-
-  validity_period_hours = 720 # 30 days
-
-  allowed_uses = [
-    "cert_signing",
-    "crl_signing",
-  ]
-
+  common_name   = "service.consul"
+  organization = "service.consul"
+  validity_period_hours = 720
   is_ca_certificate = true
 }
-
