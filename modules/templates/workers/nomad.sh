@@ -99,7 +99,7 @@ job "http-echo-${node_name}" {
       config {
         image = "hashicorp/http-echo:0.2.3"
         args  = [
-          "-listen", ":80",
+          "-listen", ":\$\{NOMAD_PORT_http\}",
           "-text", "hello world",
         ]
       }
@@ -108,7 +108,7 @@ job "http-echo-${node_name}" {
         network {
           mbits = 10
           port "http" {
-            static = 80
+         
           }
         }
       }
@@ -116,7 +116,6 @@ job "http-echo-${node_name}" {
       service {
         name = "http-echo"
         port = "http"
-
         tags = [
           "${node_name}",
           "urlprefix-/http-echo",

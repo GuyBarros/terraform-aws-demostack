@@ -284,15 +284,24 @@ echo "--> Attempting to create nomad role"
   }
 EOR
 
+  vault policy write test - <<EOR
+  path "secret/*" {
+    capabilities = ["create", "read", "update", "delete", "list"]
+}
+EOR
+
+
   echo "--> Creating Nomad token role"
   vault write auth/token/roles/nomad-cluster \
     name=nomad-cluster \
     period=259200 \
     renewable=true \
     orphan=false \
-    policy=nomad-server \
+    disallowed_policies=nomad-server \
     explicit_max_ttl=0
  
+ echo "--> Creating Initial secret for Nomad KV"
+ vault write secret/test message='Hi Mom'
   
 
 echo "==> Vault is done!"
