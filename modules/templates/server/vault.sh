@@ -301,7 +301,28 @@ EOR
     explicit_max_ttl=0
  
  echo "--> Creating Initial secret for Nomad KV"
- vault write secret/test message='Hi Mom'
-  
+ vault write secret/test message='Hello world'
 
+ echo "--> nomad nginx-vault-pki demo prep"
+{
+vault secrets enable pki &&
+
+vault write pki/root/generate/internal common_name=service.consul &&
+
+vault write pki/roles/consul-service generate_lease=true allowed_domains="service.consul" allow_subdomains="true"  &&
+
+vault write pki/issue/consul-service  common_name=nginx.service.consul  ttl=72h  &&
+
+vault policy-write superuser - <<EOR
+path "*" { 
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+  }
+
+EOR
+  
+} ||
+{
+  echo "--> pki demo already configured, moving on"
+}
+ 
 echo "==> Vault is done!"

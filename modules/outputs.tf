@@ -1,9 +1,9 @@
-output "consul_servers" {
-  value = ["${aws_instance.server.*.public_dns}"]
+output "ssh_for_servers" {
+   value = "${formatlist("ssh -i /Users/guy/.ssh/id_rsa ubuntu@%s", aws_instance.server.*.public_dns,)}"
 }
 
-output "nomad_workers_server" {
-  value = ["${aws_instance.workers.*.public_dns}"]
+output "ssh_for_workers" {
+  value = "${formatlist("ssh demo@%s", aws_instance.workers.*.public_dns,)}"
 }
 
 output "nomad_workers_consul_ui" {

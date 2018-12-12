@@ -37,12 +37,15 @@ module "primarycluster" {
   cidr_blocks         = "${var.cidr_blocks}"
   instance_type_server= "${var.instance_type_server}"
   instance_type_worker= "${var.instance_type_worker}"
-  ca_key_algorithm   = "${module.rootcertificate.ca_key_algorithm}"
+//  ca_key_algorithm   = "${var.ca_key_algorithm}"
+//  ca_private_key_pem = "${var.ca_private_key_pem}"
+//  ca_cert_pem        = "${var.ca_cert_pem}"
+ca_key_algorithm   = "${module.rootcertificate.ca_key_algorithm}"
   ca_private_key_pem = "${module.rootcertificate.ca_private_key_pem}"
   ca_cert_pem        = "${module.rootcertificate.ca_cert_pem}"
 }
 
-
+/*
 module "secondarycluster" {
   source              = "./modules"
   owner               = "${var.owner}"
@@ -76,10 +79,14 @@ module "secondarycluster" {
   cidr_blocks         = "${var.cidr_blocks}"
   instance_type_server= "${var.instance_type_server}"
   instance_type_worker= "${var.instance_type_worker}"
-  ca_key_algorithm   = "${module.rootcertificate.ca_key_algorithm}"
+//  ca_key_algorithm   = "${var.ca_key_algorithm}"
+//  ca_private_key_pem = "${var.ca_private_key_pem}"
+//  ca_cert_pem        = "${var.ca_cert_pem}"
+ca_key_algorithm   = "${module.rootcertificate.ca_key_algorithm}"
   ca_private_key_pem = "${module.rootcertificate.ca_private_key_pem}"
   ca_cert_pem        = "${module.rootcertificate.ca_cert_pem}"
 }
+*/
 
 module "rootcertificate" {
   source              = "github.com/GuyBarros/terraform-tls-certificate"
@@ -91,3 +98,4 @@ module "rootcertificate" {
   validity_period_hours = 720
   is_ca_certificate = true
 }
+
