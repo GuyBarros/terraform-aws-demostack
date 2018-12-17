@@ -1,3 +1,5 @@
+
+
 variable "primary_region" {
   description = "The region to create resources."
   default     = "eu-west-2"
