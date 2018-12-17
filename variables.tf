@@ -1,4 +1,18 @@
 
+variable "region" {
+  description = "The region to create resources."
+  default     = "eu-west-2"
+}
+
+variable "namespace" {
+  description = <<EOH
+The namespace to create the virtual training lab. This should describe the
+training and must be unique to all current trainings. IAM users, workstations,
+and resources will be scoped under this namespace.
+EOH
+
+  default = "primaryconnectdemo"
+}
 
 variable "primary_region" {
   description = "The region to create resources."
