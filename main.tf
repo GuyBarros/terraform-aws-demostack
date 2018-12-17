@@ -4,7 +4,7 @@ terraform {
   backend "remote" {
     hostname = "app.terraform.io"
     organization = "emea-se-playground"
-    token = "AmCBvnXKMmwReA.atlasv1.wHF9dSNRuo6t0qfsVf9bRyLKWioxk8gvsCzowjg3FWqZvkSs2YJSYo7jB2qAKqZRmno"
+   # token = "AmCBvnXKMmwReA.atlasv1.wHF9dSNRuo6t0qfsVf9bRyLKWioxk8gvsCzowjg3FWqZvkSs2YJSYo7jB2qAKqZRmno"
     workspaces {
       name = "Guy-TFE-Remote-Backend"
     }
