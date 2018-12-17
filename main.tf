@@ -1,11 +1,27 @@
+# Using a single workspace:
+
+terraform {
+  backend "remote" {
+    hostname = "app.terraform.io"
+    organization = "emea-se-playground"
+    token = "AmCBvnXKMmwReA.atlasv1.wHF9dSNRuo6t0qfsVf9bRyLKWioxk8gvsCzowjg3FWqZvkSs2YJSYo7jB2qAKqZRmno"
+    workspaces {
+      name = "Guy-TFE-Remote-Backend"
+    }
+  }
+}
+
+
 provider "aws" {
   version = ">= 1.20.0"
   region  = "${var.primary_region}"
 }
 
 
+
 module "primarycluster" {
   source              = "./modules"
+  #source              = "github.com/GuyBarros/terraform-aws-demostack"
   owner               = "${var.owner}"
   region              = "${var.primary_region}"
   namespace           = "${var.primary_namespace}"
