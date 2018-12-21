@@ -11,6 +11,20 @@ terraform {
   }
 }
 
+//--------------------------------------------------------------------
+// Workspace Data
+data "terraform_remote_state" "emea_se_playground_tls_root_certificate" {
+  backend = "remote"
+  config {
+   hostname = "app.terraform.io"
+    organization = "emea-se-playground"
+    workspaces {
+      name = "tls-root-certificate"
+    }
+  } //config
+}
+
+//--------------------------------------------------------------------
 
 provider "aws" {
   version = ">= 1.20.0"
@@ -56,9 +70,9 @@ module "primarycluster" {
 //  ca_key_algorithm   = "${var.ca_key_algorithm}"
 //  ca_private_key_pem = "${var.ca_private_key_pem}"
 //  ca_cert_pem        = "${var.ca_cert_pem}"
-ca_key_algorithm   = "${module.rootcertificate.ca_key_algorithm}"
-  ca_private_key_pem = "${module.rootcertificate.ca_private_key_pem}"
-  ca_cert_pem        = "${module.rootcertificate.ca_cert_pem}"
+ca_key_algorithm   = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_key_algorithm}"
+  ca_private_key_pem = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_private_key_pem}"
+  ca_cert_pem        = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_cert_pem}"
 }
 
 /*
@@ -103,15 +117,3 @@ ca_key_algorithm   = "${module.rootcertificate.ca_key_algorithm}"
   ca_cert_pem        = "${module.rootcertificate.ca_cert_pem}"
 }
 */
-
-module "rootcertificate" {
-  source              = "github.com/GuyBarros/terraform-tls-certificate"
-  version = "0.0.1"
-  algorithm = "ECDSA"
-  ecdsa_curve = "P521"
-  common_name   = "service.consul"
-  organization = "service.consul"
-  validity_period_hours = 720
-  is_ca_certificate = true
-}
-
