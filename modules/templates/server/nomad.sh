@@ -11,7 +11,7 @@ export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
   NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
   VAULT_ADDR="https://active.vault.service.consul:8200" \
   VAULT_SKIP_VERIFY=true \
-  vault token create -field=token -policy=nomad-server -period=72h)"
+  vault token create -field=token -policy=superuser -period=72h)"
 
 consul kv put service/vault/nomad-token $NOMAD_VAULT_TOKEN
 
@@ -57,11 +57,22 @@ tls {
 
 vault {
   enabled          = true
-  address          = "https://vault.service.consul:8200"
+  address          = "https://active.vault.service.consul:8200"
   ca_file          = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file        = "/etc/ssl/certs/me.crt"
   key_file         = "/etc/ssl/certs/me.key"
   create_from_role = "nomad-cluster"
+}
+
+
+autopilot {
+    cleanup_dead_servers = true
+    last_contact_threshold = "200ms"
+    max_trailing_logs = 250
+    server_stabilization_time = "10s"
+    enable_redundancy_zones = false
+    disable_upgrade_migration = false
+    enable_custom_upgrades = false
 }
 EOF
 
