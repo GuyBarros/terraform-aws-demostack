@@ -42,7 +42,7 @@ tls {
 
 vault {
   enabled   = true
-  address   = "https://vault.service.consul:8200"
+   address          = "https://active.vault.service.consul:8200"
   ca_file   = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file = "/etc/ssl/certs/me.crt"
   key_file  = "/etc/ssl/certs/me.key"

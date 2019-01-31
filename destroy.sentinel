@@ -1,0 +1,13 @@
+
+import "tfplan"
+
+
+# Rule to restrict instance types
+will_delete_resources = rule {
+ 	length(tfplan.resources) > 0 
+}
+
+# Main rule that requires other rules to be true
+main = rule {
+	(will_delete_resources) else true
+}

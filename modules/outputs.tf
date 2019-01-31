@@ -1,5 +1,5 @@
 output "ssh_for_servers" {
-   value = "${formatlist("ssh -i /Users/guy/.ssh/id_rsa ubuntu@%s", aws_instance.server.*.public_dns,)}"
+  value = "${formatlist("ssh -i /Users/guy/.ssh/id_rsa ubuntu@%s", aws_instance.server.*.public_dns,)}"
 }
 
 output "ssh_for_workers" {

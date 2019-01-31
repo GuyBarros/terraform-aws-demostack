@@ -101,8 +101,6 @@ resource "aws_iam_role" "consul-join" {
   assume_role_policy = "${file("${path.module}/templates/policies/assume-role.json")}"
 }
 
-
-
 resource "aws_iam_policy_attachment" "consul-join" {
   name       = "${var.namespace}-consul-join"
   roles      = ["${aws_iam_role.consul-join.name}"]
@@ -130,9 +128,11 @@ resource "aws_kms_key" "demostackVaultKeys" {
 resource "aws_iam_policy" "consul-join" {
   name        = "${var.namespace}-consul-join"
   description = "Allows Consul nodes to describe instances for joining."
- # policy      = "${file("${path.module}/templates/policies/describe-instances.json")}"
- policy = "${data.aws_iam_policy_document.vault-server.json}"
+
+  # policy      = "${file("${path.module}/templates/policies/describe-instances.json")}"
+  policy = "${data.aws_iam_policy_document.vault-server.json}"
 }
+
 data "aws_iam_policy_document" "vault-server" {
   statement {
     sid    = "VaultKMSUnseal"
@@ -143,12 +143,65 @@ data "aws_iam_policy_document" "vault-server" {
       "kms:Decrypt",
       "kms:DescribeKey",
     ]
-   resources = ["${aws_kms_key.demostackVaultKeys.arn}"]
+
+    resources = ["${aws_kms_key.demostackVaultKeys.arn}"]
   }
-   statement 
-    {
-      effect = "Allow",
-     actions = [ "ec2:DescribeInstances",]
-      resources = [ "*" ]
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "ssm:*",
+      "ec2:DescribeInstances",
+      "iam:PassRole",
+      "iam:ListRoles",
+      "cloudwatch:PutMetricData",
+      "ds:CreateComputer",
+      "ds:DescribeDirectories",
+      "ec2:DescribeInstanceStatus",
+      "logs:*",
+      "ec2messages:*",
+    ]
+
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "iam:CreateServiceLinkedRole",
+    ]
+
+    resources = ["arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*"]
+
+    condition {
+      test     = "StringLike"
+      variable = "iam:AWSServiceName"
+
+      values = [
+        "ssm.amazonaws.com",
+      ]
     }
+  }
+
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "iam:DeleteServiceLinkedRole",
+      "iam:GetServiceLinkedRoleDeletionStatus",
+    ]
+
+    resources = ["arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*"]
+
+    condition {
+      test     = "StringLike"
+      variable = "iam:AWSServiceName"
+
+      values = [
+        "ssm.amazonaws.com",
+      ]
+    }
+  }
 }

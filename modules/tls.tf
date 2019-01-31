@@ -68,23 +68,21 @@ resource "tls_cert_request" "server" {
     "localhost",
   ]
 
-  
   // ip_addresses = ["${aws_eip.server_ips.*.public_ip }"]
-   
 }
 
 # Server certificate
 resource "tls_locally_signed_cert" "server" {
-  count              = "${var.servers}"
-  cert_request_pem   = "${element(tls_cert_request.server.*.cert_request_pem, count.index)}"
- # ca_key_algorithm   = "${tls_private_key.root.algorithm}"
- # ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
- # ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
-ca_key_algorithm =  "${var.ca_key_algorithm}"
-ca_private_key_pem =  "${var.ca_private_key_pem}"
-ca_cert_pem =  "${var.ca_cert_pem}"
+  count            = "${var.servers}"
+  cert_request_pem = "${element(tls_cert_request.server.*.cert_request_pem, count.index)}"
 
+  # ca_key_algorithm   = "${tls_private_key.root.algorithm}"
+  # ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
+  # ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
+  ca_key_algorithm = "${var.ca_key_algorithm}"
 
+  ca_private_key_pem = "${var.ca_private_key_pem}"
+  ca_cert_pem        = "${var.ca_cert_pem}"
 
   validity_period_hours = 720 # 30 days
 
@@ -141,21 +139,21 @@ resource "tls_cert_request" "workers" {
   ]
   */
   // ip_addresses = ["${aws_eip.server_ips.*.public_ip }"]
-  
 }
 
 # Client certificate
 
 resource "tls_locally_signed_cert" "workers" {
-  count              = "${var.nomadworkers}"
-  cert_request_pem   = "${element(tls_cert_request.workers.*.cert_request_pem, count.index)}"
- # ca_key_algorithm   = "${tls_private_key.root.algorithm}"
- # ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
- # ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
-ca_key_algorithm =  "${var.ca_key_algorithm}"
-ca_private_key_pem =  "${var.ca_private_key_pem}"
-ca_cert_pem =  "${var.ca_cert_pem}"
+  count            = "${var.nomadworkers}"
+  cert_request_pem = "${element(tls_cert_request.workers.*.cert_request_pem, count.index)}"
 
+  # ca_key_algorithm   = "${tls_private_key.root.algorithm}"
+  # ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
+  # ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
+  ca_key_algorithm = "${var.ca_key_algorithm}"
+
+  ca_private_key_pem = "${var.ca_private_key_pem}"
+  ca_cert_pem        = "${var.ca_cert_pem}"
 
   validity_period_hours = 720 # 30 days
 
