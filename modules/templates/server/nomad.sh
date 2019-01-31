@@ -73,8 +73,6 @@ autopilot {
     disable_upgrade_migration = false
     enable_custom_upgrades = false
 }
-
-
 EOF
 
 echo "--> Writing profile"
