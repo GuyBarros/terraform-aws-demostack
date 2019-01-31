@@ -1,4 +1,3 @@
-
 variable "region" {
   description = "The region to create resources."
   default     = "eu-west-2"
@@ -23,7 +22,6 @@ variable "secondary_region" {
   description = "The region to create resources."
   default     = "eu-west-2"
 }
-
 
 variable "servers" {
   description = "The number of data servers (consul, nomad, etc)."
@@ -183,6 +181,7 @@ variable "consullicense" {
   description = "Enterprise License for Consul"
   default     = ""
 }
+
 /*
 variable "awsaccesskey" {
   description = "The AWS access key vault will use for auto unseal"
@@ -201,16 +200,15 @@ variable "instance_type_worker" {
   description = "The type(size) of data servers (consul, nomad, etc)."
   default     = "t2.medium"
 }
-variable "ca_key_algorithm" {
-default     = ""
-}
 
+variable "ca_key_algorithm" {
+  default = ""
+}
 
 variable "ca_private_key_pem" {
-  default     = ""
+  default = ""
 }
 
-
 variable "ca_cert_pem" {
-  default     = ""
+  default = ""
 }

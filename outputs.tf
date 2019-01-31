@@ -8,7 +8,6 @@ output "primary_ssh_for_workers" {
   value = ["${module.primarycluster.ssh_for_workers}"]
 }
 
-
 output "primary_nomad_workers_consul_ui" {
   value = ["${module.primarycluster.nomad_workers_consul_ui}"]
 }
@@ -16,7 +15,6 @@ output "primary_nomad_workers_consul_ui" {
 output "primary_nomad_workers_ui" {
   value = ["${module.primarycluster.nomad_workers_ui}"]
 }
-
 
 output "primary_vpc_id" {
   value = "${module.primarycluster.vpc_id}"
@@ -33,7 +31,6 @@ output "primary_vault_lb" {
 output "primary_vault_ui" {
   value = "${module.primarycluster.vault_ui}"
 }
-
 
 // Secondary
 /*
@@ -69,6 +66,4 @@ output "secondary_vault_ui" {
   value = "${module.secondarycluster.vault_ui}"
 }
 */
-
-
 

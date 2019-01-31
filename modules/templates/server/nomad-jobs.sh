@@ -39,6 +39,7 @@ job "hashi-ui" {
     service {
       port = "http"
       name = "hashi-ui"
+      tags = ["urlprefix-/hashi-ui strip=/hashi-ui"]
 
       check {
         type     = "http"

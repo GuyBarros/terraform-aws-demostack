@@ -48,6 +48,15 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "verify_outgoing": false,
   "verify_server_hostname": false,
   "ui": true,
+  "autopilot": {
+    "cleanup_dead_servers": true,
+    "last_contact_threshold": "200ms",
+    "max_trailing_logs": 250,
+    "server_stabilization_time": "10s",
+    "redundancy_zone_tag": "",
+    "disable_upgrade_migration": false,
+    "upgrade_version_tag": ""
+},
  "connect":{
   "enabled": true,
       "proxy": {  "allow_managed_root": true  }

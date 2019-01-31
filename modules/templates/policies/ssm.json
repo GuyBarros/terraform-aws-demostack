@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:*",
+                "ec2:describeInstances",
+                "iam:PassRole",
+                "iam:ListRoles"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

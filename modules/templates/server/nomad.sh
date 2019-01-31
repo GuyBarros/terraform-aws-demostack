@@ -64,7 +64,6 @@ vault {
   create_from_role = "nomad-cluster"
 }
 
-
 autopilot {
     cleanup_dead_servers = true
     last_contact_threshold = "200ms"

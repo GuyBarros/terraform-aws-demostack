@@ -4,29 +4,29 @@ data "template_file" "server" {
   template = "${join("\n", list(
     file("${path.module}/templates/shared/base.sh"),
     file("${path.module}/templates/shared/docker.sh"),
-
     file("${path.module}/templates/server/consul.sh"),
     file("${path.module}/templates/server/vault.sh"),
     file("${path.module}/templates/server/nomad.sh"),
     file("${path.module}/templates/server/nomad-jobs.sh"),
-
     file("${path.module}/templates/shared/cleanup.sh"),
   ))}"
 
   vars {
-  //  awsaccesskey  = "${var.awsaccesskey}"
-  //  awssecretkey  = "${var.awssecretkey}"
-    region        = "${var.region}"
+    //  awsaccesskey  = "${var.awsaccesskey}"
+    //  awssecretkey  = "${var.awssecretkey}"
+    region = "${var.region}"
+
     enterprise    = "${var.enterprise}"
     vaultlicense  = "${var.vaultlicense}"
     consullicense = "${var.consullicense}"
     kmskey        = "${aws_kms_key.demostackVaultKeys.id}"
     namespace     = "${var.namespace}"
     node_name     = "${var.namespace}-server-${count.index}"
-   # me_ca         = "${tls_self_signed_cert.root.cert_pem}"
-    me_ca         =  "${var.ca_cert_pem}"
-    me_cert       = "${element(tls_locally_signed_cert.server.*.cert_pem, count.index)}"
-    me_key        = "${element(tls_private_key.server.*.private_key_pem, count.index)}"
+
+    # me_ca         = "${tls_self_signed_cert.root.cert_pem}"
+    me_ca   = "${var.ca_cert_pem}"
+    me_cert = "${element(tls_locally_signed_cert.server.*.cert_pem, count.index)}"
+    me_key  = "${element(tls_private_key.server.*.private_key_pem, count.index)}"
 
     # Consul
     consul_url            = "${var.consul_url}"

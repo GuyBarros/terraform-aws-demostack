@@ -162,7 +162,6 @@ variable "awssecretkey" {
 }
 **/
 
-
 variable "instance_type_server" {
   description = "The type(size) of data servers (consul, nomad, etc)."
   default     = "r4.large"
@@ -174,15 +173,13 @@ variable "instance_type_worker" {
 }
 
 variable "ca_key_algorithm" {
-default     = ""
+  default = ""
 }
-
 
 variable "ca_private_key_pem" {
-  default     = ""
+  default = ""
 }
 
-
 variable "ca_cert_pem" {
-  default     = ""
+  default = ""
 }
