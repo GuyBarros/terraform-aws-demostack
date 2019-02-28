@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 set -e
 
-echo "==> Consul Connect Demo Setup"
+echo "==> Run Nomad Jobs"
+echo "create  demo directory"
+sudo mkdir /demostack
+
+echo "-->  Git pull Nomad Jobs"
+ cd /demostack
+ sudo git clone https://github.com/GuyBarros/nomad_jobs
 
 
-echo "--> Running MongoDB Nomad Job"
+echo "--> Running  Nomad Job"
 nomad run /demostack/nomad_jobs/nginx-pki.nomad
 nomad run /demostack/nomad_jobs/hashibo.nomad
 nomad run /demostack/nomad_jobs/orchestrators.nomad
 
 
-echo "==> Consul Connect Demo Setup is Done!"
+echo "==> Run Nomad is Done!"
 
 

@@ -50,8 +50,8 @@ data "template_file" "workers" {
     file("${path.module}/templates/workers/tools.sh"),
     file("${path.module}/templates/workers/nomad.sh"),
     file("${path.module}/templates/workers/webterminal.sh"),
-    file("${path.module}/templates/shared/connectdemo.sh"),
     file("${path.module}/templates/workers/connectdemo.sh"),
+    
   ))}"
 
   #   
@@ -158,41 +158,6 @@ resource "aws_instance" "workers" {
 
   user_data = "${element(data.template_cloudinit_config.workers.*.rendered, count.index)}"
 
-  provisioner "file" {
-    source      = "${path.module}/templates/connectdemo/"
-    destination = "/tmp/"
 
-    connection {
-      type     = "ssh"
-      user     = "${var.demo_username}"
-      password = "${var.demo_password}"
-    }
-  }
 
-  /*
-  provisioner "file" {
-    source      = "${path.module}/templates/connectdemo/mongod-replica.conf"
-    destination = "/etc/mongod.conf"
-    
-    connection {
-      type     = "ssh"
-      user     = "${var.demo_username}"
-      password = "${var.demo_password}"
-    }
-  }*/
 }
-
-/**
-
-rs.initiate({
-   _id : "demostack",
-members:   [
-    { _id: 0,  host : "10.1.1.253:27017"},
-    { _id: 1,  host : "10.1.2.208:27017"},
-    { _id: 2,  host : "10.1.1.213:27017"}
-]
- })
-
-
-*/
-

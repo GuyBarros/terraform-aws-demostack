@@ -5,6 +5,7 @@ echo "==> Nomad (server)"
 
 echo "--> Fetching"
 install_from_url "nomad" "${nomad_url}"
+sleep 10
 
 echo "--> Generating Vault token..."
 export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
