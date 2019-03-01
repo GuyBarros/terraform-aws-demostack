@@ -112,7 +112,7 @@ sudo systemctl start nomad
 sleep 2
 
 echo "--> Waiting for all Nomad servers"
-while [ "$(nomad server-members 2>&1 | grep "alive" | wc -l)" -lt "${nomad_servers}" ]; do
+while [ "$(nomad server members 2>&1 | grep "alive" | wc -l)" -lt "${nomad_servers}" ]; do
   sleep 5
 done
 
