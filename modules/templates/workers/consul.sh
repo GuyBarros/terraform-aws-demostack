@@ -11,6 +11,7 @@ sudo mkdir -p /mnt/consul
 sudo mkdir -p /etc/consul.d
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
+  "datacenter": "aws",
   "advertise_addr": "$(private_ip)",
   "advertise_addr_wan": "$(public_ip)",
   "bind_addr": "0.0.0.0",

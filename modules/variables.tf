@@ -110,9 +110,7 @@ variable "TTL" {
   default     = "240"
 }
 
-locals {
-  consul_join_tag_value = "${var.namespace}-${random_id.consul_join_tag_value.hex}"
-}
+
 
 variable "vpc_cidr_block" {
   description = "The top-level CIDR block for the VPC."
@@ -181,5 +179,22 @@ variable "ca_private_key_pem" {
 }
 
 variable "ca_cert_pem" {
+  default = ""
+}
+
+variable "consul_gossip_key"{
+  default = ""
+}
+
+variable "consul_master_token"{
+  default = ""
+}
+
+variable "consul_join_tag_value"{
+  default = ""
+}
+
+
+variable "nomad_gossip_key"{
   default = ""
 }

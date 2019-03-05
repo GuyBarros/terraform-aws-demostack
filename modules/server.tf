@@ -31,15 +31,15 @@ data "template_file" "server" {
     # Consul
     consul_url            = "${var.consul_url}"
     consul_ent_url        = "${var.consul_ent_url}"
-    consul_gossip_key     = "${base64encode(random_id.consul_gossip_key.hex)}"
+    consul_gossip_key     = "${var.consul_gossip_key}"
     consul_join_tag_key   = "ConsulJoin"
-    consul_join_tag_value = "${local.consul_join_tag_value}"
-    consul_master_token   = "${random_id.consul_master_token.hex}"
+    consul_join_tag_value = "${var.consul_join_tag_value}"
+    consul_master_token   = "${var.consul_master_token}"
     consul_servers        = "${var.servers}"
 
     # Nomad
     nomad_url        = "${var.nomad_url}"
-    nomad_gossip_key = "${base64encode(random_id.nomad_gossip_key.hex)}"
+    nomad_gossip_key = "${var.nomad_gossip_key}"
     nomad_servers    = "${var.servers}"
 
     # Nomad jobs
@@ -85,7 +85,7 @@ resource "aws_instance" "server" {
     created-by     = "${var.created-by}"
     sleep-at-night = "${var.sleep-at-night}"
     TTL            = "${var.TTL}"
-    ConsulJoin     = "${local.consul_join_tag_value}"
+    ConsulJoin     = "${var.consul_join_tag_value}"
   }
 
   user_data = "${element(data.template_cloudinit_config.server.*.rendered, count.index)}"

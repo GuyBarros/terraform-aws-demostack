@@ -16,6 +16,10 @@ enable_debug = true
 
 bind_addr = "0.0.0.0"
 
+datacenter = "aws"
+
+region = "aws"
+
 advertise {
   http = "${node_name}.node.consul:4646"
   rpc  = "${node_name}.node.consul:4647"

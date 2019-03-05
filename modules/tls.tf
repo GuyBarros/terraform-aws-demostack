@@ -166,6 +166,7 @@ resource "tls_locally_signed_cert" "workers" {
   ]
 }
 
+/*
 # Consul gossip encryption key
 resource "random_id" "consul_gossip_key" {
   byte_length = 16
@@ -185,3 +186,4 @@ resource "random_id" "consul_join_tag_value" {
 resource "random_id" "nomad_gossip_key" {
   byte_length = 16
 }
+*/

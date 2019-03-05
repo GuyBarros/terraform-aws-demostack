@@ -72,9 +72,9 @@ data "template_file" "workers" {
 
     # Consul
     consul_url            = "${var.consul_url}"
-    consul_gossip_key     = "${base64encode(random_id.consul_gossip_key.hex)}"
+   consul_gossip_key     = "${var.consul_gossip_key}"
     consul_join_tag_key   = "ConsulJoin"
-    consul_join_tag_value = "${local.consul_join_tag_value}"
+    consul_join_tag_value = "${var.consul_join_tag_value}"
 
     # Terraform
     terraform_url     = "${var.terraform_url}"

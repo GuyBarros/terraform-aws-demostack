@@ -212,3 +212,20 @@ variable "ca_private_key_pem" {
 variable "ca_cert_pem" {
   default = ""
 }
+
+variable "consul_gossip_key"{
+  default = ""
+}
+
+variable "consul_master_token"{
+  default = ""
+}
+
+variable "consul_join_tag_value"{
+  default = ""
+}
+
+
+variable "nomad_gossip_key"{
+  default = ""
+}
