@@ -25,7 +25,7 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "advertise_addr": "$(private_ip)",
   "advertise_addr_wan": "$(public_ip)",
   "bootstrap_expect": ${consul_servers},
-  "bind_addr": "$(private_ip)",
+  "bind_addr": "0.0.0.0",
   "data_dir": "/mnt/consul",
   "disable_update_check": true,
   "encrypt": "${consul_gossip_key}",
@@ -35,8 +35,8 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "retry_join": ["provider=aws tag_key=${consul_join_tag_key} tag_value=${consul_join_tag_value}"],
   "server": true,
   "addresses": {
-    "http": "127.0.0.1",
-    "https": "$(private_ip)"
+    "http": "0.0.0.0",
+    "https": "0.0.0.0"
   },
   "ports": {
     "http": 8500,
@@ -145,5 +145,7 @@ curl -so /dev/null -X PUT http://127.0.0.1:8500/v1/acl/update \
   "Rules": "key \"vault\" { policy = \"deny\" }\n\nkey \"tmp\" { policy = \"deny\" }"
 }
 BODY
+
+
 
 echo "==> Consul is done!"
