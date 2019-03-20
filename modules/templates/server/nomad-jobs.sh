@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -e
+echo "create  demo directory"
+sudo mkdir /demostack
 
 echo "==> Nomads jobs"
 
@@ -16,7 +18,7 @@ EOF
 }
 
 echo "--> HashiUI"
-sudo tee /tmp/hashi-ui.hcl > /dev/null <<"EOF"
+sudo tee /demostack/hashi-ui.hcl > /dev/null <<"EOF"
 job "hashi-ui" {
   datacenters = ["aws"]
 
@@ -71,10 +73,10 @@ job "hashi-ui" {
   }
 }
 EOF
-nomad_run /tmp/hashi-ui.hcl
+nomad_run /demostack/hashi-ui.hcl
 
 echo "--> Fabio"
-sudo tee /tmp/fabio.hcl > /dev/null <<"EOF"
+sudo tee /demostack/fabio.hcl > /dev/null <<"EOF"
 job "fabio" {
   datacenters = ["aws"]
 
@@ -128,6 +130,6 @@ job "fabio" {
   }
 }
 EOF
-nomad_run /tmp/fabio.hcl
+nomad_run /demostack/fabio.hcl
 
 echo "==> Nomad jobs submitted!"

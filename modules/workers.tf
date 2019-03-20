@@ -50,12 +50,13 @@ data "template_file" "workers" {
     file("${path.module}/templates/workers/terraform.sh"),
     file("${path.module}/templates/workers/tools.sh"),
     file("${path.module}/templates/workers/nomad.sh"),
-    file("${path.module}/templates/workers/webterminal.sh"),
     file("${path.module}/templates/workers/connectdemo.sh"),
+    file("${path.module}/templates/workers/webterminal.sh"),
+   
     
   ))}"
 
-  #   
+  #     file("${path.module}/templates/workers/connectdemo.sh"),
 
   vars {
     namespace = "${var.namespace}"

@@ -30,8 +30,12 @@ output "vault_ui" {
   value = "http://${aws_alb.vault.dns_name}"
 }
 
-output "vpc_id" {
-  value = "${aws_vpc.demostack.id}"
+output "nomad_ui" {
+  value = "http://${aws_alb.nomad.dns_name}"
+}
+
+output "consul_ui" {
+  value = "http://${aws_alb.consul.dns_name}"
 }
 
 /*

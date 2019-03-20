@@ -36,7 +36,7 @@ sudo rm -rf /etc/update-motd.d/*
 sudo tee /etc/update-motd.d/00-hashicorp > /dev/null <<"EOF"
 #!/bin/sh
 
-echo "Welcome to HashiCorp Consul Connecg Demo!"
+echo "Welcome to HashiCorp Fullstack Demo!"
 echo "this nodejs animal identity is:"
 echo ""
 echo "    ${identity}"

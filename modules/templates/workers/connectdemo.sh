@@ -14,7 +14,7 @@ echo "--> Running  Nomad Job"
 nomad run /demostack/nomad_jobs/nginx-pki.nomad
 nomad run /demostack/nomad_jobs/hashibo.nomad
 nomad run /demostack/nomad_jobs/orchestrators.nomad
-
+nomad run /demostack/nomad_jobs/catalogue-with-connect.nomad
 
 echo "==> Run Nomad is Done!"
 

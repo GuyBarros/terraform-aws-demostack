@@ -20,26 +20,17 @@ install_from_url "vault" "${vault_url}"
 echo "--> Writing configuration"
 sudo mkdir -p /etc/vault.d
 sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
-
-
 cluster_name = "${namespace}-demostack"
-
 storage "consul" {
   path = "vault/"
 }
-
 listener "tcp" {
   address       = "0.0.0.0:8200"
   tls_cert_file = "/etc/vault.d/tls/vault.crt"
   tls_key_file  = "/etc/ssl/certs/me.key"
 }
-
 api_addr = "https://$(public_ip):8200"
-
-
-
 ui = true
-
 EOF
 
 echo "--> Writing profile"
@@ -56,13 +47,11 @@ Description=Vault
 Documentation=https://www.vaultproject.io/docs/
 Requires=network-online.target
 After=network-online.target
-
 [Service]
 Restart=on-failure
 ExecStart=/usr/local/bin/vault server -config="/etc/vault.d/config.hcl"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
-
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -74,10 +63,8 @@ echo "--> Initializing vault"
 consul lock tmp/vault/lock "$(cat <<"EOF"
 set -e
 sleep 2
-
 export VAULT_ADDR="https://127.0.0.1:8200"
 export VAULT_SKIP_VERIFY=true
-
 if ! vault operator init -status >/dev/null; then
   curl \
     --silent \
@@ -85,10 +72,8 @@ if ! vault operator init -status >/dev/null; then
     --request PUT \
     --data '{"secret_shares": 1, "secret_threshold": 1}' \
     https://127.0.0.1:8200/v1/sys/init > /tmp/init
-
   cat /tmp/init | tr '\n' ' ' | jq -r .keys[0] | consul kv put service/vault/unseal-key -
   cat /tmp/init | tr '\n' ' ' | jq -r .root_token | consul kv put service/vault/root-token -
-
   # shred /tmp/unseal-key /tmp/init
 fi
 sleep 2
@@ -99,21 +84,17 @@ echo "--> Installing unseal helper"
 sudo tee /usr/local/bin/vault-unseal > /dev/null <<"EOF"
 #!/usr/bin/env bash
 set -e
-
 export VAULT_ADDR="https://127.0.0.1:8200"
 export VAULT_SKIP_VERIFY=true
-
 echo "Reading unseal key from KV"
 OUTPUT="$(consul kv get service/vault/unseal-key)"
 if [ -z "$OUTPUT" ]; then
   echo "No unseal key found!"
   exit 1
 fi
-
 echo "Unsealing Vault"
 KEY="$(consul kv get service/vault/unseal-key)"
 vault operator unseal "$KEY" &> /dev/null
-
 echo "Vault is unsealed!"
 EOF
 sudo chmod +x /usr/local/bin/vault-unseal
@@ -124,11 +105,9 @@ sudo tee /etc/systemd/system/vault-unseal.service > /dev/null <<"EOF"
 Description=Vault Unseal
 Requires=vault.service
 After=vault.service
-
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/vault-unseal
-
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -149,29 +128,22 @@ install_from_url "vault" "${vault_ent_url}"
 echo "--> Writing configuration"
 sudo mkdir -p /etc/vault.d
 sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
-
 cluster_name = "${namespace}-demostack"
-
 storage "consul" {
   path = "vault/"
 }
-
 listener "tcp" {
   address       = "0.0.0.0:8200"
   tls_cert_file = "/etc/vault.d/tls/vault.crt"
   tls_key_file  = "/etc/ssl/certs/me.key"
    tls-skip-verify = true
 }
-
 seal "awskms" {
   region = "${region}"
   kms_key_id = "${kmskey}"
 }
-
 api_addr = "https://$(public_ip):8200"
-
 ui = true
-
 EOF
 
 echo "--> Writing profile"
@@ -188,13 +160,11 @@ Description=Vault
 Documentation=https://www.vaultproject.io/docs/
 Requires=network-online.target
 After=network-online.target
-
 [Service]
 Restart=on-failure
 ExecStart=/usr/local/bin/vault server -config="/etc/vault.d/config.hcl"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
-
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -209,11 +179,8 @@ set -e
 sleep 2
 export VAULT_ADDR="https://127.0.0.1:8200"
 export VAULT_SKIP_VERIFY=true
-
 if ! vault operator init -status >/dev/null; then
   vault operator init -stored-shares=1 -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1 > /tmp/out.txt
-
-
   cat /tmp/out.txt | grep "Recovery Key 1" | sed 's/Recovery Key 1: //' | consul kv put service/vault/recovery-key -
    cat /tmp/out.txt | grep "Initial Root Token" | sed 's/Initial Root Token: //' | consul kv put service/vault/root-token -
   
@@ -229,7 +196,6 @@ export VAULT_TOKEN=$(consul kv get service/vault/root-token)
 echo "ROOT TOKEN: $VAULT_TOKEN"
 sudo systemctl enable vault
 sudo systemctl restart vault
-
 fi
 sleep 8
 EOF
@@ -254,31 +220,24 @@ echo "--> Attempting to create nomad role"
   path "auth/token/create/nomad-cluster" {
     capabilities = ["update"]
   }
-
   path "auth/token/revoke-accessor" {
     capabilities = ["update"]
   }
-
   path "auth/token/roles/nomad-cluster" {
     capabilities = ["read"]
   }
-
   path "auth/token/lookup-self" {
     capabilities = ["read"]
   }
-
   path "auth/token/lookup" {
     capabilities = ["update"]
   }
-
   path "auth/token/revoke-accessor" {
     capabilities = ["update"]
   }
-
   path "sys/capabilities-self" {
     capabilities = ["update"]
   }
-
   path "auth/token/renew-self" {
     capabilities = ["update"]
   }
@@ -317,7 +276,6 @@ vault policy-write superuser - <<EOR
 path "*" { 
   capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
   }
-
 EOR
   
 } ||

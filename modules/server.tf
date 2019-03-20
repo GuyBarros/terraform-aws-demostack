@@ -25,6 +25,7 @@ data "template_file" "server" {
     namespace     = "${var.namespace}"
     node_name     = "${var.namespace}-server-${count.index}"
 
+
     # me_ca         = "${tls_self_signed_cert.root.cert_pem}"
     me_ca   = "${var.ca_cert_pem}"
     me_cert = "${element(tls_locally_signed_cert.server.*.cert_pem, count.index)}"
