@@ -56,8 +56,11 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
     "server_stabilization_time": "10s",
     "redundancy_zone_tag": "",
     "disable_upgrade_migration": false,
-    "upgrade_version_tag": ""
+    "upgrade_version_tag": "build"
 },
+"node_meta": {
+    "build": "1.0.0"
+  },
  "connect":{
   "enabled": true,
       "proxy": {  "allow_managed_root": true  }

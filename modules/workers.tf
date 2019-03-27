@@ -61,6 +61,7 @@ data "template_file" "workers" {
   vars {
     namespace = "${var.namespace}"
     node_name = "${element(aws_iam_user.workers.*.name, count.index)}"
+    enterprise    = "${var.enterprise}"
 
     #me_ca     = "${tls_self_signed_cert.root.cert_pem}"
     me_ca   = "${var.ca_cert_pem}"
@@ -74,6 +75,7 @@ data "template_file" "workers" {
 
     # Consul
     consul_url            = "${var.consul_url}"
+    consul_ent_url        = "${var.consul_ent_url}"
    consul_gossip_key     = "${var.consul_gossip_key}"
     consul_join_tag_key   = "ConsulJoin"
     consul_join_tag_value = "${var.consul_join_tag_value}"
