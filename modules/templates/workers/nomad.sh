@@ -146,4 +146,5 @@ echo "--> Installing completions"
 sudo su ${demo_username} \
   -c 'nomad -autocomplete-install'
 
+
 echo "==> Nomad is done!"

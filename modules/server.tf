@@ -48,6 +48,7 @@ data "template_file" "server" {
     # Nomad jobs
     fabio_url   = "${var.fabio_url}"
     hashiui_url = "${var.hashiui_url}"
+    run_nomad_jobs = "${var.run_nomad_jobs}"
 
     # Vault
     vault_url        = "${var.vault_url}"

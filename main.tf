@@ -98,6 +98,7 @@ module "primarycluster" {
   cidr_blocks          = "${var.cidr_blocks}"
   instance_type_server = "${var.instance_type_server}"
   instance_type_worker = "${var.instance_type_worker}"
+  run_nomad_jobs       = "${var.run_nomad_jobs}"
 
   //  ca_key_algorithm   = "${var.ca_key_algorithm}"
   //  ca_private_key_pem = "${var.ca_private_key_pem}"

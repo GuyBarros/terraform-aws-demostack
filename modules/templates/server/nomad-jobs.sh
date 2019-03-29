@@ -73,7 +73,7 @@ job "hashi-ui" {
   }
 }
 EOF
-nomad_run /demostack/hashi-ui.hcl
+
 
 echo "--> Fabio"
 sudo tee /demostack/fabio.hcl > /dev/null <<"EOF"
@@ -130,6 +130,18 @@ job "fabio" {
   }
 }
 EOF
+
+
+
+if [ ${run_nomad_jobs} == 0 ]
+then
+echo "--> not running Nomad Jobs"
+
+
+else
+echo "--> Running"
+nomad_run /demostack/hashi-ui.hcl
 nomad_run /demostack/fabio.hcl
+fi
 
 echo "==> Nomad jobs submitted!"

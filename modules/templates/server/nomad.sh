@@ -12,7 +12,7 @@ export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
   NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
   VAULT_ADDR="https://active.vault.service.consul:8200" \
   VAULT_SKIP_VERIFY=true \
-  vault token create -field=token -policy=superuser -period=72h)"
+  vault token create -field=token -policy=superuser -policy=nomad-server -period=72h)"
 
 consul kv put service/vault/nomad-token $NOMAD_VAULT_TOKEN
 
@@ -125,7 +125,7 @@ while [ "$(nomad server members 2>&1 | grep "alive" | wc -l)" -lt "${nomad_serve
 done
 
 echo "--> Waiting for Nomad leader"
-while [ -z "$(curl -s http://${node_name}.node.consul:4646/v1/status/leader)" ]; do
+while [ -z "$(curl -s http://localhost:4646/v1/status/leader)" ]; do
   sleep 5
 done
 

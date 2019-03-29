@@ -14,116 +14,14 @@ echo "==> value of enterprise is ${enterprise}"
 
 if [ ${enterprise} == 0 ]
 then
-echo "--> Fetching"
+echo "--> Fetching Vault OSS"
 install_from_url "vault" "${vault_url}"
 
-echo "--> Writing configuration"
-sudo mkdir -p /etc/vault.d
-sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
-cluster_name = "${namespace}-demostack"
-storage "consul" {
-  path = "vault/"
-}
-listener "tcp" {
-  address       = "0.0.0.0:8200"
-  tls_cert_file = "/etc/vault.d/tls/vault.crt"
-  tls_key_file  = "/etc/ssl/certs/me.key"
-}
-api_addr = "https://$(public_ip):8200"
-ui = true
-EOF
-
-echo "--> Writing profile"
-sudo tee /etc/profile.d/vault.sh > /dev/null <<"EOF"
-alias vualt="vault"
-export VAULT_ADDR="https://active.vault.service.consul:8200"
-EOF
-source /etc/profile.d/vault.sh
-
-echo "--> Generating systemd configuration"
-sudo tee /etc/systemd/system/vault.service > /dev/null <<"EOF"
-[Unit]
-Description=Vault
-Documentation=https://www.vaultproject.io/docs/
-Requires=network-online.target
-After=network-online.target
-[Service]
-Restart=on-failure
-ExecStart=/usr/local/bin/vault server -config="/etc/vault.d/config.hcl"
-ExecReload=/bin/kill -HUP $MAINPID
-KillSignal=SIGINT
-[Install]
-WantedBy=multi-user.target
-EOF
-sudo systemctl enable vault
-sudo systemctl start vault
-sleep 8
-
-echo "--> Initializing vault"
-consul lock tmp/vault/lock "$(cat <<"EOF"
-set -e
-sleep 2
-export VAULT_ADDR="https://127.0.0.1:8200"
-export VAULT_SKIP_VERIFY=true
-if ! vault operator init -status >/dev/null; then
-  curl \
-    --silent \
-    --insecure \
-    --request PUT \
-    --data '{"secret_shares": 1, "secret_threshold": 1}' \
-    https://127.0.0.1:8200/v1/sys/init > /tmp/init
-  cat /tmp/init | tr '\n' ' ' | jq -r .keys[0] | consul kv put service/vault/unseal-key -
-  cat /tmp/init | tr '\n' ' ' | jq -r .root_token | consul kv put service/vault/root-token -
-  # shred /tmp/unseal-key /tmp/init
-fi
-sleep 2
-EOF
-)"
-
-echo "--> Installing unseal helper"
-sudo tee /usr/local/bin/vault-unseal > /dev/null <<"EOF"
-#!/usr/bin/env bash
-set -e
-export VAULT_ADDR="https://127.0.0.1:8200"
-export VAULT_SKIP_VERIFY=true
-echo "Reading unseal key from KV"
-OUTPUT="$(consul kv get service/vault/unseal-key)"
-if [ -z "$OUTPUT" ]; then
-  echo "No unseal key found!"
-  exit 1
-fi
-echo "Unsealing Vault"
-KEY="$(consul kv get service/vault/unseal-key)"
-vault operator unseal "$KEY" &> /dev/null
-echo "Vault is unsealed!"
-EOF
-sudo chmod +x /usr/local/bin/vault-unseal
-
-echo "--> Generating auto-unseal configuration"
-sudo tee /etc/systemd/system/vault-unseal.service > /dev/null <<"EOF"
-[Unit]
-Description=Vault Unseal
-Requires=vault.service
-After=vault.service
-[Service]
-Type=oneshot
-ExecStart=/usr/local/bin/vault-unseal
-[Install]
-WantedBy=multi-user.target
-EOF
-
-echo "--> Unsealing"
-sudo systemctl enable vault-unseal
-sudo systemctl start vault-unseal
-
-echo "--> Waiting for Vault leader"
-while ! host active.vault.service.consul &> /dev/null; do
-  sleep 5
-done
-
 else
-echo "--> Fetching"
+echo "--> Fetching Vault Ent"
 install_from_url "vault" "${vault_ent_url}"
+fi
+
 
 echo "--> Writing configuration"
 sudo mkdir -p /etc/vault.d
@@ -180,13 +78,13 @@ sleep 2
 export VAULT_ADDR="https://127.0.0.1:8200"
 export VAULT_SKIP_VERIFY=true
 if ! vault operator init -status >/dev/null; then
-  vault operator init -stored-shares=1 -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1 > /tmp/out.txt
+  vault operator init  -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1 > /tmp/out.txt
   cat /tmp/out.txt | grep "Recovery Key 1" | sed 's/Recovery Key 1: //' | consul kv put service/vault/recovery-key -
    cat /tmp/out.txt | grep "Initial Root Token" | sed 's/Initial Root Token: //' | consul kv put service/vault/root-token -
   
 export VAULT_TOKEN=$(consul kv get service/vault/root-token)
 echo "ROOT TOKEN: $VAULT_TOKEN"
-vault write sys/license text=${vaultlicense}
+
 sudo systemctl enable vault
 sudo systemctl restart vault
 else
@@ -202,10 +100,26 @@ EOF
 )"
 
 
+echo "--> Waiting for Vault leader"
+while ! host active.vault.service.consul &> /dev/null; do
+  sleep 5
+done
 
+
+
+if [ ${enterprise} == 0 ]
+then
+echo "--> OSS - no license necessary"
+
+else
+echo "--> Ent - Appyling License"
+export VAULT_ADDR="https://active.vault.service.consul:8200"
+export VAULT_SKIP_VERIFY=true
+export VAULT_TOKEN=$(consul kv get service/vault/root-token)
+echo "ROOT TOKEN: $VAULT_TOKEN"
+vault write sys/license text=${vaultlicense}
+echo "--> Ent - License applied"
 fi
-
-
 
 
 echo "--> Attempting to create nomad role"
@@ -244,7 +158,7 @@ echo "--> Attempting to create nomad role"
 EOR
 
   vault policy write test - <<EOR
-  path "secret/*" {
+  path "kv/*" {
     capabilities = ["create", "read", "update", "delete", "list"]
 }
 EOR
@@ -259,8 +173,17 @@ EOR
     disallowed_policies=nomad-server \
     explicit_max_ttl=0
  
+ echo "--> Mount KV in Vault"
+ {
+ vault secrets enable -version=2 kv &&
+  echo "--> KV Mounted succesfully"
+ } ||
+ {
+   echo "--> KV Already mounted, moving on"
+ }
+
  echo "--> Creating Initial secret for Nomad KV"
- vault write secret/test message='Hello world'
+  vault kv put kv/test message='Hello world'
 
  echo "--> nomad nginx-vault-pki demo prep"
 {
@@ -272,7 +195,7 @@ vault write pki/roles/consul-service generate_lease=true allowed_domains="servic
 
 vault write pki/issue/consul-service  common_name=nginx.service.consul  ttl=720h  &&
 
-vault policy-write superuser - <<EOR
+vault policy write superuser - <<EOR
 path "*" { 
   capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
   }

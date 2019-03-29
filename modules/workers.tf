@@ -51,13 +51,9 @@ data "template_file" "workers" {
     file("${path.module}/templates/workers/tools.sh"),
     file("${path.module}/templates/workers/nomad.sh"),
     file("${path.module}/templates/workers/connectdemo.sh"),
-    file("${path.module}/templates/workers/webterminal.sh"),
-   
-    
-  ))}"
+    ))}"
 
-  #     file("${path.module}/templates/workers/connectdemo.sh"),
-
+  
   vars {
     namespace = "${var.namespace}"
     node_name = "${element(aws_iam_user.workers.*.name, count.index)}"
@@ -97,6 +93,7 @@ data "template_file" "workers" {
 
     # Nomad
     nomad_url = "${var.nomad_url}"
+    run_nomad_jobs = "${var.run_nomad_jobs}"
 
     # Vault
     vault_url = "${var.vault_url}"

@@ -198,3 +198,7 @@ variable "consul_join_tag_value"{
 variable "nomad_gossip_key"{
   default = ""
 }
+
+variable "run_nomad_jobs"{
+  default = 1
+}
