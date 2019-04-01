@@ -8,7 +8,7 @@ variable "servers" {
   default     = "3"
 }
 
-variable "nomadworkers" {
+variable "workers" {
   description = "The number of nomad worker vms to create."
   default     = "3"
 }
@@ -110,8 +110,6 @@ variable "TTL" {
   default     = "240"
 }
 
-
-
 variable "vpc_cidr_block" {
   description = "The top-level CIDR block for the VPC."
   default     = "10.1.0.0/16"
@@ -182,23 +180,22 @@ variable "ca_cert_pem" {
   default = ""
 }
 
-variable "consul_gossip_key"{
+variable "consul_gossip_key" {
   default = ""
 }
 
-variable "consul_master_token"{
+variable "consul_master_token" {
   default = ""
 }
 
-variable "consul_join_tag_value"{
+variable "consul_join_tag_value" {
   default = ""
 }
 
-
-variable "nomad_gossip_key"{
+variable "nomad_gossip_key" {
   default = ""
 }
 
-variable "run_nomad_jobs"{
+variable "run_nomad_jobs" {
   default = 1
 }

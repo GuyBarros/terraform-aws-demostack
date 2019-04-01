@@ -34,7 +34,7 @@ resource "aws_alb_target_group" "nomad" {
 resource "aws_alb_listener" "nomad" {
   load_balancer_arn = "${aws_alb.nomad.arn}"
 
-  port     = "80"
+  port     = "4646"
   protocol = "HTTP"
 
   default_action {

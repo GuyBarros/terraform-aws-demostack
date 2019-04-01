@@ -50,7 +50,7 @@ resource "aws_alb_target_group" "fabio-ui" {
 resource "aws_alb_listener" "fabio" {
   load_balancer_arn = "${aws_alb.fabio.arn}"
 
-  port     = "80"
+  port     = "9999"
   protocol = "HTTP"
 
   default_action {
@@ -72,14 +72,14 @@ resource "aws_alb_listener" "fabio-ui" {
 }
 
 resource "aws_alb_target_group_attachment" "fabio" {
-  count            = "${var.nomadworkers}"
+  count            = "${var.workers}"
   target_group_arn = "${aws_alb_target_group.fabio.arn}"
   target_id        = "${element(aws_instance.workers.*.id, count.index)}"
   port             = "9999"
 }
 
 resource "aws_alb_target_group_attachment" "fabio-ui" {
-  count            = "${var.nomadworkers}"
+  count            = "${var.workers}"
   target_group_arn = "${aws_alb_target_group.fabio-ui.arn}"
   target_id        = "${element(aws_instance.workers.*.id, count.index)}"
   port             = "9998"

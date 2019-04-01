@@ -34,7 +34,7 @@ resource "aws_alb_target_group" "vault" {
 resource "aws_alb_listener" "vault" {
   load_balancer_arn = "${aws_alb.vault.arn}"
 
-  port     = "80"
+  port     = "8200"
   protocol = "HTTP"
 
   default_action {

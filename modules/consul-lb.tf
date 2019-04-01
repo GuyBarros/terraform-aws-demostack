@@ -34,7 +34,7 @@ resource "aws_alb_target_group" "consul" {
 resource "aws_alb_listener" "consul" {
   load_balancer_arn = "${aws_alb.consul.arn}"
 
-  port     = "80"
+  port     = "8500"
   protocol = "HTTP"
 
   default_action {

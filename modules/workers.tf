@@ -1,17 +1,17 @@
 resource "aws_iam_user" "workers" {
-  count = "${var.nomadworkers}"
+  count = "${var.workers}"
 
   name = "${var.namespace}-workers-${count.index}"
   path = "/${var.namespace}/"
 }
 
 resource "aws_iam_access_key" "workers" {
-  count = "${var.nomadworkers}"
+  count = "${var.workers}"
   user  = "${element(aws_iam_user.workers.*.name, count.index)}"
 }
 
 data "template_file" "workers_iam_policy" {
-  count    = "${var.nomadworkers}"
+  count    = "${var.workers}"
   template = "${file("${path.module}/templates/policies/iam_policy.json.tpl")}"
 
   vars {
@@ -29,14 +29,14 @@ data "template_file" "workers_iam_policy" {
 # specific instance provided it has their authorization tag, deleting instances
 # they have created, and describing instance data.
 resource "aws_iam_user_policy" "workers" {
-  count  = "${var.nomadworkers}"
+  count  = "${var.workers}"
   name   = "${var.namespace}-workers-${count.index}"
   user   = "${element(aws_iam_user.workers.*.name, count.index)}"
   policy = "${element(data.template_file.workers_iam_policy.*.rendered, count.index)}"
 }
 
 data "template_file" "workers" {
-  count = "${var.nomadworkers}"
+  count = "${var.workers}"
 
   template = "${join("\n", list(
     file("${path.module}/templates/shared/base.sh"),
@@ -53,11 +53,10 @@ data "template_file" "workers" {
     file("${path.module}/templates/workers/connectdemo.sh"),
     ))}"
 
-  
   vars {
-    namespace = "${var.namespace}"
-    node_name = "${element(aws_iam_user.workers.*.name, count.index)}"
-    enterprise    = "${var.enterprise}"
+    namespace  = "${var.namespace}"
+    node_name  = "${element(aws_iam_user.workers.*.name, count.index)}"
+    enterprise = "${var.enterprise}"
 
     #me_ca     = "${tls_self_signed_cert.root.cert_pem}"
     me_ca   = "${var.ca_cert_pem}"
@@ -72,7 +71,7 @@ data "template_file" "workers" {
     # Consul
     consul_url            = "${var.consul_url}"
     consul_ent_url        = "${var.consul_ent_url}"
-   consul_gossip_key     = "${var.consul_gossip_key}"
+    consul_gossip_key     = "${var.consul_gossip_key}"
     consul_join_tag_key   = "ConsulJoin"
     consul_join_tag_value = "${var.consul_join_tag_value}"
 
@@ -92,17 +91,20 @@ data "template_file" "workers" {
     sentinel_url        = "${var.sentinel_url}"
 
     # Nomad
-    nomad_url = "${var.nomad_url}"
+    nomad_url      = "${var.nomad_url}"
     run_nomad_jobs = "${var.run_nomad_jobs}"
 
     # Vault
-    vault_url = "${var.vault_url}"
+    vault_url        = "${var.vault_url}"
+    vault_ent_url    = "${var.vault_ent_url}"
+    vault_root_token = "${random_id.vault-root-token.hex}"
+    vault_servers    = "${var.workers}"
   }
 }
 
 # Gzip cloud-init config
 data "template_cloudinit_config" "workers" {
-  count = "${var.nomadworkers}"
+  count = "${var.workers}"
 
   gzip          = true
   base64_encode = true
@@ -115,33 +117,33 @@ data "template_cloudinit_config" "workers" {
 
 # IAM
 resource "aws_iam_role" "workers" {
-  count              = "${var.nomadworkers}"
+  count              = "${var.workers}"
   name               = "${var.namespace}-workers-${count.index}"
   assume_role_policy = "${file("${path.module}/templates/policies/assume-role.json")}"
 }
 
 resource "aws_iam_policy" "workers" {
-  count       = "${var.nomadworkers}"
+  count       = "${var.workers}"
   name        = "${var.namespace}-workers-${count.index}"
   description = "Allows user ${element(aws_iam_user.workers.*.name, count.index)} to use their workers server."
   policy      = "${element(data.template_file.workers_iam_policy.*.rendered, count.index)}"
 }
 
 resource "aws_iam_policy_attachment" "workers" {
-  count      = "${var.nomadworkers}"
+  count      = "${var.workers}"
   name       = "${var.namespace}-workers-${count.index}"
   roles      = ["${element(aws_iam_role.workers.*.name, count.index)}"]
   policy_arn = "${element(aws_iam_policy.workers.*.arn, count.index)}"
 }
 
 resource "aws_iam_instance_profile" "workers" {
-  count = "${var.nomadworkers}"
+  count = "${var.workers}"
   name  = "${var.namespace}-workers-${count.index}"
   role  = "${element(aws_iam_role.workers.*.name, count.index)}"
 }
 
 resource "aws_instance" "workers" {
-  count = "${var.nomadworkers}"
+  count = "${var.workers}"
 
   ami           = "${data.aws_ami.ubuntu.id}"
   instance_type = "${var.instance_type_worker}"
@@ -158,7 +160,4 @@ resource "aws_instance" "workers" {
   }
 
   user_data = "${element(data.template_cloudinit_config.workers.*.rendered, count.index)}"
-
-
-
 }

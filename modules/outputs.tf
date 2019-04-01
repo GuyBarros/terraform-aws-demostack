@@ -14,28 +14,24 @@ output "nomad_workers_ui" {
   value = "${formatlist("http://%s:3000/", aws_instance.workers.*.public_dns)}"
 }
 
+output "hashi_ui" {
+  value = "http://${aws_instance.workers.0.public_dns}:3000"
+}
+
 output "fabio_lb" {
-  value = "${aws_alb.fabio.dns_name}"
-}
-
-output "vault_root_token" {
-  value = "${random_id.vault-root-token.hex}"
-}
-
-output "vault_lb" {
-  value = "${aws_alb.vault.dns_name}"
+  value = "http://${aws_alb.fabio.dns_name}:9999"
 }
 
 output "vault_ui" {
-  value = "http://${aws_alb.vault.dns_name}"
+  value = "http://${aws_alb.vault.dns_name}:8200"
 }
 
 output "nomad_ui" {
-  value = "http://${aws_alb.nomad.dns_name}"
+  value = "http://${aws_alb.nomad.dns_name}:4646"
 }
 
 output "consul_ui" {
-  value = "http://${aws_alb.consul.dns_name}"
+  value = "http://${aws_alb.consul.dns_name}:8500"
 }
 
 /*

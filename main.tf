@@ -1,12 +1,12 @@
-
 //--------------------------EMEA-SE_PLAYGROUND------------------------------------------
 # Using a single workspace:
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
     organization = "emea-se-playground"
+
     workspaces {
-      name = "Guy-TFE-Remote-Backend"
+      name = "Guy-AWS-Demostack"
     }
   }
 }
@@ -74,7 +74,7 @@ module "primarycluster" {
   demo_username        = "${var.demo_username}"
   demo_password        = "${var.demo_password}"
   servers              = "${var.servers}"
-  nomadworkers         = "${var.nomadworkers}"
+  workers              = "${var.workers}"
   vaultlicense         = "${var.vaultlicense}"
   consullicense        = "${var.consullicense}"
   enterprise           = "${var.enterprise}"
@@ -103,16 +103,17 @@ module "primarycluster" {
   //  ca_key_algorithm   = "${var.ca_key_algorithm}"
   //  ca_private_key_pem = "${var.ca_private_key_pem}"
   //  ca_cert_pem        = "${var.ca_cert_pem}"
-  
- # EMEA-SE-PLAYGROUND
-  ca_key_algorithm = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_key_algorithm}"
-  ca_private_key_pem = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_private_key_pem}"
-  ca_cert_pem        = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_cert_pem}"
+
+  # EMEA-SE-PLAYGROUND
+  ca_key_algorithm      = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_key_algorithm}"
+  ca_private_key_pem    = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_private_key_pem}"
+  ca_cert_pem           = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_cert_pem}"
   consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.emea_se_playground_tls_root_certificate.consul_join_tag_value}"
-  consul_gossip_key = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.consul_gossip_key}"
-  consul_master_token = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.consul_master_token}"
-  nomad_gossip_key = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.nomad_gossip_key}"
-/*
+  consul_gossip_key     = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.consul_gossip_key}"
+  consul_master_token   = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.consul_master_token}"
+  nomad_gossip_key      = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.nomad_gossip_key}"
+
+  /*
 
 # NOMAD-TASKFORCE
 ca_key_algorithm = "${data.terraform_remote_state.nomad_taskforce_tls_root_certificate.ca_key_algorithm}"
@@ -125,7 +126,6 @@ ca_key_algorithm = "${data.terraform_remote_state.nomad_taskforce_tls_root_certi
 */
 }
 
-
 /*
 module "secondarycluster" {
   source              = "./modules"
@@ -136,7 +136,7 @@ module "secondarycluster" {
   demo_username       = "${var.demo_username}"
   demo_password       = "${var.demo_password}"
   servers             = "${var.servers}"
-  nomadworkers        = "${var.nomadworkers}"
+  workers        = "${var.workers}"
   vaultlicense        = "${var.vaultlicense}"
   consullicense       = "${var.consullicense}"
   enterprise          = "${var.enterprise}"

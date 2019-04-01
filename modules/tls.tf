@@ -104,14 +104,14 @@ resource "random_id" "vault-root-token" {
 # Client private key
 
 resource "tls_private_key" "workers" {
-  count       = "${var.nomadworkers}"
+  count       = "${var.workers}"
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
 }
 
 # Client signing request
 resource "tls_cert_request" "workers" {
-  count           = "${var.nomadworkers}"
+  count           = "${var.workers}"
   key_algorithm   = "${element(tls_private_key.workers.*.algorithm, count.index)}"
   private_key_pem = "${element(tls_private_key.workers.*.private_key_pem, count.index)}"
 
@@ -144,7 +144,7 @@ resource "tls_cert_request" "workers" {
 # Client certificate
 
 resource "tls_locally_signed_cert" "workers" {
-  count            = "${var.nomadworkers}"
+  count            = "${var.workers}"
   cert_request_pem = "${element(tls_cert_request.workers.*.cert_request_pem, count.index)}"
 
   # ca_key_algorithm   = "${tls_private_key.root.algorithm}"
@@ -187,3 +187,4 @@ resource "random_id" "nomad_gossip_key" {
   byte_length = 16
 }
 */
+
