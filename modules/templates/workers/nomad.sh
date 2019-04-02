@@ -16,9 +16,9 @@ enable_debug = true
 
 bind_addr = "0.0.0.0"
 
-datacenter = "aws"
+datacenter = "${region}"
 
-region = "eu"
+region = "aws"
 
 
 
@@ -107,7 +107,7 @@ sudo mkdir -p /workstation/nomad
 echo "--> Creating http-echo"
 sudo tee /workstation/nomad/http-echo.nomad > /dev/null <<"EOF"
 job "http-echo-${node_name}" {
-  datacenters = ["dc1"]
+  datacenters = ["${region}"]
 
   group "echo" {
     task "server" {
