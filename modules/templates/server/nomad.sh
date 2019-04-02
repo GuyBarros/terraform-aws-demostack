@@ -27,9 +27,9 @@ enable_debug = true
 bind_addr = "0.0.0.0"
 
 
-datacenter = "aws"
+datacenter = "${region}"
 
-region = "eu"
+region = "aws"
 
 
 

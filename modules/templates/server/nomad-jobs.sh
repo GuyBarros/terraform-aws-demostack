@@ -20,7 +20,7 @@ EOF
 echo "--> HashiUI"
 sudo tee /demostack/hashi-ui.hcl > /dev/null <<"EOF"
 job "hashi-ui" {
-  datacenters = ["aws"]
+  datacenters = ["${region}"]
 
   type     = "system"
   priority = 75
@@ -78,7 +78,7 @@ EOF
 echo "--> Fabio"
 sudo tee /demostack/fabio.hcl > /dev/null <<"EOF"
 job "fabio" {
-  datacenters = ["aws"]
+  datacenters = ["${region}"]
 
   type     = "system"
   priority = 75

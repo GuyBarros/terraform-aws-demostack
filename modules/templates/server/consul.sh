@@ -17,8 +17,8 @@ sudo mkdir -p /mnt/consul
 sudo mkdir -p /etc/consul.d
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
-  "datacenter": "aws",
-  "acl_datacenter": "aws",
+  "datacenter": "${region}",
+  "acl_datacenter": "${region}",
   "acl_master_token": "${consul_master_token}",
   "acl_token": "${consul_master_token}",
   "acl_default_policy": "allow",
