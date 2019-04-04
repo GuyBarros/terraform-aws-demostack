@@ -160,6 +160,10 @@ echo "--> Attempting to create nomad role"
     capabilities = ["create", "read", "update", "delete", "list"]
 }
 
+path "pki/*" {
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+}
+
 EOR
 
   vault policy write test - <<EOR
@@ -210,6 +214,11 @@ path "*" {
 }
 
 path "kv/test/*" {
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+}
+
+
+path "pki/*" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
 }
 EOR
