@@ -6,7 +6,7 @@ terraform {
     organization = "rgustafsson"
 
     workspaces {
-      name = "AWS-Demostack"
+      name = "Guy-AWS-Demostack"
     }
   }
 }
@@ -17,7 +17,7 @@ data "terraform_remote_state" "emea_se_playground_tls_root_certificate" {
 
   config {
     hostname     = "app.terraform.io"
-    organization = "emea-se-playground"
+    organization = "rgustafsson"
 
     workspaces {
       name = "tls-root-certificate"
