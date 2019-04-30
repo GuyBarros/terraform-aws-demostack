@@ -3,10 +3,10 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "emea-se-playground"
+    organization = "rgustafsson"
 
     workspaces {
-      name = "Guy-AWS-Demostack"
+      name = "AWS-Demostack"
     }
   }
 }
