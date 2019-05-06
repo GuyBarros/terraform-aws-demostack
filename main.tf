@@ -6,7 +6,7 @@ terraform {
     organization = "rgustafsson"
 
     workspaces {
-      name = "Guy-AWS-Demostack"
+      name = "rgustafsson-AWS-Demostack"
     }
   }
 }
@@ -33,10 +33,10 @@ terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
     organization = "nomad_taskforce"
-    
+
 
     workspaces {
-      name = "Guy-AWS-Demostack"
+      name = "rgustafsson-AWS-Demostack"
     }
   }
 }
@@ -172,4 +172,3 @@ ca_key_algorithm = "${data.terraform_remote_state.emea_se_playground_tls_root_ce
   nomad_gossip_key = "${data.terraform_remote_state.emea_se_playground_tls_root_certificate.nomad_gossip_key}"
 }
 */
-
