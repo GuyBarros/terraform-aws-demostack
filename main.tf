@@ -3,11 +3,8 @@
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
-    organization = "emea-se-playground-2019"
-
     workspaces {
-      name = "Guy-AWS-Demostack"
-    }
+      name = "Andre-AWS-Demostack"
   }
 }
 
@@ -18,7 +15,38 @@ data "terraform_remote_state" "emea_se_playground_tls_root_certificate" {
   config = {
     hostname     = "app.terraform.io"
     organization = "emea-se-playground-2019"
-    workspaces = {
+
+    workspaces {
+      name = "tls-root-certificate"
+    }
+  } //config
+}
+
+/*
+//--------------------------------------------------------------------
+//--------------------------NOMAD-TASKFORCE------------------------------------------
+# Using a single workspace:
+terraform {
+  backend "remote" {
+    hostname     = "app.terraform.io"
+    organization = "nomad_taskforce"
+    
+
+    workspaces {
+      name = "Guy-AWS-Demostack"
+    }
+  }
+}
+
+// Workspace Data
+data "terraform_remote_state" "nomad_taskforce_tls_root_certificate" {
+  backend = "remote"
+
+  config {
+    hostname     = "app.terraform.io"
+    organization = "nomad_taskforce"
+
+    workspaces {
       name = "tls-root-certificate"
     }
   } //config
