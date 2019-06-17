@@ -3,6 +3,9 @@ set -e
 
 echo "==> Base"
 
+echo "==> libc6 issue workaround"
+echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
+
 function install_from_url {
   cd /tmp && {
     curl -sfLo "$${1}.zip" "$${2}"

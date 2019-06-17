@@ -13,7 +13,7 @@ data "template_file" "server" {
     file("${path.module}/templates/shared/cleanup.sh"),
   ))}"
 
-  vars {
+  vars = {
     //  awsaccesskey  = "${var.awsaccesskey}"
     //  awssecretkey  = "${var.awssecretkey}"
     region = "${var.region}"
@@ -82,7 +82,7 @@ resource "aws_instance" "server" {
   iam_instance_profile   = "${aws_iam_instance_profile.consul-join.name}"
   vpc_security_group_ids = ["${aws_security_group.demostack.id}"]
 
-  tags {
+  tags = {
     Name           = "${var.namespace}-server-${count.index}"
     owner          = "${var.owner}"
     created-by     = "${var.created-by}"

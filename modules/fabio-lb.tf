@@ -1,10 +1,10 @@
 resource "aws_alb" "fabio" {
   name = "${var.namespace}-fabio"
 
-  security_groups = ["${aws_security_group.demostack.id}"]
-  subnets         = ["${aws_subnet.demostack.*.id}"]
+  security_groups = [aws_security_group.demostack.id]
+  subnets         = aws_subnet.demostack.*.id
 
-  tags {
+  tags = {
     Name           = "${var.namespace}-fabio"
     owner          = "${var.owner}"
     created-by     = "${var.created-by}"

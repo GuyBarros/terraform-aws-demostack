@@ -27,7 +27,7 @@ resource "aws_vpc" "demostack" {
   cidr_block           = "${var.vpc_cidr_block}"
   enable_dns_hostnames = true
 
-  tags {
+  tags = {
     Name           = "${var.namespace}"
     owner          = "${var.owner}"
     created-by     = "${var.created-by}"
@@ -39,7 +39,7 @@ resource "aws_vpc" "demostack" {
 resource "aws_internet_gateway" "demostack" {
   vpc_id = "${aws_vpc.demostack.id}"
 
-  tags {
+  tags = {
     Name           = "${var.namespace}"
     owner          = "${var.owner}"
     created-by     = "${var.created-by}"
@@ -63,7 +63,7 @@ resource "aws_subnet" "demostack" {
   cidr_block              = "${var.cidr_blocks[count.index]}"
   map_public_ip_on_launch = true
 
-  tags {
+  tags = {
     Name           = "${var.namespace}"
     owner          = "${var.owner}"
     created-by     = "${var.created-by}"
@@ -116,7 +116,7 @@ resource "aws_kms_key" "demostackVaultKeys" {
   description             = "KMS for the Consul Demo Vault"
   deletion_window_in_days = 10
 
-  tags {
+  tags = {
     Name           = "${var.namespace}"
     owner          = "${var.owner}"
     created-by     = "${var.created-by}"

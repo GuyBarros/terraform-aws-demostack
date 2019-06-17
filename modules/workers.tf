@@ -14,7 +14,7 @@ data "template_file" "workers_iam_policy" {
   count    = "${var.workers}"
   template = "${file("${path.module}/templates/policies/iam_policy.json.tpl")}"
 
-  vars {
+  vars = {
     identity          = "${element(aws_iam_user.workers.*.name, count.index)}"
     region            = "${var.region}"
     owner_id          = "${aws_security_group.demostack.owner_id}"
@@ -53,7 +53,7 @@ data "template_file" "workers" {
     file("${path.module}/templates/workers/connectdemo.sh"),
     ))}"
 
-  vars {
+  vars = {
     namespace  = "${var.namespace}"
     node_name  = "${element(aws_iam_user.workers.*.name, count.index)}"
     enterprise = "${var.enterprise}"
@@ -153,7 +153,7 @@ resource "aws_instance" "workers" {
   iam_instance_profile   = "${element(aws_iam_instance_profile.workers.*.name, count.index)}"
   vpc_security_group_ids = ["${aws_security_group.demostack.id}"]
 
-  tags {
+  tags = {
     Name       = "${var.namespace}-workers-${count.index}"
     owner      = "${var.owner}"
     created-by = "${var.created-by}"
