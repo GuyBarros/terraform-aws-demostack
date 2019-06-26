@@ -165,7 +165,7 @@ variable "instance_type_server" {
 
 variable "instance_type_worker" {
   description = "The type(size) of data servers (consul, nomad, etc)."
-  default     = "t2.medium"
+  default     = "t2.xlarge"
 }
 
 variable "ca_key_algorithm" {

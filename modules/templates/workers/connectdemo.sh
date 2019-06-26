@@ -40,7 +40,6 @@ sleep 180
 echo "--> Running  Nomad Job"
 
  nomad run /demostack/nomad_jobs/hashibo.nomad
- nomad run /demostack/nomad_jobs/orchestrators.nomad
  nomad run /demostack/nomad_jobs/catalogue-with-connect.nomad
  nomad run /demostack/nomad_jobs/nginx-pki.nomad
 
