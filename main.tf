@@ -56,19 +56,14 @@ data "terraform_remote_state" "nomad_taskforce_tls_root_certificate" {
 
 //--------------------------------------------------------------------
 
-
-
 provider "aws" {
-     alias  = "aws-assume"
-     assume_role {
-        role_arn     = "arn:aws:iam::753646501470:role/Administrator_Role"
-     }
-      region  = "${var.primary_region}"
- }
+  version = ">= 1.20.0"
+  region  = "${var.primary_region}"
+}
 
 module "primarycluster" {
   source = "./modules"
-  provider = "aws.aws-assume"
+
   #source              = "github.com/GuyBarros/terraform-aws-demostack"
   owner                = "${var.owner}"
   region               = "${var.primary_region}"
