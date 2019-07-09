@@ -56,10 +56,15 @@ data "terraform_remote_state" "nomad_taskforce_tls_root_certificate" {
 
 //--------------------------------------------------------------------
 
+
+
 provider "aws" {
-  version = ">= 1.20.0"
-  region  = var.primary_region
-}
+     alias  = "aws-assume"
+     assume_role {
+        role_arn     = "arn:aws:iam::753646501470:role/Administrator_Role"
+     }
+      region  = "${var.primary_region}"
+ }
 
 module "primarycluster" {
   source = "./modules"
