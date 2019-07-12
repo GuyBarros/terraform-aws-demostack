@@ -18,7 +18,7 @@ data "terraform_remote_state" "emea_se_playground_tls_root_certificate" {
     hostname     = "app.terraform.io"
     organization = "emea-se-playground-2019"
 
-    workspaces {
+    workspaces = {
       name = "tls-root-certificate"
     }
   } //config
