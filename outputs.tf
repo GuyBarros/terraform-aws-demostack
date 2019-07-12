@@ -3,34 +3,29 @@ output "Primary_Consul" {
   value = module.primarycluster.consul_ui
 }
 
-output "Primary_Nomad" {
-  value = module.primarycluster.nomad_ui
+output "Consul" {
+  value = "${module.primarycluster.consul_ui}"
+}
+output "Nomad" {
+  value = "${module.primarycluster.nomad_ui}"
 }
 
-output "Primary_Vault" {
-  value = module.primarycluster.vault_ui
+output "Vault" {
+  value = "${module.primarycluster.vault_ui}"
 }
 
-output "Primary_Fabio" {
-  value = module.primarycluster.fabio_lb
+output "Fabio" {
+  value = "${module.primarycluster.fabio_lb}"
+}
+output "Hashi UI" {
+  value = "${module.primarycluster.hashi_ui}"
 }
 
-output "Primary_Hashi_UI" {
-  value = module.primarycluster.hashi_ui
+output "ssh into Worked Nodes" {
+  value = ["${module.primarycluster.ssh_for_workers}"]
 }
-
-output "Primary_ssh_Worked_Nodes" {
-  value = [module.primarycluster.ssh_for_workers]
-}
-
-output "Primary_ssh_Server_nodes" {
-  value = [module.primarycluster.ssh_for_servers]
-}
-
-// Secondary
-
-output "Secondary_Consul" {
-  value = module.secondarycluster.consul_ui
+output "ssh into Server nodes" {
+  value = ["${module.primarycluster.ssh_for_servers}"]
 }
 
 output "Secondary_Nomad" {
