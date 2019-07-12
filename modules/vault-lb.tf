@@ -1,8 +1,8 @@
 resource "aws_alb" "vault" {
   name = "${var.namespace}-vault"
 
-  security_groups = [aws_security_group.demostack.id]
-  subnets         = aws_subnet.demostack.*.id
+  security_groups = ["${aws_security_group.demostack.id}"]
+  subnets         = "${aws_subnet.demostack.*.id}"
 
   tags = {
     Name           = "${var.namespace}-vault"
