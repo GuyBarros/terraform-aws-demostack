@@ -17,14 +17,14 @@ output "Vault" {
 output "Fabio" {
   value = "${module.primarycluster.fabio_lb}"
 }
-output "Hashi UI" {
+output "Hashi_UI" {
   value = "${module.primarycluster.hashi_ui}"
 }
 
-output "ssh into Worked Nodes" {
+output "ssh_into_Worker_Nodes" {
   value = ["${module.primarycluster.ssh_for_workers}"]
 }
-output "ssh into Server nodes" {
+output "ssh_into_Server_nodes" {
   value = ["${module.primarycluster.ssh_for_servers}"]
 }
 
