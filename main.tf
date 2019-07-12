@@ -106,7 +106,7 @@ module "primarycluster" {
   ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_key_algorithm
   ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_private_key_pem
   ca_cert_pem           = data.terraform_remote_state.emea_se_playground_tls_root_certificate.ca_cert_pem
-  consul_join_tag_value = join("-"var.namespace,data.terraform_remote_state.emea_se_playground_tls_root_certificate.consul_join_tag_value)
+  consul_join_tag_value = join("-",[var.namespace,data.terraform_remote_state.emea_se_playground_tls_root_certificate.consul_join_tag_value])
   consul_gossip_key     = data.terraform_remote_state.emea_se_playground_tls_root_certificate.consul_gossip_key
   consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.consul_master_token
   nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.nomad_gossip_key
