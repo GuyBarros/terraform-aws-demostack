@@ -4,30 +4,34 @@ output "Primary_Consul" {
 }
 
 output "Consul" {
-  value = "${module.primarycluster.consul_ui}"
+  value = module.primarycluster.consul_ui
 }
+
 output "Nomad" {
-  value = "${module.primarycluster.nomad_ui}"
+  value = module.primarycluster.nomad_ui
 }
 
 output "Vault" {
-  value = "${module.primarycluster.vault_ui}"
+  value = module.primarycluster.vault_ui
 }
 
 output "Fabio" {
-  value = "${module.primarycluster.fabio_lb}"
+  value = module.primarycluster.fabio_lb
 }
+
 output "Hashi_UI" {
-  value = "${module.primarycluster.hashi_ui}"
+  value = module.primarycluster.hashi_ui
 }
 
 output "ssh_into_Worker_Nodes" {
-  value = ["${module.primarycluster.ssh_for_workers}"]
-}
-output "ssh_into_Server_nodes" {
-  value = ["${module.primarycluster.ssh_for_servers}"]
+  value = [module.primarycluster.ssh_for_workers]
 }
 
+output "ssh_into_Server_nodes" {
+  value = [module.primarycluster.ssh_for_servers]
+}
+
+<<<<<<< HEAD
 output "Secondary_Nomad" {
   value = module.secondarycluster.nomad_ui
 }
@@ -39,6 +43,10 @@ output "Secondary_Vault" {
 output "Secondary_Fabio" {
   value = module.secondarycluster.fabio_lb
 }
+=======
+// Secondary
+/*
+>>>>>>> block format change for tf0.12
 
 output "Secondary_Hashi_UI" {
   value = module.secondarycluster.hashi_ui
