@@ -18,7 +18,7 @@ bind_addr = "0.0.0.0"
 
 datacenter = "${region}"
 
-region = "aws"
+region = "global"
 
 
 
