@@ -68,6 +68,7 @@ ssh-apt install \
   vim \
   wget \
   tree \
+  python3-pip \
   &>/dev/null
 
 echo "--> Installing git secrets"
