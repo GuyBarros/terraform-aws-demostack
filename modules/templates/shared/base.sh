@@ -69,6 +69,7 @@ ssh-apt install \
   wget \
   tree \
   python3-pip \
+  ruby-full \
   &>/dev/null
 
 echo "--> Installing git secrets"

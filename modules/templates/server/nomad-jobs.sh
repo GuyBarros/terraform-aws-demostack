@@ -20,7 +20,7 @@ EOF
 echo "--> HashiUI"
 sudo tee /demostack/hashi-ui.hcl > /dev/null <<"EOF"
 job "hashi-ui" {
-  region = "aws"
+ region = "global"
   datacenters = ["${region}"]
 
   type     = "system"

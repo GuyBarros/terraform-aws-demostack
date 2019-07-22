@@ -18,7 +18,6 @@ sudo mkdir -p /etc/consul.d
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
-  "acl_datacenter": "${region}",
   "acl_master_token": "${consul_master_token}",
   "acl_token": "${consul_master_token}",
   "acl_default_policy": "allow",
@@ -34,20 +33,26 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "raft_protocol": 3,
   "retry_join": ["provider=aws tag_key=${consul_join_tag_key} tag_value=${consul_join_tag_value}"],
   "server": true,
+ 
   "addresses": {
     "http": "0.0.0.0",
-    "https": "0.0.0.0"
+    "https": "0.0.0.0",
+    "gRPC": "0.0.0.0"
   },
   "ports": {
     "http": 8500,
-    "https": 8533
+    "https": 8501,
+    "gRPC": 8502
   },
   "key_file": "/etc/ssl/certs/me.key",
   "cert_file": "/etc/ssl/certs/me.crt",
   "ca_file": "/usr/local/share/ca-certificates/01-me.crt",
-  "verify_incoming": false,
+  "verify_incoming": true,
   "verify_outgoing": false,
   "verify_server_hostname": false,
+   "auto_encrypt": {
+    "allow_tls": true
+  },
   "ui": true,
   "autopilot": {
     "cleanup_dead_servers": true,
@@ -63,7 +68,7 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   },
  "connect":{
   "enabled": true,
-      "proxy": {  "allow_managed_root": true  }
+  "ca_provider" : "consul"
       }
 }
 EOF
