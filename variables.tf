@@ -5,13 +5,33 @@ variable "region" {
 
 variable "namespace" {
   description = <<EOH
-The namespace to create the virtual training lab. This should describe the
-training and must be unique to all current trainings. IAM users, workstations,
-and resources will be scoped under this namespace.
+this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
+EOH
+  default = "primarystack"
+}
+
+variable "primary_namespace" {
+    description = <<EOH
+this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
 EOH
 
+default = "primarystack"
+}
 
-  default = "primaryconnectdemo"
+variable "secondary_namespace" {
+  description = <<EOH
+this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
+EOH
+
+default = "secondarystack"
+}
+
+variable "tertiary_namespace" {
+  description = <<EOH
+this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
+EOH
+
+default = "tertiarystack"
 }
 
 variable "primary_region" {
@@ -23,6 +43,12 @@ variable "secondary_region" {
   description = "The region to create resources."
   default = "eu-west-2"
 }
+
+variable "tertiary_region" {
+  description = "The region to create resources."
+  default = "ap-northeast-1"
+}
+
 
 variable "servers" {
   description = "The number of data servers (consul, nomad, etc)."
@@ -99,33 +125,6 @@ variable "vault_ent_url" {
   default = "https://s3-us-west-2.amazonaws.com/hc-enterprise-binaries/vault/ent/0.11.1/vault-enterprise_0.11.1%2Bent_linux_amd64.zip"
 }
 
-variable "primary_namespace" {
-  description = <<EOH
-The namespace to create the virtual training lab. This should describe the
-training and must be unique to all current trainings. IAM users, workstations,
-and resources will be scoped under this namespace.
-
-It is best if you add this to your .tfvars file so you do not need to type
-it manually with each run
-EOH
-
-
-default = "primaryconnectdemo"
-}
-
-variable "secondary_namespace" {
-description = <<EOH
-The namespace to create the virtual training lab. This should describe the
-training and must be unique to all current trainings. IAM users, workstations,
-and resources will be scoped under this namespace.
-
-It is best if you add this to your .tfvars file so you do not need to type
-it manually with each run
-EOH
-
-
-default = "secondaryconnectdemo"
-}
 
 variable "owner" {
 description = "IAM user responsible for lifecycle of cloud resources used for training"

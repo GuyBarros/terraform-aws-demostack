@@ -70,6 +70,7 @@ ssh-apt install \
   tree \
   python3-pip \
   ruby-full \
+  npm \
   &>/dev/null
 
 echo "--> Installing git secrets"

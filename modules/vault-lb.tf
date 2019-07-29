@@ -26,7 +26,7 @@ resource "aws_alb_target_group" "vault" {
     path              = "/v1/sys/health"
     port              = "8200"
     protocol          = "HTTPS"
-    matcher           = "200,429"
+    matcher           = "200,472,473"
     healthy_threshold = 2
   }
 }

@@ -1,66 +1,89 @@
 // Primary
-
-output "Consul" {
+output "Primary_Consul" {
   value = module.primarycluster.consul_ui
 }
 
-output "Nomad" {
+output "Primary_Nomad" {
   value = module.primarycluster.nomad_ui
 }
 
-output "Vault" {
+output "Primary_Vault" {
   value = module.primarycluster.vault_ui
 }
 
-output "Fabio" {
+output "Primary_Fabio" {
   value = module.primarycluster.fabio_lb
 }
 
-output "Hashi_UI" {
+output "Primary_Hashi_UI" {
   value = module.primarycluster.hashi_ui
 }
 
-output "ssh_Worked_Nodes" {
+output "Primary_ssh_Worked_Nodes" {
   value = [module.primarycluster.ssh_for_workers]
 }
 
-output "ssh_Server_nodes" {
+output "Primary_ssh_Server_nodes" {
   value = [module.primarycluster.ssh_for_servers]
 }
 
 // Secondary
+
+output "Secondary_Consul" {
+  value = module.secondarycluster.consul_ui
+}
+
+output "Secondary_Nomad" {
+  value = module.secondarycluster.nomad_ui
+}
+
+output "Secondary_Vault" {
+  value = module.secondarycluster.vault_ui
+}
+
+output "Secondary_Fabio" {
+  value = module.secondarycluster.fabio_lb
+}
+
+output "Secondary_Hashi_UI" {
+  value = module.secondarycluster.hashi_ui
+}
+
+output "Secondary_ssh_Worked_Nodes" {
+  value = [module.secondarycluster.ssh_for_workers]
+}
+
+output "Secondary_ssh_Server_nodes" {
+  value = [module.secondarycluster.ssh_for_servers]
+}
+
+// Tertiary
 /*
-
-
-output "secondary_ssh_for_servers" {
-  value = ["${module.secondarycluster.ssh_for_servers}"]
+output "Tertiary_Consul" {
+  value = module.tertiarycluster.consul_ui
 }
 
-output "secondary_ssh_for_workers" {
-  value = ["${module.secondarycluster.ssh_for_workers}"]
+output "Tertiary_Nomad" {
+  value = module.tertiarycluster.nomad_ui
 }
 
-output "secondary_nomad_workers_consul_ui" {
-  value = ["${module.secondarycluster.nomad_workers_consul_ui}"]
+output "Tertiary_Vault" {
+  value = module.tertiarycluster.vault_ui
 }
 
-output "secondary_nomad_workers_ui" {
-  value = ["${module.secondarycluster.nomad_workers_ui}"]
+output "Tertiary_Fabio" {
+  value = module.tertiarycluster.fabio_lb
 }
 
-output "secondary_vpc_id" {
-  value = "${module.secondarycluster.vpc_id}"
+output "Tertiary_Hashi_UI" {
+  value = module.tertiarycluster.hashi_ui
 }
 
-output "secondary_fabio_lb" {
-  value = "${module.secondarycluster.fabio_lb}"
+output "Tertiary_ssh_Worked_Nodes" {
+  value = [module.tertiarycluster.ssh_for_workers]
 }
 
-output "secondary_vault_lb" {
-  value = "${module.secondarycluster.vault_lb}"
-}
-
-output "secondary_vault_ui" {
-  value = "${module.secondarycluster.vault_ui}"
+output "Tertiary_ssh_Server_nodes" {
+  value = [module.tertiarycluster.ssh_for_servers]
 }
 */
