@@ -227,5 +227,16 @@ EOR
 {
   echo "--> pki demo already configured, moving on"
 }
- 
+
+echo "--> Setting up Github auth"
+ {
+ vault auth enable github &&
+ vault write auth/github/config organization=hashicorp &&
+ vault write auth/github/map/teams/team-se  value=default
+  echo "--> github auth done"
+ } ||
+ {
+   echo "--> github auth mounted, moving on"
+ }
+
 echo "==> Vault is done!"
