@@ -31,22 +31,8 @@ output "ssh_into_Server_nodes" {
   value = [module.primarycluster.ssh_for_servers]
 }
 
-<<<<<<< HEAD
-output "Secondary_Nomad" {
-  value = module.secondarycluster.nomad_ui
-}
-
-output "Secondary_Vault" {
-  value = module.secondarycluster.vault_ui
-}
-
-output "Secondary_Fabio" {
-  value = module.secondarycluster.fabio_lb
-}
-=======
 // Secondary
 /*
->>>>>>> block format change for tf0.12
 
 output "Secondary_Hashi_UI" {
   value = module.secondarycluster.hashi_ui

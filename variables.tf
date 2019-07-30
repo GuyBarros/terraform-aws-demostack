@@ -23,20 +23,8 @@ variable "secondary_namespace" {
 this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
 EOH
 
-<<<<<<< HEAD
-default = "secondarystack"
-}
-
-variable "tertiary_namespace" {
-  description = <<EOH
-this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
-EOH
-
-default = "tertiarystack"
-=======
 
   default = "primaryconnectdemo"
->>>>>>> block format change for tf0.12
 }
 
 variable "primary_region" {
@@ -130,8 +118,6 @@ variable "vault_ent_url" {
   default = "https://s3-us-west-2.amazonaws.com/hc-enterprise-binaries/vault/ent/0.11.1/vault-enterprise_0.11.1%2Bent_linux_amd64.zip"
 }
 
-<<<<<<< HEAD
-=======
 variable "primary_namespace" {
   description = <<EOH
 The namespace to create the virtual training lab. This should describe the
@@ -159,7 +145,6 @@ EOH
 
 default = "secondaryconnectdemo"
 }
->>>>>>> block format change for tf0.12
 
 variable "owner" {
 description = "IAM user responsible for lifecycle of cloud resources used for training"
