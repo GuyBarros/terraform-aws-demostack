@@ -23,8 +23,15 @@ variable "secondary_namespace" {
 this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
 EOH
 
+default = "secondarystack"
+}
 
-  default = "primaryconnectdemo"
+variable "tertiary_namespace" {
+  description = <<EOH
+this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
+EOH
+
+default = "tertiarystack"
 }
 
 variable "primary_region" {
@@ -118,33 +125,6 @@ variable "vault_ent_url" {
   default = "https://s3-us-west-2.amazonaws.com/hc-enterprise-binaries/vault/ent/0.11.1/vault-enterprise_0.11.1%2Bent_linux_amd64.zip"
 }
 
-variable "primary_namespace" {
-  description = <<EOH
-The namespace to create the virtual training lab. This should describe the
-training and must be unique to all current trainings. IAM users, workstations,
-and resources will be scoped under this namespace.
-
-It is best if you add this to your .tfvars file so you do not need to type
-it manually with each run
-EOH
-
-
-default = "primaryconnectdemo"
-}
-
-variable "secondary_namespace" {
-description = <<EOH
-The namespace to create the virtual training lab. This should describe the
-training and must be unique to all current trainings. IAM users, workstations,
-and resources will be scoped under this namespace.
-
-It is best if you add this to your .tfvars file so you do not need to type
-it manually with each run
-EOH
-
-
-default = "secondaryconnectdemo"
-}
 
 variable "owner" {
 description = "IAM user responsible for lifecycle of cloud resources used for training"
@@ -208,7 +188,6 @@ default = ""
 variable "awsaccesskey" {
   description = "The AWS access key vault will use for auto unseal"
 }
-
 variable "awssecretkey" {
   description = "The AWS secret key vault will use for auto unseal"
 }
@@ -254,4 +233,3 @@ default = ""
 variable "run_nomad_jobs" {
 default = 1
 }
-
