@@ -79,56 +79,42 @@ resource "aws_security_group" "demostack" {
   ingress {
     from_port   = 443
     to_port     = 443
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 22
     to_port     = 22
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 80
     to_port     = 80
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 8000
     to_port     = 8999
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
     from_port   = 9998
     to_port     = 9999
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
 ingress {
     from_port   = 3000
     to_port     = 4999
-    protocol    = "-1"
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   egress {
