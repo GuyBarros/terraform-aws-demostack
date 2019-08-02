@@ -6,7 +6,7 @@ terraform {
     organization = "emea-se-playground-2019"
 
     workspaces {
-      name = "Andre-AWS-Demostack"
+      name = "Guy-AWS-Demostack"
     }
   }
 }
