@@ -3,7 +3,7 @@ terraform {
 }
 
 provider "aws" {
-  version = ">= 1.20.0"
+  version = "~> 2.0"
   region  = "${var.region}"
 }
 
@@ -76,13 +76,63 @@ resource "aws_security_group" "demostack" {
   name_prefix = "${var.namespace}"
   vpc_id      = "${aws_vpc.demostack.id}"
 
+#Demostack HTTPS
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+#SSH
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+#HTTP 
+#TODO - Remove when sslcerts are done
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+#Consul and Vault ports
+  ingress {
+    from_port   = 8000
+    to_port     = 8999
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+#Fabio Ports
+  ingress {
+    from_port   = 9998
+    to_port     = 9999
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+#Nomad
+ingress {
+    from_port   = 3000
+    to_port     = 4999
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+#More nomad ports
+  ingress {
+    from_port   = 20000
+    to_port     = 29999
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 30000
+    to_port     = 39999
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   egress {
     from_port   = 0
     to_port     = 0

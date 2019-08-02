@@ -188,7 +188,6 @@ default = ""
 variable "awsaccesskey" {
   description = "The AWS access key vault will use for auto unseal"
 }
-
 variable "awssecretkey" {
   description = "The AWS secret key vault will use for auto unseal"
 }
@@ -234,4 +233,3 @@ default = ""
 variable "run_nomad_jobs" {
 default = 1
 }
-

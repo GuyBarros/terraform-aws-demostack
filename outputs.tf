@@ -62,27 +62,21 @@ output "Secondary_ssh_Server_nodes" {
 output "Tertiary_Consul" {
   value = module.tertiarycluster.consul_ui
 }
-
 output "Tertiary_Nomad" {
   value = module.tertiarycluster.nomad_ui
 }
-
 output "Tertiary_Vault" {
   value = module.tertiarycluster.vault_ui
 }
-
 output "Tertiary_Fabio" {
   value = module.tertiarycluster.fabio_lb
 }
-
 output "Tertiary_Hashi_UI" {
   value = module.tertiarycluster.hashi_ui
 }
-
 output "Tertiary_ssh_Worked_Nodes" {
   value = [module.tertiarycluster.ssh_for_workers]
 }
-
 output "Tertiary_ssh_Server_nodes" {
   value = [module.tertiarycluster.ssh_for_servers]
 }
