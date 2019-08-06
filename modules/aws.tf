@@ -4,7 +4,7 @@ terraform {
 
 provider "aws" {
   version = "~> 2.0"
-  region  = "${var.region}"
+  region  = var.region
 }
 
 data "aws_ami" "ubuntu" {
@@ -24,57 +24,57 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_vpc" "demostack" {
-  cidr_block           = "${var.vpc_cidr_block}"
+  cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = true
 
   tags = {
-    Name           = "${var.namespace}"
-    owner          = "${var.owner}"
-    created-by     = "${var.created-by}"
-    sleep-at-night = "${var.sleep-at-night}"
-    TTL            = "${var.TTL}"
+    Name           = var.namespace
+    owner          = var.owner
+    created-by     = var.created-by
+    sleep-at-night = var.sleep-at-night
+    TTL            = var.TTL
   }
 }
 
 resource "aws_internet_gateway" "demostack" {
-  vpc_id = "${aws_vpc.demostack.id}"
+  vpc_id = aws_vpc.demostack.id
 
   tags = {
-    Name           = "${var.namespace}"
-    owner          = "${var.owner}"
-    created-by     = "${var.created-by}"
-    sleep-at-night = "${var.sleep-at-night}"
-    TTL            = "${var.TTL}"
+    Name           = var.namespace
+    owner          = var.owner
+    created-by     = var.created-by
+    sleep-at-night = var.sleep-at-night
+    TTL            = var.TTL
   }
 }
 
 resource "aws_route" "internet_access" {
-  route_table_id         = "${aws_vpc.demostack.main_route_table_id}"
+  route_table_id         = aws_vpc.demostack.main_route_table_id
   destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "${aws_internet_gateway.demostack.id}"
+  gateway_id             = aws_internet_gateway.demostack.id
 }
 
 data "aws_availability_zones" "available" {}
 
 resource "aws_subnet" "demostack" {
   count                   = "${length(var.cidr_blocks)}"
-  vpc_id                  = "${aws_vpc.demostack.id}"
+  vpc_id                  = aws_vpc.demostack.id
   availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
   cidr_block              = "${var.cidr_blocks[count.index]}"
   map_public_ip_on_launch = true
 
   tags = {
-    Name           = "${var.namespace}"
-    owner          = "${var.owner}"
-    created-by     = "${var.created-by}"
-    sleep-at-night = "${var.sleep-at-night}"
-    TTL            = "${var.TTL}"
+    Name           = var.namespace
+    owner          = var.owner
+    created-by     = var.created-by
+    sleep-at-night = var.sleep-at-night
+    TTL            = var.TTL
   }
 }
 
 resource "aws_security_group" "demostack" {
-  name_prefix = "${var.namespace}"
-  vpc_id      = "${aws_vpc.demostack.id}"
+  name_prefix = var.namespace
+  vpc_id      = aws_vpc.demostack.id
 
 #Demostack HTTPS
   ingress {
@@ -142,8 +142,8 @@ ingress {
 }
 
 resource "aws_key_pair" "demostack" {
-  key_name   = "${var.namespace}"
-  public_key = "${var.public_key}"
+  key_name   = var.namespace
+  public_key = var.public_key
 }
 
 resource "aws_iam_role" "consul-join" {
@@ -153,13 +153,13 @@ resource "aws_iam_role" "consul-join" {
 
 resource "aws_iam_policy_attachment" "consul-join" {
   name       = "${var.namespace}-consul-join"
-  roles      = ["${aws_iam_role.consul-join.name}"]
-  policy_arn = "${aws_iam_policy.consul-join.arn}"
+  roles      = [aws_iam_role.consul-join.name]
+  policy_arn = aws_iam_policy.consul-join.arn
 }
 
 resource "aws_iam_instance_profile" "consul-join" {
   name = "${var.namespace}-consul-join"
-  role = "${aws_iam_role.consul-join.name}"
+  role = aws_iam_role.consul-join.name
 }
 
 resource "aws_kms_key" "demostackVaultKeys" {
@@ -167,11 +167,11 @@ resource "aws_kms_key" "demostackVaultKeys" {
   deletion_window_in_days = 10
 
   tags = {
-    Name           = "${var.namespace}"
-    owner          = "${var.owner}"
-    created-by     = "${var.created-by}"
-    sleep-at-night = "${var.sleep-at-night}"
-    TTL            = "${var.TTL}"
+    Name           = var.namespace
+    owner          = var.owner
+    created-by     = var.created-by
+    sleep-at-night = var.sleep-at-night
+    TTL            = var.TTL
   }
 }
 
@@ -180,7 +180,7 @@ resource "aws_iam_policy" "consul-join" {
   description = "Allows Consul nodes to describe instances for joining."
 
   # policy      = "${file("${path.module}/templates/policies/describe-instances.json")}"
-  policy = "${data.aws_iam_policy_document.vault-server.json}"
+  policy = data.aws_iam_policy_document.vault-server.json
 }
 
 data "aws_iam_policy_document" "vault-server" {
@@ -194,7 +194,7 @@ data "aws_iam_policy_document" "vault-server" {
       "kms:DescribeKey",
     ]
 
-    resources = ["${aws_kms_key.demostackVaultKeys.arn}"]
+    resources = [aws_kms_key.demostackVaultKeys.arn]
   }
 
   statement {
