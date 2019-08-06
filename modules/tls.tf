@@ -22,6 +22,8 @@ resource "tls_cert_request" "server" {
     # Consul
     "${var.namespace}-server-${count.index}.node.consul",
 
+    "*.service.consul",
+    "*.query.consul",
     "consul.service.consul",
     "server.dc1.consul",
 
@@ -35,6 +37,7 @@ resource "tls_cert_request" "server" {
     "${var.namespace}-server-${count.index}.node.consul",
 
     "vault.service.consul",
+    "vault.query.consul",
     "active.vault.service.consul",
     "standby.vault.service.consul",
 
@@ -91,12 +94,26 @@ resource "tls_cert_request" "workers" {
 
   dns_names = [
     # Consul
-    "${element(aws_iam_user.workers.*.name, count.index)}.node.consul",
+    "${var.namespace}-workers-${count.index}.node.consul",
+
+    "*.service.consul",
+    "*.query.consul",
+    "consul.service.consul",
+    "server.dc1.consul",
 
     # Nomad
     "nomad.service.consul",
 
     "client.global.nomad",
+    "server.global.nomad",
+
+    # Vault
+    "${var.namespace}-server-${count.index}.node.consul",
+
+    "vault.service.consul",
+    "vault.query.consul",
+    "active.vault.service.consul",
+    "standby.vault.service.consul",
 
     # Common
     "localhost",
