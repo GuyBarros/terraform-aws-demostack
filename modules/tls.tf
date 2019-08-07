@@ -2,26 +2,28 @@
 
 # Server private key
 resource "tls_private_key" "server" {
-  count       = "${var.servers}"
+  count       = var.servers
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
 }
 
 # Server signing request
 resource "tls_cert_request" "server" {
-  count           = "${var.servers}"
+  count           = var.servers
   key_algorithm   = "${element(tls_private_key.server.*.algorithm, count.index)}"
   private_key_pem = "${element(tls_private_key.server.*.private_key_pem, count.index)}"
 
   subject {
     common_name  = "${var.namespace}-server-${count.index}.node.consul"
-    organization = "HashiCorp Consul Connect Demo"
+    organization = "HashiCorp Demostack"
   }
 
   dns_names = [
     # Consul
     "${var.namespace}-server-${count.index}.node.consul",
 
+    "*.service.consul",
+    "*.query.consul",
     "consul.service.consul",
     "server.dc1.consul",
 
@@ -35,6 +37,7 @@ resource "tls_cert_request" "server" {
     "${var.namespace}-server-${count.index}.node.consul",
 
     "vault.service.consul",
+    "vault.query.consul",
     "active.vault.service.consul",
     "standby.vault.service.consul",
 
@@ -47,11 +50,11 @@ resource "tls_cert_request" "server" {
 
 # Server certificate
 resource "tls_locally_signed_cert" "server" {
-  count            = "${var.servers}"
+  count            = var.servers
   cert_request_pem = "${element(tls_cert_request.server.*.cert_request_pem, count.index)}"
-  ca_key_algorithm = "${var.ca_key_algorithm}"
-  ca_private_key_pem = "${var.ca_private_key_pem}"
-  ca_cert_pem        = "${var.ca_cert_pem}"
+  ca_key_algorithm = var.ca_key_algorithm
+  ca_private_key_pem = var.ca_private_key_pem
+  ca_cert_pem        = var.ca_cert_pem
 
   validity_period_hours = 720 # 30 days
 
@@ -73,30 +76,44 @@ resource "random_id" "vault-root-token" {
 # Client private key
 
 resource "tls_private_key" "workers" {
-  count       = "${var.workers}"
+  count       = var.workers
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
 }
 
 # Client signing request
 resource "tls_cert_request" "workers" {
-  count           = "${var.workers}"
+  count           = var.workers
   key_algorithm   = "${element(tls_private_key.workers.*.algorithm, count.index)}"
   private_key_pem = "${element(tls_private_key.workers.*.private_key_pem, count.index)}"
 
   subject {
     common_name  = "${element(aws_iam_user.workers.*.name, count.index)}.node.consul"
-    organization = "HashiCorp Consul Connect Demo"
+    organization = "HashiCorp Demostack"
   }
 
   dns_names = [
     # Consul
-    "${element(aws_iam_user.workers.*.name, count.index)}.node.consul",
+    "${var.namespace}-workers-${count.index}.node.consul",
+
+    "*.service.consul",
+    "*.query.consul",
+    "consul.service.consul",
+    "server.dc1.consul",
 
     # Nomad
     "nomad.service.consul",
 
     "client.global.nomad",
+    "server.global.nomad",
+
+    # Vault
+    "${var.namespace}-server-${count.index}.node.consul",
+
+    "vault.service.consul",
+    "vault.query.consul",
+    "active.vault.service.consul",
+    "standby.vault.service.consul",
 
     # Common
     "localhost",
@@ -113,12 +130,12 @@ resource "tls_cert_request" "workers" {
 # Client certificate
 
 resource "tls_locally_signed_cert" "workers" {
-  count            = "${var.workers}"
+  count            = var.workers
   cert_request_pem = "${element(tls_cert_request.workers.*.cert_request_pem, count.index)}"
 
-  ca_key_algorithm = "${var.ca_key_algorithm}"
-  ca_private_key_pem = "${var.ca_private_key_pem}"
-  ca_cert_pem        = "${var.ca_cert_pem}"
+  ca_key_algorithm = var.ca_key_algorithm
+  ca_private_key_pem = var.ca_private_key_pem
+  ca_cert_pem        = var.ca_cert_pem
 
   validity_period_hours = 720 # 30 days
 
@@ -130,26 +147,3 @@ resource "tls_locally_signed_cert" "workers" {
     "server_auth",
   ]
 }
-
-/*
-# Consul gossip encryption key
-resource "random_id" "consul_gossip_key" {
-  byte_length = 16
-}
-
-# Consul master token
-resource "random_id" "consul_master_token" {
-  byte_length = 16
-}
-
-# Consul join key
-resource "random_id" "consul_join_tag_value" {
-  byte_length = 16
-}
-
-# Nomad gossip encryption key
-resource "random_id" "nomad_gossip_key" {
-  byte_length = 16
-}
-*/
-

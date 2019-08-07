@@ -239,4 +239,25 @@ echo "--> Setting up Github auth"
    echo "--> github auth mounted, moving on"
  }
 
+ echo "--> Setting up vault prepared query"
+ {
+ curl http://localhost:8500/v1/query \
+    --request POST \
+    --data \
+'{
+  "Name": "vault",
+  "Service": {
+    "Service": "vault",
+    "Tags":  ["active"],
+    "Failover": {
+      "NearestN": 2
+    }
+  }
+}'
+  echo "--> github auth done"
+ } ||
+ {
+   echo "--> github auth mounted, moving on"
+ }
+
 echo "==> Vault is done!"

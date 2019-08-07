@@ -31,21 +31,6 @@ sudo su ${demo_username} \
 echo "--> Giving sudoless for Docker"
 sudo usermod -aG docker "${demo_username}"
 
-echo "--> Configuring MOTD"
-sudo rm -rf /etc/update-motd.d/*
-sudo tee /etc/update-motd.d/00-hashicorp > /dev/null <<"EOF"
-#!/bin/sh
-
-echo "Welcome to HashiCorp Fullstack Demo!"
-echo "this nodejs animal identity is:"
-echo ""
-echo "    ${identity}"
-echo ""
-echo "Please do not lose this identity as it will be important in"
-echo "completing this training course. Have a great day!"
-EOF
-sudo chmod +x /etc/update-motd.d/00-hashicorp
-sudo run-parts /etc/update-motd.d/ &>/dev/null
 
 echo "--> Adding helper for identity retrieval"
 sudo tee /etc/profile.d/identity.sh > /dev/null <<"EOF"

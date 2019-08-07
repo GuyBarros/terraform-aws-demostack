@@ -72,15 +72,15 @@ data "template_cloudinit_config" "server" {
 
 # Create the Consul cluster
 resource "aws_instance" "server" {
-  count = "${var.servers}"
+  count = var.servers
 
-  ami           = "${data.aws_ami.ubuntu.id}"
-  instance_type = "${var.instance_type_server}"
-  key_name      = "${aws_key_pair.demostack.id}"
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = var.instance_type_server
+  key_name      = aws_key_pair.demostack.id
 
   subnet_id              = "${element(aws_subnet.demostack.*.id, count.index)}"
-  iam_instance_profile   = "${aws_iam_instance_profile.consul-join.name}"
-  vpc_security_group_ids = ["${aws_security_group.demostack.id}"]
+  iam_instance_profile   = aws_iam_instance_profile.consul-join.name
+  vpc_security_group_ids = [aws_security_group.demostack.id]
   root_block_device{
     volume_size           = "50"
     delete_on_termination = "true"
@@ -95,11 +95,11 @@ resource "aws_instance" "server" {
 
   tags = {
     Name           = "${var.namespace}-server-${count.index}"
-    owner          = "${var.owner}"
-    created-by     = "${var.created-by}"
-    sleep-at-night = "${var.sleep-at-night}"
-    TTL            = "${var.TTL}"
-    ConsulJoin     = "${var.consul_join_tag_value}"
+    owner          = var.owner
+    created-by     = var.created-by
+    sleep-at-night = var.sleep-at-night
+    TTL            = var.TTL
+    ConsulJoin     = var.consul_join_tag_value
   }
 
   user_data = "${element(data.template_cloudinit_config.server.*.rendered, count.index)}"

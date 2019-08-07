@@ -46,11 +46,8 @@ data "template_file" "workers" {
     file("${path.module}/templates/workers/user.sh"),
     file("${path.module}/templates/workers/consul.sh"),
     file("${path.module}/templates/workers/vault.sh"),
-    file("${path.module}/templates/workers/postgres.sh"),
-    file("${path.module}/templates/workers/terraform.sh"),
-    file("${path.module}/templates/workers/tools.sh"),
     file("${path.module}/templates/workers/nomad.sh"),
-    file("${path.module}/templates/workers/connectdemo.sh"),
+    file("${path.module}/templates/workers/nomadjobs.sh"),
     ))}"
 
   vars = {

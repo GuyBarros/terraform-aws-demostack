@@ -49,7 +49,7 @@ tls {
 
 vault {
   enabled   = true
-   address          = "https://active.vault.service.consul:8200"
+   address          = "https://vault.query.consul:8200"
   ca_file   = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file = "/etc/ssl/certs/me.crt"
   key_file  = "/etc/ssl/certs/me.key"
@@ -104,52 +104,6 @@ sudo systemctl start nomad
 
 echo "--> Creating workspace"
 sudo mkdir -p /workstation/nomad
-
-echo "--> Creating http-echo"
-sudo tee /workstation/nomad/http-echo.nomad > /dev/null <<"EOF"
-job "http-echo-${node_name}" {
-  datacenters = ["${region}"]
-
-  group "echo" {
-    task "server" {
-      driver = "docker"
-
-      config {
-        image = "hashicorp/http-echo:0.2.3"
-        args  = [
-          "-listen", ":\$\{NOMAD_PORT_http\}",
-          "-text", "hello world",
-        ]
-      }
-
-      resources {
-        network {
-          mbits = 10
-          port "http" {
-         
-          }
-        }
-      }
-
-      service {
-        name = "http-echo"
-        port = "http"
-        tags = [
-          "${node_name}",
-          "urlprefix-/http-echo",
-        ]
-
-        check {
-          type     = "http"
-          path     = "/health"
-          interval = "2s"
-          timeout  = "2s"
-        }
-      }
-    }
-  }
-}
-EOF
 
 echo "--> Changing ownership"
 sudo chown -R "${demo_username}:${demo_username}" "/workstation/nomad"
