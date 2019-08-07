@@ -28,7 +28,7 @@ output "Primary_ssh_Server_nodes" {
 }
 
 // Secondary
-
+/*
 output "Secondary_Consul" {
   value = module.secondarycluster.consul_ui
 }
@@ -56,6 +56,7 @@ output "Secondary_ssh_Worked_Nodes" {
 output "Secondary_ssh_Server_nodes" {
   value = [module.secondarycluster.ssh_for_servers]
 }
+*/
 
 // Tertiary
 /*
