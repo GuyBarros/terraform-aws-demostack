@@ -88,7 +88,7 @@ resource "tls_cert_request" "workers" {
   private_key_pem = "${element(tls_private_key.workers.*.private_key_pem, count.index)}"
 
   subject {
-    common_name  = "${element(aws_iam_user.workers.*.name, count.index)}.node.consul"
+    common_name  = "${var.namespace}-worker-${count.index}.node.consul"
     organization = "HashiCorp Demostack"
   }
 

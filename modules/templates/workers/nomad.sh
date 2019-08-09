@@ -105,12 +105,5 @@ sudo systemctl start nomad
 echo "--> Creating workspace"
 sudo mkdir -p /workstation/nomad
 
-echo "--> Changing ownership"
-sudo chown -R "${demo_username}:${demo_username}" "/workstation/nomad"
-
-echo "--> Installing completions"
-sudo su ${demo_username} \
-  -c 'nomad -autocomplete-install'
-
 
 echo "==> Nomad is done!"

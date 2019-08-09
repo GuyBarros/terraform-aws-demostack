@@ -10,51 +10,48 @@ data "template_file" "server" {
     file("${path.module}/templates/server/nomad.sh"),
     file("${path.module}/templates/server/nomad-jobs.sh"),
     
-    file("${path.module}/templates/shared/cleanup.sh"),
   ))}"
 
   vars = {
-    //  awsaccesskey  = "${var.awsaccesskey}"
-    //  awssecretkey  = "${var.awssecretkey}"
     region = "${var.region}"
 
-    enterprise    = "${var.enterprise}"
-    vaultlicense  = "${var.vaultlicense}"
-    consullicense = "${var.consullicense}"
-    kmskey        = "${aws_kms_key.demostackVaultKeys.id}"
-    namespace     = "${var.namespace}"
-    node_name     = "${var.namespace}-server-${count.index}"
+    enterprise    =var.enterprise
+   vaultlicense  =var.vaultlicense
+   consullicense =var.consullicense
+   kmskey        = "${aws_kms_key.demostackVaultKeys.id}"
+    namespace     =var.namespace
+   node_name     = "${var.namespace}-server-${count.index}"
 
     # me_ca         = "${tls_self_signed_cert.root.cert_pem}"
-    me_ca   = "${var.ca_cert_pem}"
-    me_cert = "${element(tls_locally_signed_cert.server.*.cert_pem, count.index)}"
+    me_ca   =var.ca_cert_pem
+   me_cert = "${element(tls_locally_signed_cert.server.*.cert_pem, count.index)}"
     me_key  = "${element(tls_private_key.server.*.private_key_pem, count.index)}"
 
     # Consul
-    consul_url            = "${var.consul_url}"
-    consul_ent_url        = "${var.consul_ent_url}"
-    consul_gossip_key     = "${var.consul_gossip_key}"
-    consul_join_tag_key   = "ConsulJoin"
-    consul_join_tag_value = "${var.consul_join_tag_value}"
-    consul_master_token   = "${var.consul_master_token}"
-    consul_servers        = "${var.servers}"
+    consul_url            =var.consul_url
+   consul_ent_url        =var.consul_ent_url
+   consul_gossip_key     =var.consul_gossip_key
+   consul_join_tag_key   = "ConsulJoin"
+    consul_join_tag_value =var.consul_join_tag_value
+   consul_master_token   =var.consul_master_token
+   consul_servers        = "${var.servers}"
 
     # Nomad
-    nomad_url        = "${var.nomad_url}"
-    nomad_gossip_key = "${var.nomad_gossip_key}"
-    nomad_servers    = "${var.servers}"
+    nomad_url        =var.nomad_url
+   nomad_gossip_key =var.nomad_gossip_key
+   nomad_servers    = "${var.servers}"
 
     # Nomad jobs
-    fabio_url      = "${var.fabio_url}"
-    hashiui_url    = "${var.hashiui_url}"
-    run_nomad_jobs = "${var.run_nomad_jobs}"
+    fabio_url      =var.fabio_url
+   hashiui_url    =var.hashiui_url
+   run_nomad_jobs = "${var.run_nomad_jobs}"
 
     # Vault
-    vault_url        = "${var.vault_url}"
-    vault_ent_url    = "${var.vault_ent_url}"
-    vault_root_token = "${random_id.vault-root-token.hex}"
-    vault_servers    = "${var.servers}"
-  }
+    vault_url        =var.vault_url
+   vault_ent_url    =var.vault_ent_url
+   vault_root_token = "${random_id.vault-root-token.hex}"
+    vault_servers    =var.servers
+ }
 }
 
 # Gzip cloud-init config

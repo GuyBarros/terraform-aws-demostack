@@ -148,7 +148,7 @@ resource "aws_key_pair" "demostack" {
 
 resource "aws_iam_role" "consul-join" {
   name               = "${var.namespace}-consul-join"
-  assume_role_policy = "${file("${path.module}/templates/policies/assume-role.json")}"
+  assume_role_policy = "${file("${path.module}/templates/policies/describe-instances.json")}"
 }
 
 resource "aws_iam_policy_attachment" "consul-join" {
@@ -201,7 +201,6 @@ data "aws_iam_policy_document" "vault-server" {
     effect = "Allow"
 
     actions = [
-      "ssm:*",
       "ec2:DescribeInstances",
       "iam:PassRole",
       "iam:ListRoles",
@@ -216,42 +215,5 @@ data "aws_iam_policy_document" "vault-server" {
     resources = ["*"]
   }
 
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "iam:CreateServiceLinkedRole",
-    ]
-
-    resources = ["arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*"]
-
-    condition {
-      test     = "StringLike"
-      variable = "iam:AWSServiceName"
-
-      values = [
-        "ssm.amazonaws.com",
-      ]
-    }
   }
 
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "iam:DeleteServiceLinkedRole",
-      "iam:GetServiceLinkedRoleDeletionStatus",
-    ]
-
-    resources = ["arn:aws:iam::*:role/aws-service-role/ssm.amazonaws.com/AWSServiceRoleForAmazonSSM*"]
-
-    condition {
-      test     = "StringLike"
-      variable = "iam:AWSServiceName"
-
-      values = [
-        "ssm.amazonaws.com",
-      ]
-    }
-  }
-}
