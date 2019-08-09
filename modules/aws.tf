@@ -83,13 +83,7 @@ resource "aws_security_group" "demostack" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-#SSH
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+
 #HTTP 
 #TODO - Remove when sslcerts are done
   ingress {
@@ -146,17 +140,6 @@ resource "aws_key_pair" "demostack" {
   public_key = var.public_key
 }
 
-resource "aws_iam_role" "consul-join" {
-  name               = "${var.namespace}-consul-join"
-  assume_role_policy = "${file("${path.module}/templates/policies/describe-instances.json")}"
-}
-
-resource "aws_iam_policy_attachment" "consul-join" {
-  name       = "${var.namespace}-consul-join"
-  roles      = [aws_iam_role.consul-join.name]
-  policy_arn = aws_iam_policy.consul-join.arn
-}
-
 resource "aws_iam_instance_profile" "consul-join" {
   name = "${var.namespace}-consul-join"
   role = aws_iam_role.consul-join.name
@@ -179,9 +162,21 @@ resource "aws_iam_policy" "consul-join" {
   name        = "${var.namespace}-consul-join"
   description = "Allows Consul nodes to describe instances for joining."
 
-  # policy      = "${file("${path.module}/templates/policies/describe-instances.json")}"
   policy = data.aws_iam_policy_document.vault-server.json
 }
+
+
+resource "aws_iam_role" "consul-join" {
+  name               = "${var.namespace}-consul-join"
+  assume_role_policy = "${file("${path.module}/templates/policies/assume-role.json")}"
+}
+
+resource "aws_iam_policy_attachment" "consul-join" {
+  name       = "${var.namespace}-consul-join"
+  roles      = [aws_iam_role.consul-join.name]
+  policy_arn = aws_iam_policy.consul-join.arn
+}
+
 
 data "aws_iam_policy_document" "vault-server" {
   statement {
@@ -205,13 +200,12 @@ data "aws_iam_policy_document" "vault-server" {
       "iam:PassRole",
       "iam:ListRoles",
       "cloudwatch:PutMetricData",
-      "ds:CreateComputer",
       "ds:DescribeDirectories",
       "ec2:DescribeInstanceStatus",
       "logs:*",
       "ec2messages:*",
     ]
-
+      
     resources = ["*"]
   }
 

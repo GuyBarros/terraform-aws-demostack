@@ -34,23 +34,22 @@ data "template_file" "server" {
    consul_join_tag_key   = "ConsulJoin"
     consul_join_tag_value =var.consul_join_tag_value
    consul_master_token   =var.consul_master_token
-   consul_servers        = "${var.servers}"
+   consul_servers        = var.servers
 
     # Nomad
     nomad_url        =var.nomad_url
    nomad_gossip_key =var.nomad_gossip_key
-   nomad_servers    = "${var.servers}"
+   nomad_servers    = var.servers
 
     # Nomad jobs
     fabio_url      =var.fabio_url
    hashiui_url    =var.hashiui_url
-   run_nomad_jobs = "${var.run_nomad_jobs}"
 
     # Vault
     vault_url        =var.vault_url
    vault_ent_url    =var.vault_ent_url
-   vault_root_token = "${random_id.vault-root-token.hex}"
-    vault_servers    =var.servers
+   vault_root_token = random_id.vault-root-token.hex
+   vault_servers    =var.servers
  }
 }
 
