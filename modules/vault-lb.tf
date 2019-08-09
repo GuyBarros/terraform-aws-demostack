@@ -6,11 +6,11 @@ resource "aws_alb" "vault" {
 
   tags = {
     Name           = "${var.namespace}-vault"
-    owner          = "${var.owner}"
-    created-by     = "${var.created-by}"
+    owner          =var.owner
+   created-by     = "${var.created-by}"
     sleep-at-night = "${var.sleep-at-night}"
-    TTL            = "${var.TTL}"
-  }
+    TTL            =var.TTL
+ }
 }
 
 resource "aws_alb_target_group" "vault" {
@@ -44,8 +44,8 @@ resource "aws_alb_listener" "vault" {
 }
 
 resource "aws_alb_target_group_attachment" "vault" {
-  count            = "${var.servers}"
-  target_group_arn = "${aws_alb_target_group.vault.arn}"
+  count            =var.servers
+ target_group_arn = "${aws_alb_target_group.vault.arn}"
   target_id        = "${element(aws_instance.server.*.id, count.index)}"
   port             = "8200"
 }

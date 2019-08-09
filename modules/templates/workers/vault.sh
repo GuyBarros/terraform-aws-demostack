@@ -34,9 +34,4 @@ sudo systemctl enable vault
 sleep 2
 
 
-
-echo "--> Installing completions"
-sudo su ${demo_username} \
-  -c 'vault -autocomplete-install'
-
 echo "==> Vault is done!"
