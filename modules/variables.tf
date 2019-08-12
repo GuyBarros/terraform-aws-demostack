@@ -31,11 +31,6 @@ variable "consul_ent_url" {
   default     = "https://s3-us-west-2.amazonaws.com/hc-enterprise-binaries/consul/ent/1.2.3/consul-enterprise_1.2.3%2Bent_linux_amd64.zip"
 }
 
-variable "packer_url" {
-  description = "The url to download Packer."
-  default     = "https://releases.hashicorp.com/packer/1.2.5/packer_1.2.5_linux_amd64.zip"
-}
-
 variable "fabio_url" {
   description = "The url download fabio."
   default     = "https://github.com/fabiolb/fabio/releases/download/v1.5.7/fabio-1.5.7-go1.9.2-linux_amd64"
@@ -54,11 +49,6 @@ variable "nomad_url" {
 variable "nomad_ent_url" {
   description = "The url to download nomad."
   default     = "https://releases.hashicorp.com/nomad/0.8.6/nomad_0.8.6_linux_amd64.zip"
-}
-
-variable "terraform_url" {
-  description = "The url to download terraform."
-  default     = "https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip"
 }
 
 variable "vault_url" {

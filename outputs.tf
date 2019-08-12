@@ -19,13 +19,14 @@ output "Primary_Hashi_UI" {
   value = module.primarycluster.hashi_ui
 }
 
-output "Primary_ssh_Worked_Nodes" {
-  value = [module.primarycluster.ssh_for_workers]
+output "Primary_Servers_nodes" {
+  value = [module.primarycluster.servers]
 }
 
-output "Primary_ssh_Server_nodes" {
-  value = [module.primarycluster.ssh_for_servers]
+output "Primary_Workers_Nodes" {
+  value = [module.primarycluster.workers]
 }
+
 
 // Secondary
 /*
@@ -48,13 +49,11 @@ output "Secondary_Fabio" {
 output "Secondary_Hashi_UI" {
   value = module.secondarycluster.hashi_ui
 }
-
-output "Secondary_ssh_Worked_Nodes" {
-  value = [module.secondarycluster.ssh_for_workers]
+output "Secondary_Servers_nodes" {
+  value = [module.secondarycluster.ervers]
 }
-
-output "Secondary_ssh_Server_nodes" {
-  value = [module.secondarycluster.ssh_for_servers]
+output "Secondary_Workers_Nodes" {
+  value = [module.secondarycluster.workers]
 }
 */
 
@@ -75,10 +74,11 @@ output "Tertiary_Fabio" {
 output "Tertiary_Hashi_UI" {
   value = module.tertiarycluster.hashi_ui
 }
-output "Tertiary_ssh_Worked_Nodes" {
-  value = [module.tertiarycluster.ssh_for_workers]
+output "Tertiary_Server_nodes" {
+  value = [module.tertiarycluster.servers]
 }
-output "Tertiary_ssh_Server_nodes" {
-  value = [module.tertiarycluster.ssh_for_servers]
+output "Tertiary_Workers_Nodes" {
+  value = [module.tertiarycluster.workers]
 }
+
 */
