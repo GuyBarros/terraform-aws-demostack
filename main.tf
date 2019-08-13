@@ -57,6 +57,7 @@ module "primarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
+  zone_id            = var.zone_id
   # EMEA-SE-PLAYGROUND
   ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
   ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem
@@ -94,6 +95,7 @@ module "secondarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
+  zone_id            = var.zone_id
   # EMEA-SE-PLAYGROUND
   ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
   ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem
@@ -132,6 +134,7 @@ module "tertiarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
+  zone_id            = var.zone_id
   # EMEA-SE-PLAYGROUND
   ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
   ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem

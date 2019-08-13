@@ -129,6 +129,12 @@ description = "The CIDR blocks to create the workstations in."
 default = ["10.1.1.0/24", "10.1.2.0/24"]
 }
 
+variable "zone_id" {
+  description = "The CIDR blocks to create the workstations in."
+  default     = ""
+}
+
+
 variable "public_key" {
 description = "The contents of the SSH public key to use for connecting to the cluster."
 }
