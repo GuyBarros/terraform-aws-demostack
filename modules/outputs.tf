@@ -15,21 +15,21 @@ output "nomad_workers_ui" {
 }
 
 output "hashi_ui" {
-  value = "http://${aws_instance.workers.0.public_dns}:3000"
+  value = "http://${aws_route53_record.hashiui.fqdn}:3000"
 }
 
 output "fabio_lb" {
-  value = "http://${aws_alb.fabio.dns_name}:9999"
+  value = "http://${aws_route53_record.fabio.fqdn}:9999"
 }
 
 output "vault_ui" {
-  value = "http://${aws_alb.vault.dns_name}:8200"
+  value = "http://${aws_route53_record.vault.fqdn}:8200"
 }
 
 output "nomad_ui" {
-  value = "http://${aws_alb.nomad.dns_name}:4646"
+  value = "http://${aws_route53_record.nomad.fqdn}:4646"
 }
 
 output "consul_ui" {
-  value = "http://${aws_alb.consul.dns_name}:8500"
+  value = "http://${aws_route53_record.consul.fqdn}:8500"
 }
