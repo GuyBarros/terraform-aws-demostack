@@ -66,7 +66,7 @@ data "template_cloudinit_config" "server" {
   }
 }
 
-# Create the Consul cluster
+
 resource "aws_instance" "server" {
   count = var.servers
 
