@@ -194,16 +194,29 @@ EOR
  echo "--> Creating Initial secret for Nomad KV"
   vault kv put kv/test message='Hello world'
 
+
  echo "--> nomad nginx-vault-pki demo prep"
 {
-vault secrets enable pki &&
+vault secrets enable pki
+ }||
+{
+  echo "--> pki already enabled, moving on"
+}
 
-vault write pki/root/generate/internal common_name=service.consul &&
+ {
+vault write pki/root/generate/internal common_name=service.consul
+}||
+{
+  echo "--> pki generate internal already configured, moving on"
+}
+{
+vault write pki/roles/consul-service generate_lease=true allowed_domains="service.consul" allow_subdomains="true" 
+}||
+{
+  echo "--> pki role already configured, moving on"
+}
 
-vault write pki/roles/consul-service generate_lease=true allowed_domains="service.consul" allow_subdomains="true"  &&
-
-vault write pki/issue/consul-service  common_name=nginx.service.consul  ttl=720h  &&
-
+{
 vault policy write superuser - <<EOR
 path "*" { 
   capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
@@ -222,10 +235,9 @@ path "pki/*" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
 }
 EOR
-  
 } ||
 {
-  echo "--> pki demo already configured, moving on"
+  echo "--> superuser role already configured, moving on"
 }
 
 echo "--> Setting up Github auth"
