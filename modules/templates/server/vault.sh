@@ -168,7 +168,42 @@ EOR
 
   vault policy write test - <<EOR
   path "kv/*" {
-    capabilities = ["create", "read", "update", "delete", "list"]
+    capabilities = ["list"] 
+}
+
+path "kv/test" {
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+}
+
+path "kv/data/test" {
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+}
+
+path "pki/*" {
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+}
+
+path "kv/data/cgtest" {
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    control_group = {
+        factor "approvers" {
+            identity {
+                group_names = ["approvers"]
+                approvals = 1
+            }
+        }
+    }
+}
+
+
+# To approve the request
+path "sys/control-group/authorize" {
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+}
+
+# To check control group request status
+path "sys/control-group/request" {
+   capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
 }
 EOR
 
@@ -244,7 +279,7 @@ echo "--> Setting up Github auth"
  {
  vault auth enable github &&
  vault write auth/github/config organization=hashicorp &&
- vault write auth/github/map/teams/team-se  value=default,superuser
+ vault write auth/github/map/teams/team-se  value=default,test
   echo "--> github auth done"
  } ||
  {
@@ -266,10 +301,10 @@ echo "--> Setting up Github auth"
     }
   }
 }'
-  echo "--> github auth done"
+  echo "--> consul query done"
  } ||
  {
-   echo "--> github auth mounted, moving on"
+   echo "-->consul query already done, moving on"
  }
 
 echo "==> Vault is done!"
