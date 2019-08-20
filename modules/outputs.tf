@@ -6,7 +6,6 @@ output "workers" {
   value = [aws_route53_record.workers.*.fqdn]
 }
 
-
 output "hashi_ui" {
   value = "http://${aws_route53_record.hashiui.fqdn}:3000"
 }
@@ -16,13 +15,13 @@ output "fabio_lb" {
 }
 
 output "vault_ui" {
-  value = "http://${aws_route53_record.vault.fqdn}:8200"
+  value = "https://${aws_route53_record.vault.fqdn}:8200"
 }
 
 output "nomad_ui" {
-  value = "http://${aws_route53_record.nomad.fqdn}:4646"
+  value = "https://${aws_route53_record.nomad.fqdn}:4646"
 }
 
 output "consul_ui" {
-  value = "http://${aws_route53_record.consul.fqdn}:8500"
+  value = "https://${aws_route53_record.consul.fqdn}:8500"
 }
