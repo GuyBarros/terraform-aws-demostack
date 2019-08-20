@@ -147,3 +147,41 @@ resource "tls_locally_signed_cert" "workers" {
     "server_auth",
   ]
 }
+
+// ALB certs
+resource "aws_acm_certificate" "cert" {
+  domain_name       = "*.${var.namespace}.hashidemos.io"
+  validation_method = "DNS"
+
+  tags = {
+    Name           = "${var.namespace}-vault"
+    owner          = var.owner
+    created-by     = "${var.created-by}"
+    sleep-at-night = "${var.sleep-at-night}"
+    TTL            = var.TTL
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "validation_record" {
+  name    = aws_acm_certificate.cert.domain_validation_options.0.resource_record_name
+  type    = aws_acm_certificate.cert.domain_validation_options.0.resource_record_type
+  zone_id = "${var.zone_id}"
+  records = [ aws_acm_certificate.cert.domain_validation_options.0.resource_record_value ]
+  ttl     = "60"
+  allow_overwrite = true
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "cert" {
+  certificate_arn = "${aws_acm_certificate.cert.arn}"
+  validation_record_fqdns = [
+    aws_route53_record.validation_record.fqdn,
+  ]
+}
