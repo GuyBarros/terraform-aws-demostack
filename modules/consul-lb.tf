@@ -32,10 +32,16 @@ resource "aws_alb_target_group" "consul" {
 }
 
 resource "aws_alb_listener" "consul" {
+  depends_on = [
+    aws_acm_certificate_validation.cert
+  ]
+
   load_balancer_arn = aws_alb.consul.arn
 
   port     = "8500"
-  protocol = "HTTP"
+  protocol = "HTTPS"
+  certificate_arn = "${aws_acm_certificate_validation.cert.certificate_arn}"
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
 
   default_action {
     target_group_arn = aws_alb_target_group.consul.arn

@@ -32,10 +32,16 @@ resource "aws_alb_target_group" "nomad" {
 }
 
 resource "aws_alb_listener" "nomad" {
+  depends_on = [
+    aws_acm_certificate_validation.cert
+  ]
+  
   load_balancer_arn = aws_alb.nomad.arn
 
   port     = "4646"
-  protocol = "HTTP"
+  protocol = "HTTPS"
+  certificate_arn = "${aws_acm_certificate_validation.cert.certificate_arn}"
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
 
   default_action {
     target_group_arn = aws_alb_target_group.nomad.arn
