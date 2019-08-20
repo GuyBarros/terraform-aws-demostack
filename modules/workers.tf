@@ -28,8 +28,6 @@ data "template_file" "workers" {
     consul_join_tag_key   = "ConsulJoin"
     consul_join_tag_value = var.consul_join_tag_value
 
-    
-    
     # Nomad
     nomad_url      =  var.nomad_url
 
@@ -76,7 +74,7 @@ resource "aws_instance" "workers" {
     volume_type           = "gp2"
     volume_size           = "50"
     delete_on_termination = "true"
-}
+  }
 
   tags = {
     Name       = "${var.namespace}-workers-${count.index}"
