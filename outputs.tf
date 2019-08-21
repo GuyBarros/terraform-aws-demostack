@@ -29,7 +29,7 @@ output "Primary_Workers_Nodes" {
 
 
 // Secondary
-/*
+
 output "Secondary_Consul" {
   value = module.secondarycluster.consul_ui
 }
@@ -50,12 +50,12 @@ output "Secondary_Hashi_UI" {
   value = module.secondarycluster.hashi_ui
 }
 output "Secondary_Servers_nodes" {
-  value = [module.secondarycluster.ervers]
+  value = [module.secondarycluster.servers]
 }
 output "Secondary_Workers_Nodes" {
   value = [module.secondarycluster.workers]
 }
-*/
+
 
 // Tertiary
 /*

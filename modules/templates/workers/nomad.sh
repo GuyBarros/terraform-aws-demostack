@@ -47,6 +47,10 @@ tls {
   verify_server_hostname = false
 }
 
+meta {
+    "type" = "worker"
+  }
+
 vault {
   enabled   = true
    address          = "https://vault.query.consul:8200"

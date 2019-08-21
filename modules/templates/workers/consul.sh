@@ -44,6 +44,10 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
    "auto_encrypt": {
     "tls": false
   },
+  "node_meta": {
+    "build": "1.0.0",
+    "type" : "server"
+  },
   "verify_server_hostname": false,
   "verify_incoming": false,
   "verify_outgoing": false,
