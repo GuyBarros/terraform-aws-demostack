@@ -19,11 +19,11 @@ output "Primary_Hashi_UI" {
   value = module.primarycluster.hashi_ui
 }
 
-output "Primary_Servers_nodes" {
+output "Primary_servers_nodes" {
   value = [module.primarycluster.servers]
 }
 
-output "Primary_Workers_Nodes" {
+output "Primary_workers_Nodes" {
   value = [module.primarycluster.workers]
 }
 
