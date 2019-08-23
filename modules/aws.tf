@@ -6,6 +6,11 @@ provider "aws" {
   version = "~> 2.0"
   region  = var.region
 }
+//Getting the Domaing name
+data "aws_route53_zone" "fdqn" {
+  zone_id = var.zone_id
+}
+
 
 data "aws_ami" "ubuntu" {
   most_recent = true
@@ -75,6 +80,17 @@ resource "aws_subnet" "demostack" {
 resource "aws_security_group" "demostack" {
   name_prefix = var.namespace
   vpc_id      = aws_vpc.demostack.id
+
+  # SSH access if host_access_ip has CIDR blocks
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
+      from_port = 22
+      to_port   = 22
+      protocol  = "tcp"
+      cidr_blocks = [ "${ingress.value}" ]
+    }
+  }
 
 #Demostack HTTPS
   ingress {

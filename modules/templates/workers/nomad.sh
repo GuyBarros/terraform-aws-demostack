@@ -126,7 +126,7 @@ done
 echo "--> Waiting for Nomad leader"
 while [ -z "$(curl -s http://localhost:4646/v1/status/leader)" ]; do
   sleep 5
-done
+done  
 
 sleep 180
 
