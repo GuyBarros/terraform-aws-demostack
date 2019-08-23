@@ -30,6 +30,7 @@ data "template_file" "workers" {
 
     # Nomad
     nomad_url      =  var.nomad_url
+    run_nomad_jobs = var.run_nomad_jobs
 
     # Vault
     vault_url        = var.vault_url

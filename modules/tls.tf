@@ -43,6 +43,7 @@ resource "tls_cert_request" "server" {
 
     # Common
     "localhost",
+    "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}",
   ]
 
   // ip_addresses = ["${aws_eip.server_ips.*.public_ip }"]
@@ -94,7 +95,7 @@ resource "tls_cert_request" "workers" {
 
   dns_names = [
     # Consul
-    "${var.namespace}-workers-${count.index}.node.consul",
+    "${var.namespace}-worker-${count.index}.node.consul",
 
     "*.service.consul",
     "*.query.consul",
@@ -109,7 +110,7 @@ resource "tls_cert_request" "workers" {
 
     # Vault
     "${var.namespace}-server-${count.index}.node.consul",
-
+    
     "vault.service.consul",
     "vault.query.consul",
     "active.vault.service.consul",
@@ -117,6 +118,7 @@ resource "tls_cert_request" "workers" {
 
     # Common
     "localhost",
+    "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}",
   ]
 
   /*
@@ -148,9 +150,10 @@ resource "tls_locally_signed_cert" "workers" {
   ]
 }
 
+
 // ALB certs
 resource "aws_acm_certificate" "cert" {
-  domain_name       = "*.${var.namespace}.hashidemos.io"
+   domain_name       = "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}"
   validation_method = "DNS"
 
   tags = {

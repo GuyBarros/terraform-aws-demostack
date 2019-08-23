@@ -152,3 +152,12 @@ variable "consul_join_tag_value" {
 variable "nomad_gossip_key" {
   default = ""
 }
+
+variable "run_nomad_jobs"{
+ default = "0" 
+}
+
+variable "host_access_ip" {
+  description = "CIDR blocks allowed to connect via SSH on port 22"
+  default = [  ]
+}
