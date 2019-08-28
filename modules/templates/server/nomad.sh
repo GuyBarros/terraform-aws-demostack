@@ -54,6 +54,7 @@ client {
   }
   meta {
     "type" = "server"
+    "name" = "${node_name}"
   }
 }
 
