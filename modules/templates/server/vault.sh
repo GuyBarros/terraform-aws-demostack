@@ -279,7 +279,7 @@ echo "--> Setting up Github auth"
  {
  vault auth enable github &&
  vault write auth/github/config organization=hashicorp &&
- vault write auth/github/map/teams/team-se  value=default,test
+ vault write auth/github/map/teams/team-se  value=default,test,superuser
   echo "--> github auth done"
  } ||
  {
