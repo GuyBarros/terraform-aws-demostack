@@ -142,19 +142,7 @@ resource "aws_security_group" "demostack" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-#Postgres port
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 5050
-    to_port     = 5050
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+
 #Consul and Vault ports
   ingress {
     from_port   = 8000
