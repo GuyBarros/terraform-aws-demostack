@@ -91,11 +91,44 @@ resource "aws_security_group" "demostack" {
       cidr_blocks = [ "${ingress.value}" ]
     }
   }
+#Demostack LDAP
+  ingress {
+    from_port   = 389
+    to_port     = 389
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 
 #Demostack HTTPS
   ingress {
     from_port   = 443
     to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  #Demostack Postgres
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+#Demostack pgadmin
+  ingress {
+    from_port   = 5050
+    to_port     = 5050
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  #Demostack HTTPS
+  ingress {
+    from_port   = 27017
+    to_port     = 27017
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

@@ -53,7 +53,8 @@ client {
      "docker.privileged.enabled" = "true"
   }
   meta {
-    "type" = "server"
+    "type" = "server",
+    "name" = "${node_name}"
   }
 }
 

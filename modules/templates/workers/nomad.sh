@@ -34,6 +34,11 @@ client {
     "driver.raw_exec.enable" = "1"
      "docker.privileged.enabled" = "true"
   }
+
+  meta {
+    "type" = "worker",
+    "name" = "${node_name}"
+  }
 }
 
 tls {
@@ -47,9 +52,7 @@ tls {
   verify_server_hostname = false
 }
 
-meta {
-    "type" = "worker"
-  }
+
 
 vault {
   enabled   = true
