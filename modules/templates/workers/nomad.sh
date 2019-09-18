@@ -105,6 +105,12 @@ LimitNOFILE=65536
 WantedBy=multi-user.target
 EOF
 
+echo "--> Installing CNI plugin"
+sudo mkdir -p /opt/cni/bin/
+wget -O cni.tgz ${cni_plugin_url} 
+sudo tar -xf cni.tgz -C /opt/cni/bin/
+
+
 echo "--> Starting nomad"
 sudo systemctl enable nomad
 sudo systemctl start nomad

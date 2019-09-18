@@ -41,6 +41,7 @@ data "template_file" "server" {
     nomad_url        = var.nomad_url
     nomad_gossip_key = var.nomad_gossip_key
     nomad_servers    = var.servers
+    cni_plugin_url = var.cni_plugin_url
 
     # Nomad jobs
     fabio_url      = var.fabio_url

@@ -148,4 +148,16 @@ EOF
 sudo systemctl enable dnsmasq
 sudo systemctl restart dnsmasq
 
+echo "--> Writting default Mesh proxy configs"
+consul config write -<<EOF
+{
+  "Kind": "proxy-defaults",
+  "Name": "global",
+  "MeshGateway": {
+    "Mode": "local"
+  }
+}
+EOF
+
+
 echo "==> Consul is done!"

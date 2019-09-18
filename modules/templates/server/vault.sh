@@ -183,6 +183,12 @@ path "pki/*" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
 }
 
+
+path "kv/metadata/cgtest" {
+    capabilities = ["list"] 
+}
+
+
 path "kv/data/cgtest" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
     control_group = {
@@ -265,10 +271,20 @@ path "kv/test/*" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
 }
 
-
 path "pki/*" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
 }
+
+path "sys/control-group/authorize" {
+    capabilities = ["create", "update"]
+}
+
+# To check control group request status
+path "sys/control-group/request" {
+    capabilities = ["create", "update"]
+}
+
+
 EOR
 } ||
 {

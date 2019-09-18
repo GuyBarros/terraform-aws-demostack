@@ -48,6 +48,7 @@ module "primarycluster" {
   hashiui_url          = var.hashiui_url
   nomad_url            = var.nomad_url
   nomad_ent_url        = var.nomad_ent_url
+  cni_plugin_url       = var.cni_plugin_url
   vault_url            = var.vault_url
   vault_ent_url        = var.vault_ent_url
   created-by           = var.created-by
@@ -89,6 +90,7 @@ module "secondarycluster" {
   hashiui_url          = var.hashiui_url
   nomad_url            = var.nomad_url
   nomad_ent_url        = var.nomad_ent_url
+  cni_plugin_url       = var.cni_plugin_url
   vault_url            = var.vault_url
   vault_ent_url        = var.vault_ent_url
   created-by           = var.created-by
@@ -130,6 +132,7 @@ module "tertiarycluster" {
   hashiui_url          = var.hashiui_url
   nomad_url            = var.nomad_url
   nomad_ent_url        = var.nomad_ent_url
+  cni_plugin_url       = var.cni_plugin_url
   vault_url            = var.vault_url
   vault_ent_url        = var.vault_ent_url
   created-by           = var.created-by
