@@ -201,16 +201,6 @@ path "kv/data/cgtest" {
     }
 }
 
-
-# To approve the request
-path "sys/control-group/authorize" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
-}
-
-# To check control group request status
-path "sys/control-group/request" {
-   capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
-}
 EOR
 
 
@@ -295,7 +285,7 @@ echo "--> Setting up Github auth"
  {
  vault auth enable github &&
  vault write auth/github/config organization=hashicorp &&
- vault write auth/github/map/teams/team-se  value=default,test,superuser
+ vault write auth/github/map/teams/team-se  value=default,superuser
   echo "--> github auth done"
  } ||
  {

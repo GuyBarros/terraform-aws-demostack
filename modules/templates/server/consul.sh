@@ -69,8 +69,8 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   },
  "connect":{
   "enabled": true,
-  "ca_provider" : "consul"
-      }
+   "ca_provider":"consul"
+       }
 }
 EOF
 

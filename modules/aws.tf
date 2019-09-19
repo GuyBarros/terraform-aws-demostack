@@ -146,7 +146,7 @@ resource "aws_security_group" "demostack" {
 #Consul and Vault ports
   ingress {
     from_port   = 8000
-    to_port     = 8999
+    to_port     = 9010
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
