@@ -16,6 +16,11 @@ export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
 
 consul kv put service/vault/${node_name}-token $NOMAD_VAULT_TOKEN
 
+echo "--> Installing CNI plugin"
+mkdir -p /opt/cni/bin
+curl -o /tmp/cni.tar.gz -L https://github.com/containernetworking/plugins/releases/download/v0.8.1/cni-plugins-linux-amd64-v0.8.1.tgz
+tar -xzf /tmp/cni.tar.gz -C /opt/cni/bin
+
 echo "--> Writing configuration"
 sudo mkdir -p /mnt/nomad
 sudo mkdir -p /etc/nomad.d
@@ -23,29 +28,14 @@ sudo tee /etc/nomad.d/config.hcl > /dev/null <<EOF
 name         = "${node_name}"
 data_dir     = "/mnt/nomad"
 enable_debug = true
-
 bind_addr = "0.0.0.0"
-
-
 datacenter = "${region}"
-
 region = "global"
-
-
-
-advertise {
-  http = "$(public_ip):4646"
-  rpc  = "$(public_ip):4647"
-  serf = "$(public_ip):4648"
-}
-
-
 server {
   enabled          = true
   bootstrap_expect = ${nomad_servers}
   encrypt          = "${nomad_gossip_key}"
 }
-
 client {
   enabled = true
    options {
@@ -57,18 +47,25 @@ client {
     "name" = "${node_name}"
   }
 }
-
 tls {
   rpc  = true
   http = true
-
   ca_file   = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file = "/etc/ssl/certs/me.crt"
   key_file  = "/etc/ssl/certs/me.key"
-
   verify_server_hostname = false
 }
-
+consul {
+    address = "localhost:8500"
+    server_service_name = "nomad"
+    client_service_name = "nomad-client"
+    auto_advertise = true
+    server_auto_join = true
+    client_auto_join = true
+    ca_file   = "/usr/local/share/ca-certificates/01-me.crt"
+    cert_file = "/etc/ssl/certs/me.crt"
+    key_file  = "/etc/ssl/certs/me.key"
+}
 vault {
   enabled          = true
   address          = "https://active.vault.service.consul:8200"
@@ -77,7 +74,6 @@ vault {
   key_file         = "/etc/ssl/certs/me.key"
   create_from_role = "nomad-cluster"
 }
-
 autopilot {
     cleanup_dead_servers = true
     last_contact_threshold = "200ms"
@@ -87,6 +83,7 @@ autopilot {
     disable_upgrade_migration = false
     enable_custom_upgrades = false
 }
+
 EOF
 
 echo "--> Writing profile"
@@ -120,12 +117,6 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 EOF
-
-echo "--> Installing CNI plugin"
-sudo mkdir -p /opt/cni/bin/
-wget -O cni.tgz ${cni_plugin_url} 
-sudo tar -xf cni.tgz -C /opt/cni/bin/
-
 
 sudo systemctl enable nomad
 sudo systemctl start nomad
