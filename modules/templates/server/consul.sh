@@ -34,27 +34,8 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
     "https": 8501,
     "grpc": 8502
   },
-   "key_file": "/etc/ssl/certs/me.key",
-  "cert_file": "/etc/ssl/certs/me.crt",
-  "ca_file": "/usr/local/share/ca-certificates/01-me.crt",
- "verify_incoming": true,
-  "verify_outgoing": false,
-  "verify_server_hostname": false,
-  "verify_incoming_rpc": true,
-  "encrypt_verify_incoming": false,
-  "encrypt_verify_outgoing": false,
-   "auto_encrypt": {
-    "allow_tls": true,
-    "tls": true
-  },
-  "enable_agent_tls_for_checks":true,
   "connect":{
-  "enabled": true,
-  "ca_provider":"consul",
-  "ca_config": {
-  "private_key": "/etc/ssl/certs/me.key",
-  "root_cert": "/usr/local/share/ca-certificates/01-me.crt"
-  }
+  "enabled": true
       },
   "ui": true,
   "enable_central_service_config":true,     
@@ -63,10 +44,8 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
     "last_contact_threshold": "200ms",
     "max_trailing_logs": 250,
     "server_stabilization_time": "10s",
-    "redundancy_zone_tag": "",
-    "disable_upgrade_migration": false,
-    "upgrade_version_tag": "build"
-}
+    "disable_upgrade_migration": false
+ }
 }
 EOF
 
@@ -139,20 +118,5 @@ curl -so /dev/null -X PUT http://127.0.0.1:8500/v1/acl/update \
 BODY
 
 
-echo "--> Waiting for Consul leader"
-while [ -z "$(curl -s http://127.0.0.1:8500/v1/status/leader)" ]; do
-  sleep 3
-done
-
-echo "--> Writting default Mesh proxy configs"
-consul config write -<<EOF
-{
-  "Kind": "proxy-defaults",
-  "Name": "global",
-  "MeshGateway": {
-    "Mode": "local"
-  }
-}
-EOF
 
 echo "==> Consul is done!"

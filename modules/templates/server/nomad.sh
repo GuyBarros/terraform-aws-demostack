@@ -62,10 +62,7 @@ consul {
     auto_advertise = true
     server_auto_join = true
     client_auto_join = true
-    ca_file   = "/usr/local/share/ca-certificates/01-me.crt"
-    cert_file = "/etc/ssl/certs/me.crt"
-    key_file  = "/etc/ssl/certs/me.key"
-}
+  }
 vault {
   enabled          = true
   address          = "https://active.vault.service.consul:8200"
