@@ -31,6 +31,11 @@ enable_debug = true
 bind_addr = "0.0.0.0"
 datacenter = "${region}"
 region = "global"
+advertise {
+  http = "$(public_ip):4646"
+  rpc  = "$(public_ip):4647"
+  serf = "$(public_ip):4648"
+}
 server {
   enabled          = true
   bootstrap_expect = ${nomad_servers}
