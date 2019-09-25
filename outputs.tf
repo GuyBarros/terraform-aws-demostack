@@ -58,7 +58,7 @@ output "Secondary_workers_Nodes" {
 
 
 // Tertiary
-/*
+
 output "Tertiary_Consul" {
   value = module.tertiarycluster.consul_ui
 }
@@ -80,4 +80,4 @@ output "Tertiary_server_nodes" {
 output "Tertiary_workers_Nodes" {
   value = [module.tertiarycluster.workers]
 }
-*/
+

@@ -6,6 +6,11 @@ echo "==> Nomad (client)"
 echo "--> Fetching"
 install_from_url "nomad" "${nomad_url}"
 
+
+echo "--> Create a Directory to Use as a Mount Target"
+sudo mkdir -p /opt/mysql/data
+sudo mkdir -p opt/mongodb/data
+
 echo "--> Installing CNI plugin"
 mkdir -p /opt/cni/bin
 curl -o /tmp/cni.tar.gz -L https://github.com/containernetworking/plugins/releases/download/v0.8.1/cni-plugins-linux-amd64-v0.8.1.tgz
@@ -35,6 +40,14 @@ client {
   meta {
     "type" = "worker",
     "name" = "${node_name}"
+  }
+  host_volume "mysql_mount" {
+    path      = "/opt/mysql/data"
+    read_only = false
+  }
+  host_volume "mongodb_mount" {
+    path      = "/opt/mongodb/data"
+    read_only = false
   }
 }
 tls {
