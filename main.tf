@@ -32,7 +32,7 @@ provider "aws" {
 }
 
 module "primarycluster" {
-  source = "./modules"
+  source               = "./modules"
   owner                = var.owner
   region               = var.primary_region
   namespace            = var.primary_namespace
@@ -58,7 +58,7 @@ module "primarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
-  zone_id            = var.zone_id
+  zone_id              = var.zone_id
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
 
@@ -72,7 +72,7 @@ module "primarycluster" {
   nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
 }
 
-/*
+
 module "secondarycluster" {
     source = "./modules"
   owner                = var.owner
@@ -112,9 +112,9 @@ module "secondarycluster" {
   consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
   nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
 }
-*/
 
-/*
+
+
 module "tertiarycluster" {
     source = "./modules"
   owner                = var.owner
@@ -155,4 +155,3 @@ module "tertiarycluster" {
   consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
   nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
 }
-*/

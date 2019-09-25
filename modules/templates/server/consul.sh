@@ -18,59 +18,34 @@ sudo mkdir -p /etc/consul.d
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
-  "acl_master_token": "${consul_master_token}",
-  "acl_token": "${consul_master_token}",
-  "acl_default_policy": "allow",
+  "bootstrap_expect": ${consul_servers},
   "advertise_addr": "$(private_ip)",
   "advertise_addr_wan": "$(public_ip)",
-  "bootstrap_expect": ${consul_servers},
   "bind_addr": "0.0.0.0",
+  "client_addr": "0.0.0.0",
   "data_dir": "/mnt/consul",
-  "disable_update_check": true,
   "encrypt": "${consul_gossip_key}",
   "leave_on_terminate": true,
   "node_name": "${node_name}",
-  "raft_protocol": 3,
   "retry_join": ["provider=aws tag_key=${consul_join_tag_key} tag_value=${consul_join_tag_value}"],
   "server": true,
- 
-  "addresses": {
-    "http": "0.0.0.0",
-    "https": "0.0.0.0",
-    "gRPC": "0.0.0.0"
-  },
   "ports": {
     "http": 8500,
     "https": 8501,
-    "gRPC": 8502
+    "grpc": 8502
   },
-  "key_file": "/etc/ssl/certs/me.key",
-  "cert_file": "/etc/ssl/certs/me.crt",
-  "ca_file": "/usr/local/share/ca-certificates/01-me.crt",
-  "verify_incoming": true,
-  "verify_outgoing": false,
-  "verify_server_hostname": false,
-   "auto_encrypt": {
-    "allow_tls": true
-  },
+  "connect":{
+  "enabled": true
+      },
   "ui": true,
-  "autopilot": {
+  "enable_central_service_config":true,     
+"autopilot": {
     "cleanup_dead_servers": true,
     "last_contact_threshold": "200ms",
     "max_trailing_logs": 250,
     "server_stabilization_time": "10s",
-    "redundancy_zone_tag": "",
-    "disable_upgrade_migration": false,
-    "upgrade_version_tag": "build"
-},
-"node_meta": {
-    "build": "1.0.0",
-    "type" : "server"
-  },
- "connect":{
-  "enabled": true,
-   "ca_provider":"consul"
-       }
+    "disable_upgrade_migration": false
+ }
 }
 EOF
 
@@ -142,15 +117,6 @@ curl -so /dev/null -X PUT http://127.0.0.1:8500/v1/acl/update \
 }
 BODY
 
-echo "--> Writting default Mesh proxy configs"
-consul config write -<<EOF
-{
-  "Kind": "proxy-defaults",
-  "Name": "global",
-  "MeshGateway": {
-    "Mode": "local"
-  }
-}
-EOF
+
 
 echo "==> Consul is done!"
