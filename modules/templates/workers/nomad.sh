@@ -11,10 +11,12 @@ echo "--> Create a Directory to Use as a Mount Target"
 sudo mkdir -p /opt/mysql/data
 sudo mkdir -p opt/mongodb/data
 
+
 echo "--> Installing CNI plugin"
-mkdir -p /opt/cni/bin
-curl -o /tmp/cni.tar.gz -L https://github.com/containernetworking/plugins/releases/download/v0.8.1/cni-plugins-linux-amd64-v0.8.1.tgz
-tar -xzf /tmp/cni.tar.gz -C /opt/cni/bin
+sudo mkdir -p /opt/cni/bin/
+wget -O cni.tgz ${cni_plugin_url}
+sudo tar -xzf cni.tgz -C /opt/cni/bin/
+
 
 echo "--> Installing"
 sudo mkdir -p /mnt/nomad
@@ -141,7 +143,7 @@ done
 echo "--> Waiting for Nomad leader"
 while [ -z "$(curl -s http://localhost:4646/v1/status/leader)" ]; do
   sleep 5
-done  
+done
 
 sleep 180
 
