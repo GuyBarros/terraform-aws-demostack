@@ -29,6 +29,7 @@ sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
 storage "consul" {
   path = "vault/"
+  service = "vault-${region}"
 }
 listener "tcp" {
   address       = "0.0.0.0:8200"
