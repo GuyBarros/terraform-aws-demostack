@@ -8,8 +8,8 @@ install_from_url "nomad" "${nomad_url}"
 
 
 echo "--> Create a Directory to Use as a Mount Target"
-sudo mkdir -p /opt/mysql/data
-sudo mkdir -p opt/mongodb/data
+sudo mkdir -p /opt/mysql/data/
+sudo mkdir -p /opt/mongodb/data/
 
 
 echo "--> Installing CNI plugin"
@@ -62,7 +62,7 @@ tls {
 }
 consul {
     address = "localhost:8500"
-    server_service_name = "nomad"
+    server_service_name = "nomad-server"
     client_service_name = "nomad-client"
     auto_advertise = true
     server_auto_join = true
