@@ -107,8 +107,8 @@ EOF
 
 echo "--> Installing CNI plugin"
 sudo mkdir -p /opt/cni/bin/
-wget -O cni.tgz ${cni_plugin_url} 
-sudo tar -xf cni.tgz -C /opt/cni/bin/
+wget -O cni.tgz ${cni_plugin_url}
+sudo tar -xzf cni.tgz -C /opt/cni/bin/
 
 
 echo "--> Starting nomad"
@@ -135,7 +135,7 @@ done
 echo "--> Waiting for Nomad leader"
 while [ -z "$(curl -s http://localhost:4646/v1/status/leader)" ]; do
   sleep 5
-done  
+done
 
 sleep 180
 

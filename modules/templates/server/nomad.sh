@@ -123,8 +123,8 @@ EOF
 
 echo "--> Installing CNI plugin"
 sudo mkdir -p /opt/cni/bin/
-wget -O cni.tgz ${cni_plugin_url} 
-sudo tar -xf cni.tgz -C /opt/cni/bin/
+wget -O cni.tgz ${cni_plugin_url}
+sudo tar -xzf cni.tgz -C /opt/cni/bin/
 
 
 sudo systemctl enable nomad
