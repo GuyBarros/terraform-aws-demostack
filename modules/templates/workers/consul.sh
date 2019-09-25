@@ -92,12 +92,11 @@ sudo tee /etc/consul.d/backup.json > /dev/null <<EOF
   "verify_server_hostname": false,
   "verify_incoming": false,
   "verify_outgoing": false,
-   "ui": true,
- "connect":{
-  "enabled": true,
-  "ca_provider":"consul"
-
-      }
+  "ui": true,
+  "connect":{
+    "enabled": true,
+    "ca_provider":"consul"
+  }
 }
 EOF
 

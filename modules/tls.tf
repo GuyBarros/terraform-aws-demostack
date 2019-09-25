@@ -21,25 +21,30 @@ resource "tls_cert_request" "server" {
   dns_names = [
     # Consul
     "${var.namespace}-server-${count.index}.node.consul",
+    "${var.namespace}-server-${count.index}.node.${var.region}.consul",
 
     "*.service.consul",
+    "*.service.${var.region}.consul",
     "*.query.consul",
     "consul.service.consul",
-    "server.dc1.consul",
 
     # Nomad
     "nomad.service.consul",
+    "nomad.service.${var.region}.consul",
+
 
     "client.global.nomad",
     "server.global.nomad",
 
     # Vault
-    "${var.namespace}-server-${count.index}.node.consul",
-
     "vault.service.consul",
     "vault.query.consul",
     "active.vault.service.consul",
+    "active.vault.service.${var.region}.consul",
     "standby.vault.service.consul",
+    "standby.vault.service.${var.region}.consul",
+    "performance-standby.vault.service.consul",
+    "performance-standby.vault.service.${var.region}.consul",
 
     # Common
     "localhost",
@@ -96,25 +101,29 @@ resource "tls_cert_request" "workers" {
   dns_names = [
     # Consul
     "${var.namespace}-worker-${count.index}.node.consul",
+    "${var.namespace}-worker-${count.index}.node.${var.region}.consul",
 
     "*.service.consul",
+    "*.service.${var.region}.consul",
     "*.query.consul",
     "consul.service.consul",
-    "server.dc1.consul",
 
     # Nomad
     "nomad.service.consul",
+    "nomad.service.${var.region}.consul",
 
     "client.global.nomad",
     "server.global.nomad",
 
     # Vault
-    "${var.namespace}-server-${count.index}.node.consul",
-    
     "vault.service.consul",
     "vault.query.consul",
     "active.vault.service.consul",
+    "active.vault.service.${var.region}.consul",
     "standby.vault.service.consul",
+    "standby.vault.service.${var.region}.consul",
+    "performance-standby.vault.service.consul",
+    "performance-standby.vault.service.${var.region}.consul",
 
     # Common
     "localhost",
