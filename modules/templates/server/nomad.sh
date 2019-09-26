@@ -64,6 +64,10 @@ client {
     path      = "/opt/mongodb/data/"
     read_only = false
   }
+  host_volume "prometheus_mount" {
+    path      = "/opt/prometheus/data/"
+    read_only = false
+  }
 }
 tls {
   rpc  = true
