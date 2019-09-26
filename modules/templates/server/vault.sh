@@ -41,6 +41,10 @@ seal "awskms" {
   region = "${region}"
   kms_key_id = "${kmskey}"
 }
+telemetry {
+  prometheus_retention_time = "30s",
+  disable_hostname = true
+}
 api_addr = "https://$(public_ip):8200"
 disable_mlock = true
 ui = true
