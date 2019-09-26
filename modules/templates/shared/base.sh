@@ -68,6 +68,8 @@ ssh-apt install \
   vim \
   wget \
   tree \
+  nfs-kernel-server \
+  nfs-common \
   python3-pip \
   ruby-full \
   npm \

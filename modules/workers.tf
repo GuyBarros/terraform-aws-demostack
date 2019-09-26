@@ -68,14 +68,14 @@ resource "aws_instance" "workers" {
 
 
   root_block_device{
-    volume_size           = "50"
+    volume_size           = "240"
     delete_on_termination = "true"
   }
 
    ebs_block_device  {
     device_name           = "/dev/xvdd"
     volume_type           = "gp2"
-    volume_size           = "50"
+    volume_size           = "240"
     delete_on_termination = "true"
   }
 

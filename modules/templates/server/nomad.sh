@@ -19,7 +19,7 @@ consul kv put service/vault/${node_name}-token $NOMAD_VAULT_TOKEN
 echo "--> Create a Directory to Use as a Mount Target"
 sudo mkdir -p /opt/mysql/data/
 sudo mkdir -p /opt/mongodb/data/
-
+sudo mkdir -p /opt/prometheus/data/
 
 echo "--> Installing CNI plugin"
 sudo mkdir -p /opt/cni/bin/
