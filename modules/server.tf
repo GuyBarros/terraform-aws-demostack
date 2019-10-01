@@ -45,7 +45,7 @@ data "template_file" "server" {
 
     # Nomad jobs
     fabio_url      = var.fabio_url
-    hashiui_url    = var.hashiui_url
+    
 
     # Vault
     vault_url        = var.vault_url
