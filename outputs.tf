@@ -30,7 +30,7 @@ o888o   o888o `Y888""8o 8""888P' o888o o888o o888o  `Y8bood8P'  `Y8bod8P' d888b 
     \  / :   ___________   : \,'
      `.| |  |           |  |,'
        `.|  |           |  |
-         |  | SSt       |  |
+         |  | HashiCorp |  |
 
 SHELLCOMMANDS
 }
