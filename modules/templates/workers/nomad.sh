@@ -90,7 +90,9 @@ autopilot {
     disable_upgrade_migration = false
     enable_custom_upgrades = false
 }
-
+telemetry {
+  prometheus_metrics = true
+}
 EOF
 
 echo "--> Writing profile"
