@@ -1,4 +1,4 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 set -ex
 
 echo "==> Vault (server)"
@@ -48,6 +48,10 @@ telemetry {
 api_addr = "https://$(public_ip):8200"
 disable_mlock = true
 ui = true
+telemetry {
+  prometheus_retention_time = "30s",
+  disable_hostname = false
+}
 EOF
 
 echo "--> Writing profile"
@@ -87,7 +91,7 @@ if ! vault operator init -status >/dev/null; then
   vault operator init  -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1 > /tmp/out.txt
   cat /tmp/out.txt | grep "Recovery Key 1" | sed 's/Recovery Key 1: //' | consul kv put service/vault/recovery-key -
    cat /tmp/out.txt | grep "Initial Root Token" | sed 's/Initial Root Token: //' | consul kv put service/vault/root-token -
-  
+
 export VAULT_TOKEN=$(consul kv get service/vault/root-token)
 echo "ROOT TOKEN: $VAULT_TOKEN"
 
@@ -166,36 +170,36 @@ echo "--> Attempting to create nomad role"
 }
 
 path "pki/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 EOR
 
   vault policy write test - <<EOR
   path "kv/*" {
-    capabilities = ["list"] 
+    capabilities = ["list"]
 }
 
 path "kv/test" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 path "kv/data/test" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 path "pki/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 
 path "kv/metadata/cgtest" {
-    capabilities = ["list"] 
+    capabilities = ["list"]
 }
 
 
 path "kv/data/cgtest" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
     control_group = {
         factor "approvers" {
             identity {
@@ -217,7 +221,7 @@ EOR
     orphan=false \
     disallowed_policies=nomad-server \
     explicit_max_ttl=0
- 
+
  echo "--> Mount KV in Vault"
  {
  vault secrets enable -version=2 kv &&
@@ -246,7 +250,7 @@ vault write pki/root/generate/internal common_name=service.consul
   echo "--> pki generate internal already configured, moving on"
 }
 {
-vault write pki/roles/consul-service generate_lease=true allowed_domains="service.consul" allow_subdomains="true" 
+vault write pki/roles/consul-service generate_lease=true allowed_domains="service.consul" allow_subdomains="true"
 }||
 {
   echo "--> pki role already configured, moving on"
@@ -254,20 +258,20 @@ vault write pki/roles/consul-service generate_lease=true allowed_domains="servic
 
 {
 vault policy write superuser - <<EOR
-path "*" { 
-  capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+path "*" {
+  capabilities = ["create", "read", "update", "delete", "list", "sudo"]
   }
 
   path "kv/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 path "kv/test/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 path "pki/*" {
-    capabilities = ["create", "read", "update", "delete", "list", "sudo"] 
+    capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
 path "sys/control-group/authorize" {
