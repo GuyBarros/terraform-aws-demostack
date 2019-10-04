@@ -47,7 +47,7 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
     "disable_upgrade_migration": false
   },
   "telemetry": {
-    "disable_hostname": true
+    "disable_hostname": true,
     "prometheus_retention_time": "30s"
   }
 }
