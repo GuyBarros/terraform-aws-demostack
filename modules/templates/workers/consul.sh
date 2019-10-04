@@ -45,7 +45,7 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   },
   "telemetry": {
     "disable_hostname": true
-    "prometheus_retention_time ": "30s"
+    "prometheus_retention_time": "30s"
   }
 }
 EOF
