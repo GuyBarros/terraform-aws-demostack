@@ -6,10 +6,6 @@ output "workers" {
   value = [aws_route53_record.workers.*.fqdn]
 }
 
-output "hashi_ui" {
-  value = "http://${aws_route53_record.hashiui.fqdn}:3000"
-}
-
 output "fabio_lb" {
   value = "http://${aws_route53_record.fabio.fqdn}:9999"
 }

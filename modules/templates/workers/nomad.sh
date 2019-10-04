@@ -10,6 +10,7 @@ install_from_url "nomad" "${nomad_url}"
 echo "--> Create a Directory to Use as a Mount Target"
 sudo mkdir -p /opt/mysql/data/
 sudo mkdir -p /opt/mongodb/data/
+sudo mkdir -p /opt/prometheus/data/
 
 
 echo "--> Installing CNI plugin"
@@ -89,7 +90,9 @@ autopilot {
     disable_upgrade_migration = false
     enable_custom_upgrades = false
 }
-
+telemetry {
+  prometheus_metrics = true
+}
 EOF
 
 echo "--> Writing profile"

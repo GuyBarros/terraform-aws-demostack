@@ -45,7 +45,6 @@ module "primarycluster" {
   consul_url           = var.consul_url
   consul_ent_url       = var.consul_ent_url
   fabio_url            = var.fabio_url
-  hashiui_url          = var.hashiui_url
   nomad_url            = var.nomad_url
   nomad_ent_url        = var.nomad_ent_url
   cni_plugin_url       = var.cni_plugin_url
@@ -72,7 +71,7 @@ module "primarycluster" {
   nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
 }
 
-/*
+
 module "secondarycluster" {
     source = "./modules"
   owner                = var.owner
@@ -87,7 +86,6 @@ module "secondarycluster" {
   consul_url           = var.consul_url
   consul_ent_url       = var.consul_ent_url
   fabio_url            = var.fabio_url
-  hashiui_url          = var.hashiui_url
   nomad_url            = var.nomad_url
   nomad_ent_url        = var.nomad_ent_url
   cni_plugin_url       = var.cni_plugin_url
@@ -112,7 +110,7 @@ module "secondarycluster" {
   consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
   nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
 }
-*/
+
 
 /*
 module "tertiarycluster" {
@@ -129,7 +127,6 @@ module "tertiarycluster" {
   consul_url           = var.consul_url
   consul_ent_url       = var.consul_ent_url
   fabio_url            = var.fabio_url
-  hashiui_url          = var.hashiui_url
   nomad_url            = var.nomad_url
   nomad_ent_url        = var.nomad_ent_url
   cni_plugin_url       = var.cni_plugin_url

@@ -35,17 +35,21 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
     "grpc": 8502
   },
   "connect":{
-  "enabled": true
-      },
+    "enabled": true
+  },
   "ui": true,
-  "enable_central_service_config":true,     
-"autopilot": {
+  "enable_central_service_config":true,
+  "autopilot": {
     "cleanup_dead_servers": true,
     "last_contact_threshold": "200ms",
     "max_trailing_logs": 250,
     "server_stabilization_time": "10s",
     "disable_upgrade_migration": false
- }
+  },
+  "telemetry": {
+    "disable_hostname": true
+    "prometheus_retention_time ": "30s"
+  }
 }
 EOF
 

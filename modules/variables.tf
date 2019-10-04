@@ -36,11 +36,6 @@ variable "fabio_url" {
   default     = "https://github.com/fabiolb/fabio/releases/download/v1.5.7/fabio-1.5.7-go1.9.2-linux_amd64"
 }
 
-variable "hashiui_url" {
-  description = "The url to download hashi-ui."
-  default     = "https://github.com/jippi/hashi-ui/releases/download/v0.26.1/hashi-ui-linux-amd64"
-}
-
 variable "nomad_url" {
   description = "The url to download nomad."
   default     = "https://releases.hashicorp.com/nomad/0.8.6/nomad_0.8.6_linux_amd64.zip"

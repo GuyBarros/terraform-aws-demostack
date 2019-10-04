@@ -45,7 +45,7 @@ data "template_file" "server" {
 
     # Nomad jobs
     fabio_url      = var.fabio_url
-    hashiui_url    = var.hashiui_url
+    
 
     # Vault
     vault_url        = var.vault_url
@@ -80,14 +80,14 @@ resource "aws_instance" "server" {
   iam_instance_profile   = aws_iam_instance_profile.consul-join.name
   vpc_security_group_ids = [aws_security_group.demostack.id]
   root_block_device{
-    volume_size           = "50"
+    volume_size           = "240"
     delete_on_termination = "true"
   }
 
    ebs_block_device  {
     device_name           = "/dev/xvdd"
     volume_type           = "gp2"
-    volume_size           = "50"
+    volume_size           = "240"
     delete_on_termination = "true"
 }
 

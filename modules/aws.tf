@@ -91,6 +91,15 @@ resource "aws_security_group" "demostack" {
       cidr_blocks = [ "${ingress.value}" ]
     }
   }
+
+#HTTP 
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 #Demostack LDAP
   ingress {
     from_port   = 389
@@ -107,6 +116,16 @@ resource "aws_security_group" "demostack" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+
+#Grafana
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 
   #Demostack Postgres
   ingress {
@@ -125,28 +144,10 @@ resource "aws_security_group" "demostack" {
   }
 
 
-  #Demostack HTTPS
-  ingress {
-    from_port   = 27017
-    to_port     = 27017
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-#HTTP 
-
-#TODO - Remove when sslcerts are done
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
 #Consul and Vault ports
   ingress {
     from_port   = 8000
-    to_port     = 9010
+    to_port     = 9200
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -171,7 +172,7 @@ ingress {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+ 
   ingress {
     from_port   = 30000
     to_port     = 39999

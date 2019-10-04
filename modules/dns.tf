@@ -1,12 +1,5 @@
 
-resource "aws_route53_record" "hashiui" {
-  zone_id = var.zone_id
-   name    = "hashiui.${var.namespace}"
-  # name    = "hashiui"
-  type    = "CNAME"
-  records = [aws_instance.workers.0.public_dns]
-  ttl     = "300"
-}
+
 resource "aws_route53_record" "fabio" {
   zone_id = var.zone_id
    name    = "fabio.${var.namespace}"
