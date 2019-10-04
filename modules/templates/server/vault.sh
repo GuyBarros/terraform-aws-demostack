@@ -48,10 +48,6 @@ telemetry {
 api_addr = "https://$(public_ip):8200"
 disable_mlock = true
 ui = true
-telemetry {
-  prometheus_retention_time = "30s",
-  disable_hostname = false
-}
 EOF
 
 echo "--> Writing profile"
