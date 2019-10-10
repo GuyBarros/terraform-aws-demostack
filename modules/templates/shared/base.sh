@@ -73,6 +73,11 @@ ssh-apt install \
   python3-pip \
   ruby-full \
   npm \
+  apt-transport-https \
+  ca-certificates \
+  curl \
+  gnupg-agent \
+  software-properties-common \
   &>/dev/null
 
 echo "--> Installing git secrets"
@@ -106,5 +111,14 @@ echo "--> Configuring DNSmasq"
 sudo bash -c "cat >/etc/dnsmasq.d/10-consul" << EOF
 server=/consul/127.0.0.1#8600
 EOF
+
+echo "--> Install Envoy"
+curl -sL 'https://getenvoy.io/gpg' | sudo apt-key add -
+sudo add-apt-repository \
+"deb [arch=amd64] https://dl.bintray.com/tetrate/getenvoy-deb \
+$(lsb_release -cs) \
+stable"
+sudo apt-get update && sudo apt-get install -y getenvoy-envoy
+envoy --version
 
 echo "==> Base is done!"
