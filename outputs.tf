@@ -1,16 +1,16 @@
 output "A_Welcome_Message" {
   value = <<SHELLCOMMANDS
-  
-ooooo   ooooo                    oooo         o8o    .oooooo.                                 
-`888'   `888'                    `888         `"'   d8P'  `Y8b                                
- 888     888   .oooo.    .oooo.o  888 .oo.   oooo  888           .ooooo.  oooo d8b oo.ooooo.  
- 888ooooo888  `P  )88b  d88(  "8  888P"Y88b  `888  888          d88' `88b `888""8P  888' `88b 
- 888     888   .oP"888  `"Y88b.   888   888   888  888          888   888  888      888   888 
- 888     888  d8(  888  o.  )88b  888   888   888  `88b    ooo  888   888  888      888   888 
-o888o   o888o `Y888""8o 8""888P' o888o o888o o888o  `Y8bood8P'  `Y8bod8P' d888b     888bod8P' 
-                                                                                    888       
-                                                                                   o888o      
-                                                                                              
+
+ooooo   ooooo                    oooo         o8o    .oooooo.
+`888'   `888'                    `888         `"'   d8P'  `Y8b
+ 888     888   .oooo.    .oooo.o  888 .oo.   oooo  888           .ooooo.  oooo d8b oo.ooooo.
+ 888ooooo888  `P  )88b  d88(  "8  888P"Y88b  `888  888          d88' `88b `888""8P  888' `88b
+ 888     888   .oP"888  `"Y88b.   888   888   888  888          888   888  888      888   888
+ 888     888  d8(  888  o.  )88b  888   888   888  `88b    ooo  888   888  888      888   888
+o888o   o888o `Y888""8o 8""888P' o888o o888o o888o  `Y8bood8P'  `Y8bod8P' d888b     888bod8P'
+                                                                                    888
+                                                                                   o888o
+
 
 
  |.--------_--_------------_--__--.|
@@ -53,11 +53,11 @@ output "Primary_Fabio" {
 }
 
 output "Primary_servers_nodes" {
-  value = [module.primarycluster.servers]
+  value = module.primarycluster.servers
 }
 
 output "Primary_workers_Nodes" {
-  value = [module.primarycluster.workers]
+  value = module.primarycluster.workers
 }
 
 
@@ -80,12 +80,11 @@ output "Secondary_Fabio" {
 }
 
 output "Secondary_servers_nodes" {
-  value = [module.secondarycluster.servers]
+  value = module.secondarycluster.servers
 }
 output "Secondary_workers_Nodes" {
-  value = [module.secondarycluster.workers]
+  value = module.secondarycluster.workers
 }
-
 
 // Tertiary
 /*
@@ -102,9 +101,9 @@ output "Tertiary_Fabio" {
   value = module.tertiarycluster.fabio_lb
 }
 output "Tertiary_server_nodes" {
-  value = [module.tertiarycluster.servers]
+  value = module.tertiarycluster.servers
 }
 output "Tertiary_workers_Nodes" {
-  value = [module.tertiarycluster.workers]
+  value = module.tertiarycluster.workers
 }
 */

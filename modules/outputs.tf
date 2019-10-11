@@ -1,9 +1,9 @@
 output "servers" {
-  value = [aws_route53_record.servers.*.fqdn]
+  value = aws_route53_record.servers.*.fqdn
 }
 
 output "workers" {
-  value = [aws_route53_record.workers.*.fqdn]
+  value = aws_route53_record.workers.*.fqdn
 }
 
 output "fabio_lb" {
