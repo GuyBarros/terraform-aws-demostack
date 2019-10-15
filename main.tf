@@ -60,6 +60,7 @@ module "primarycluster" {
   zone_id              = var.zone_id
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
+  primary_datacenter   = var.primary_datacenter
 
   # EMEA-SE-PLAYGROUND
   ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
@@ -71,7 +72,7 @@ module "primarycluster" {
   nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
 }
 
-
+/*
 module "secondarycluster" {
     source = "./modules"
   owner                = var.owner
@@ -101,6 +102,7 @@ module "secondarycluster" {
   zone_id              = var.zone_id
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
+  primary_datacenter   = var.primary_datacenter
   # EMEA-SE-PLAYGROUND
   ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
   ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem
@@ -110,7 +112,7 @@ module "secondarycluster" {
   consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
   nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
 }
-
+*/
 
 /*
 module "tertiarycluster" {
@@ -142,7 +144,7 @@ module "tertiarycluster" {
   zone_id            = var.zone_id
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
-
+  primary_datacenter   = var.primary_datacenter
   # EMEA-SE-PLAYGROUND
   ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
   ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem

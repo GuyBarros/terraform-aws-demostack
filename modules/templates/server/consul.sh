@@ -18,6 +18,7 @@ sudo mkdir -p /etc/consul.d
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
+  "primary_datacenter":  "${primary_datacenter}",
   "bootstrap_expect": ${consul_servers},
   "advertise_addr": "$(private_ip)",
   "advertise_addr_wan": "$(public_ip)",
@@ -120,6 +121,16 @@ curl -so /dev/null -X PUT http://127.0.0.1:8500/v1/acl/update \
   "Rules": "key \"vault\" { policy = \"deny\" }\n\nkey \"tmp\" { policy = \"deny\" }"
 }
 BODY
+
+echo "--> writting default gateway configs for Mesh Gateways"
+sudo tee /tmp/proxy-defaults.json > /dev/null <<"EOF"
+Kind = "proxy-defaults"
+Name = "global"
+MeshGateway {
+   Mode = "local"
+}
+EOF
+consul config write /tmp/proxy-defaults.json
 
 
 

@@ -161,3 +161,8 @@ variable "host_access_ip" {
   description = "CIDR blocks allowed to connect via SSH on port 22"
   default = [  ]
 }
+
+variable "primary_datacenter"{
+  description = "the primary datacenter for mesh gateways"
+  default = ""
+}

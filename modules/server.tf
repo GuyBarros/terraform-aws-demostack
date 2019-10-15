@@ -29,6 +29,7 @@ data "template_file" "server" {
     public_key = var.public_key
 
     # Consul
+    primary_datacenter    = var.primary_datacenter
     consul_url            = var.consul_url
     consul_ent_url        = var.consul_ent_url
     consul_gossip_key     = var.consul_gossip_key
