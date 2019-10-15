@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 echo "create  demo directory"
 sudo mkdir /demostack
 
@@ -59,9 +58,9 @@ job "fabio" {
     }
 
     resources {
-      
+
       network {
-        
+
         port "http" {
           static = 9999
         }

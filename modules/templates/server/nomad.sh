@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -e
-
 echo "==> Nomad (server)"
 
 echo "--> Fetching"

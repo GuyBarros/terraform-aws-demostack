@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -e
-
 echo "==> Consul (client)"
 
 echo "==> Consul (server)"
@@ -95,7 +93,5 @@ cache-size=0
 EOF
 sudo systemctl enable dnsmasq
 sudo systemctl restart dnsmasq
-
-
 
 echo "==> Consul is done!"

@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -e
-
 echo "==> Consul (server)"
 if [ ${enterprise} == 0 ]
 then
@@ -131,7 +129,5 @@ MeshGateway {
 }
 EOF
 consul config write /tmp/proxy-defaults.json
-
-
 
 echo "==> Consul is done!"

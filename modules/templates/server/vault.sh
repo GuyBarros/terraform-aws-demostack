@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -ex
-
 echo "==> Vault (server)"
 # Vault expects the key to be concatenated with the CA
 sudo mkdir -p /etc/vault.d/tls/

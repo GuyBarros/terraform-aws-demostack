@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -e
-
 echo "==> Base"
 
 echo "==> libc6 issue workaround"
