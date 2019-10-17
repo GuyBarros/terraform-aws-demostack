@@ -120,14 +120,4 @@ curl -so /dev/null -X PUT http://127.0.0.1:8500/v1/acl/update \
 }
 BODY
 
-echo "--> writting default gateway configs for Mesh Gateways"
-sudo tee /tmp/proxy-defaults.json > /dev/null <<"EOF"
-Kind = "proxy-defaults"
-Name = "global"
-MeshGateway {
-   Mode = "local"
-}
-EOF
-consul config write /tmp/proxy-defaults.json
-
 echo "==> Consul is done!"

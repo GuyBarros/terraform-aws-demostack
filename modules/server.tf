@@ -9,7 +9,6 @@ data "template_file" "server" {
     file("${path.module}/templates/server/vault.sh"),
     file("${path.module}/templates/server/nomad.sh"),
     file("${path.module}/templates/server/nomad-jobs.sh"),
-    
   ))}"
 
   vars = {
@@ -47,7 +46,6 @@ data "template_file" "server" {
     # Nomad jobs
     fabio_url      = var.fabio_url
     
-
     # Vault
     vault_url        = var.vault_url
     vault_ent_url    = var.vault_ent_url
