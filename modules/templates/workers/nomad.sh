@@ -89,6 +89,8 @@ autopilot {
     enable_custom_upgrades = false
 }
 telemetry {
+  publish_allocation_metrics = true
+  publish_node_metrics = true
   prometheus_metrics = true
 }
 EOF
