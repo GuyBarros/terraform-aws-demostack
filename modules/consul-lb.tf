@@ -52,6 +52,6 @@ resource "aws_alb_listener" "consul" {
 resource "aws_alb_target_group_attachment" "consul" {
   count            = var.servers
   target_group_arn = aws_alb_target_group.consul.arn
-  target_id        = "${element(aws_instance.server.*.id, count.index)}"
+  target_id        = "${element(aws_instance.servers.*.id, count.index)}"
   port             = "8500"
 }

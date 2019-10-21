@@ -52,6 +52,6 @@ resource "aws_alb_listener" "vault" {
 resource "aws_alb_target_group_attachment" "vault" {
   count            = var.servers
   target_group_arn = "${aws_alb_target_group.vault.arn}"
-  target_id        = "${element(aws_instance.server.*.id, count.index)}"
+  target_id        = "${element(aws_instance.servers.*.id, count.index)}"
   port             = "8200"
 }

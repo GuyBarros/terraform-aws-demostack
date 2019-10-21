@@ -39,7 +39,7 @@ resource "aws_route53_record" "servers" {
   name    = "server-${count.index}.${var.namespace}"
   // name    = "server-${count.index}"
   type    = "CNAME"
-  records = ["${element(aws_instance.server.*.public_dns, count.index)}"]
+  records = ["${element(aws_instance.servers.*.public_dns, count.index)}"]
   ttl     = "300"
 }
 

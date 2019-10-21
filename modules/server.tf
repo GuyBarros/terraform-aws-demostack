@@ -1,4 +1,4 @@
-data "template_file" "server" {
+data "template_file" "servers" {
   count = "${var.servers}"
 
   template = "${join("\n", list(
@@ -55,7 +55,7 @@ data "template_file" "server" {
 }
 
 # Gzip cloud-init config
-data "template_cloudinit_config" "server" {
+data "template_cloudinit_config" "servers" {
   count = "${var.servers}"
 
   gzip          = true
@@ -63,12 +63,12 @@ data "template_cloudinit_config" "server" {
 
   part {
     content_type = "text/x-shellscript"
-    content      = "${element(data.template_file.server.*.rendered, count.index)}"
+    content      = "${element(data.template_file.servers.*.rendered, count.index)}"
   }
 }
 
 
-resource "aws_instance" "server" {
+resource "aws_instance" "servers" {
   count = var.servers
 
   ami           = data.aws_ami.ubuntu.id
@@ -99,5 +99,5 @@ resource "aws_instance" "server" {
     ConsulJoin     = var.consul_join_tag_value
   }
 
-  user_data = "${element(data.template_cloudinit_config.server.*.rendered, count.index)}"
+  user_data = "${element(data.template_cloudinit_config.servers.*.rendered, count.index)}"
 }
