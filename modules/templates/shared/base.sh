@@ -54,9 +54,13 @@ sudo tee /etc/ssl/certs/me.key > /dev/null <<EOF
 ${me_key}
 EOF
 
+echo "--> updated version of Nodejs"
+curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+
 echo "--> Installing common dependencies"
 ssh-apt install \
   build-essential \
+  nodejs \
   curl \
   emacs \
   git \
@@ -70,7 +74,6 @@ ssh-apt install \
   nfs-common \
   python3-pip \
   ruby-full \
-  npm \
   apt-transport-https \
   ca-certificates \
   curl \
