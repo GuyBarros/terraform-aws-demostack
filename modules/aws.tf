@@ -127,18 +127,10 @@ resource "aws_security_group" "demostack" {
   }
 
 
-  #Demostack Postgres
+  #Demostack Postgres + pgadmin
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-#Demostack pgadmin
-  ingress {
-    from_port   = 5050
-    to_port     = 5050
+    from_port   = 5000
+    to_port     = 5500
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
