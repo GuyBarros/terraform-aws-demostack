@@ -54,6 +54,19 @@ sudo tee /etc/ssl/certs/me.key > /dev/null <<EOF
 ${me_key}
 EOF
 
+
+echo "--> Setting iptables for bridge networking"
+echo 1 > /proc/sys/net/bridge/bridge-nf-call-arptables
+echo 1 > /proc/sys/net/bridge/bridge-nf-call-ip6tables
+echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+echo "--> Making iptables settings for bridge networking config change"
+sudo tee /etc/sysctl.d/nomadtables > /dev/null <<EOF
+net.bridge.bridge-nf-call-arptables = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+
 echo "--> updated version of Nodejs"
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
