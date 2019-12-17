@@ -1,0 +1,6 @@
+ hostname     = "app.terraform.io"
+    organization = "<MY_ORG>"
+
+    workspaces {
+      name = ""<MY_WORKSPACE>"
+    }
