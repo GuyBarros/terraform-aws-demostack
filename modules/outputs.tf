@@ -6,6 +6,14 @@ output "workers" {
   value = aws_route53_record.workers.*.fqdn
 }
 
+output "vpc_id" {
+  value = aws_vpc.demostack.id
+}
+
+output "subnet_ids" {
+  value = aws_subnet.demostack.*.id
+}
+
 output "fabio_lb" {
   value = "http://${aws_route53_record.fabio.fqdn}:9999"
 }
