@@ -1,7 +1,7 @@
 # terraform-aws-demostack
-    This Project configures Nomad, Vault and Consul on a variable amount of servers and workers. it already set up some nomad jobs, vault configurations and Consul queries. this is meant as a reference (and a demo enviroment) and really shouldnt be used for production. 
+    This Project configures Nomad, Vault and Consul on a variable amount of servers and workers. it already set up some nomad jobs, vault configurations and Consul queries. this is meant as a reference (and a demo enviroment) and really shouldnt be used for production.
 ## Solution Diagram
-![Solution Diagram](./assets/Demostack_overview.png)
+![Solution Diagram](./assets/Demostack_overview.webp)
 
 ## Dependencies
  <TODO>
@@ -19,7 +19,7 @@
  <TODO>
 
  ## Nomad
- 
+
  <TODO>
 
 ## troubleshooting

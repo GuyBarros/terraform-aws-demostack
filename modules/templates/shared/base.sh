@@ -25,6 +25,7 @@ function ssh-apt {
     "$@"
 }
 
+
 echo "--> Adding helper for IP retrieval"
 sudo tee /etc/profile.d/ips.sh > /dev/null <<EOF
 function private_ip {

@@ -52,6 +52,10 @@ output "Primary_Fabio" {
   value = module.primarycluster.fabio_lb
 }
 
+output "Primary_Traefik" {
+  value = module.primarycluster.traefik_lb
+}
+
 output "Primary_servers_nodes" {
   value = module.primarycluster.servers
 }
