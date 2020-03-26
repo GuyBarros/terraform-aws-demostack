@@ -158,7 +158,6 @@ sleep 180
 echo "--> Running  Nomad Job"
 
  nomad run hashibo.nomad
- nomad run catalogue-with-connect.nomad
  nomad run nginx-pki.nomad
 
 fi

@@ -1,0 +1,45 @@
+2020/02/13 13:06:13 [INFO] Terraform version: 0.12.20  
+2020/02/13 13:06:13 [INFO] Go runtime version: go1.12.13
+2020/02/13 13:06:13 [INFO] CLI args: []string{"/Users/guy/HashiStack/terraform", "init"}
+2020/02/13 13:06:13 [DEBUG] Attempting to open CLI config file: /Users/guy/.terraformrc
+2020/02/13 13:06:13 Loading CLI configuration from /Users/guy/.terraformrc
+2020/02/13 13:06:13 [INFO] CLI command args: []string{"init"}
+2020/02/13 13:06:13 [TRACE] ModuleInstaller: installing child modules for . into .terraform/modules
+2020/02/13 13:06:13 [DEBUG] Module installer: begin primarycluster
+2020/02/13 13:06:13 [TRACE] ModuleInstaller: Module installer: primarycluster <nil> already installed in modules
+2020/02/13 13:06:13 [TRACE] modsdir: writing modules manifest to .terraform/modules/modules.json
+2020/02/13 13:06:13 [TRACE] Meta.Backend: built configuration for "remote" backend with hash value 4115669078
+2020/02/13 13:06:13 [TRACE] Preserving existing state lineage "63433c21-8591-0112-41c7-c4b0e437ebc6"
+2020/02/13 13:06:13 [TRACE] Preserving existing state lineage "63433c21-8591-0112-41c7-c4b0e437ebc6"
+2020/02/13 13:06:14 [TRACE] Meta.Backend: working directory was previously initialized for "remote" backend
+2020/02/13 13:06:14 [TRACE] backendConfigNeedsMigration: configuration values have changed, so migration is required
+2020/02/13 13:06:14 [TRACE] Meta.Backend: backend configuration has changed (from type "remote" to type "remote")
+2020/02/13 13:06:14 [WARN] backend config has changed since last init
+2020/02/13 13:06:14 [DEBUG] command: asking for input: "organization"
+panic: interface conversion: interface {} is nil, not map[string]interface {}
+
+goroutine 1 [running]:
+github.com/zclconf/go-cty/cty.Value.GetAttr(0x2ee37a0, 0xc0000c80b0, 0x0, 0x0, 0x2a05a1d, 0xc, 0x106e95a, 0x2e9f960, 0x100b709, 0x2ee35e0)
+	/opt/teamcity-agent/work/9e329aa031982669/pkg/mod/github.com/zclconf/go-cty@v1.2.1/cty/value_ops.go:711 +0x40b
+github.com/hashicorp/terraform/backend/remote.(*Remote).PrepareConfig(0xc000506d10, 0x2ee37a0, 0xc0000c80b0, 0x0, 0x0, 0x1, 0xc00068e150, 0x1, 0x1, 0x4044900, ...)
+	/opt/teamcity-agent/work/9e329aa031982669/src/github.com/hashicorp/terraform/backend/remote/backend.go:146 +0x7f
+github.com/hashicorp/terraform/command.(*Meta).backendInitFromConfig(0xc0004d2700, 0xc0004717c0, 0xc7, 0xc0003344e0, 0xc7, 0xc000334410, 0xce, 0xc0000ca060, 0xc000580780, 0x46, ...)
+	/opt/teamcity-agent/work/9e329aa031982669/src/github.com/hashicorp/terraform/command/meta_backend.go:1116 +0x2df
+github.com/hashicorp/terraform/command.(*Meta).backend_C_r_S_changed(0xc0004d2700, 0xc0004717c0, 0xf5502056, 0xc000537f80, 0x1, 0x0, 0x0, 0x0, 0x0, 0x0)
+	/opt/teamcity-agent/work/9e329aa031982669/src/github.com/hashicorp/terraform/command/meta_backend.go:876 +0xa2
+github.com/hashicorp/terraform/command.(*Meta).backendFromConfig(0xc0004d2700, 0xc0000ad1e0, 0x0, 0x0, 0x0, 0x0, 0x0)
+	/opt/teamcity-agent/work/9e329aa031982669/src/github.com/hashicorp/terraform/command/meta_backend.go:551 +0x9ad
+github.com/hashicorp/terraform/command.(*Meta).Backend(0xc0004d2700, 0xc0000ad1e0, 0x0, 0xc0006b3700, 0x1, 0x1, 0x0)
+	/opt/teamcity-agent/work/9e329aa031982669/src/github.com/hashicorp/terraform/command/meta_backend.go:85 +0x5ee
+github.com/hashicorp/terraform/command.(*InitCommand).initBackend(0xc0004d2700, 0xc0001b8180, 0x2a09127, 0xf, 0xc0004d1220, 0x1, 0x0, 0x0, 0x0, 0x0, ...)
+	/opt/teamcity-agent/work/9e329aa031982669/src/github.com/hashicorp/terraform/command/init.go:482 +0x1c9
+github.com/hashicorp/terraform/command.(*InitCommand).Run(0xc0004d2700, 0xc0000cc010, 0x0, 0x0, 0xc0000cffb0)
+	/opt/teamcity-agent/work/9e329aa031982669/src/github.com/hashicorp/terraform/command/init.go:287 +0x1931
+github.com/mitchellh/cli.(*CLI).Run(0xc000286f00, 0xc000286f00, 0xc000539d90, 0x1)
+	/opt/teamcity-agent/work/9e329aa031982669/pkg/mod/github.com/mitchellh/cli@v1.0.0/cli.go:255 +0x1f1
+main.wrappedMain(0x0)
+	/opt/teamcity-agent/work/9e329aa031982669/src/github.com/hashicorp/terraform/main.go:239 +0xc33
+main.realMain(0x0)
+	/opt/teamcity-agent/work/9e329aa031982669/src/github.com/hashicorp/terraform/main.go:103 +0xb4
+main.main()
+	/opt/teamcity-agent/work/9e329aa031982669/src/github.com/hashicorp/terraform/main.go:39 +0x3b
