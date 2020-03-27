@@ -93,6 +93,7 @@ ssh-apt install \
   curl \
   gnupg-agent \
   software-properties-common \
+  openjdk-9-jdk-headless \
   &>/dev/null
 
 echo "--> Installing git secrets"
