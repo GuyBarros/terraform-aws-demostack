@@ -73,7 +73,7 @@ output "Primary_nomad_tag_servers"{
 }
 
 // Secondary
-/*
+
 output "Secondary_Consul" {
   value = module.secondarycluster.consul_ui
 }
@@ -103,7 +103,7 @@ output "Secondary_nomad_tag_workers"{
 output "Secondary_nomad_tag_servers"{
   value = module.secondarycluster.nomad_tag_servers
 }
-*/
+
 
 // Tertiary
 /*

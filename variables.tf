@@ -1,3 +1,12 @@
+data "http" "myipaddr" {
+    url = "http://ipv4.icanhazip.com"
+}
+
+locals {
+   host_access_ip = ["${chomp(data.http.myipaddr.body)}/32"]
+}
+
+
 variable "region" {
   description = "The region to create resources."
   default     = "eu-west-2"
@@ -196,10 +205,6 @@ variable "run_nomad_jobs" {
   default = "0"
 }
 
-variable "host_access_ip" {
-  description = "CIDR blocks allowed to connect via SSH on port 22"
-  default     = []
-}
 
 variable "primary_datacenter"{
   description = "the primary datacenter for mesh gateways"
