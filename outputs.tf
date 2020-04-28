@@ -1,3 +1,5 @@
+////////////////////// Main //////////////////////////
+
 output "A_Welcome_Message" {
   value = <<SHELLCOMMANDS
 
@@ -72,8 +74,17 @@ output "Primary_nomad_tag_servers"{
   value = module.primarycluster.nomad_tag_servers
 }
 
-// Secondary
+output "Primary_k8s_eks_endpoint"{
+  value = module.primarycluster.eks_endpoint
+}
 
+output "Primary_k8s_eks_ca"{
+  value = module.primarycluster.eks_ca
+}
+
+
+// Secondary
+/*
 output "Secondary_Consul" {
   value = module.secondarycluster.consul_ui
 }
@@ -104,6 +115,8 @@ output "Secondary_nomad_tag_servers"{
   value = module.secondarycluster.nomad_tag_servers
 }
 
+
+*/
 
 // Tertiary
 /*

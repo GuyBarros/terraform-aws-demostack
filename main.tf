@@ -70,7 +70,7 @@ module "primarycluster" {
   nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
 }
 
-
+/*
 module "secondarycluster" {
     source = "./modules"
   owner                = var.owner
@@ -110,7 +110,7 @@ module "secondarycluster" {
   consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
   nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
 }
-
+*/
 
 /*
 module "tertiarycluster" {

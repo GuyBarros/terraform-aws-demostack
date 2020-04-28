@@ -77,6 +77,8 @@ resource "aws_subnet" "demostack" {
   }
 }
 
+
+
 resource "aws_security_group" "demostack" {
   name_prefix = var.namespace
   vpc_id      = aws_vpc.demostack.id

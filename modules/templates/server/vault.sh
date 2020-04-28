@@ -316,4 +316,27 @@ echo "--> Setting up Github auth"
    echo "-->consul query already done, moving on"
  }
 
+
+ echo "-->Enabling transform"
+vault secrets enable  -path=/data-protection/masking/transform transform
+
+echo "-->Configuring CCN role for transform"
+vault write /data-protection/masking/transform/role/ccn transformations=ccn
+
+
+echo "-->Configuring transformation template"
+vault write /data-protection/masking/transform/transformation/ccn \
+        type=masking \
+        template="card-mask" \
+        masking_character="#" \
+        allowed_roles=ccn
+        
+echo "-->Configuring template masking"
+vault write /data-protection/masking/transform/template/card-mask type=regex \
+        pattern="(\d{4})-(\d{4})-(\d{4})-\d{4}" \
+        alphabet="builtin/numeric"
+        
+echo "-->Test transform"
+vault write /data-protection/masking/transform/encode/ccn value=2345-2211-3333-4356
+
 echo "==> Vault is done!"

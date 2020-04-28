@@ -1,3 +1,5 @@
+////////////////////// Module //////////////////////////
+
 output "servers" {
   value = aws_route53_record.servers.*.fqdn
 }
@@ -34,10 +36,19 @@ output "consul_ui" {
   value = "https://${aws_route53_record.consul.fqdn}:8500"
 }
 
+
 output "nomad_tag_workers"{
   value = data.template_file.workers.*.vars.node_name
 }
 
 output "nomad_tag_servers"{
   value = data.template_file.servers.*.vars.node_name
+}
+
+output "eks_endpoint" {
+  value = aws_eks_cluster.eks.endpoint
+}
+output "eks_ca" {
+ // value = aws_eks_cluster.eks.endpoint
+  value = aws_eks_cluster.eks.certificate_authority.0.data
 }
