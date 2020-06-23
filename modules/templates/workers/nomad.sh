@@ -6,10 +6,10 @@ echo "==> Nomad (server)"
 if [ ${enterprise} == 0 ]
 then
 echo "--> Fetching OSS binaries"
-install_from_url "consul" "${nomad_url}"
+install_from_url "nomad" "${nomad_url}"
 else
 echo "--> Fetching enterprise binaries"
-install_from_url "consul" "${nomad_ent_url}"
+install_from_url "nomad" "${nomad_ent_url}"
 fi
 
 echo "--> Create a Directory to Use as a Mount Target"
