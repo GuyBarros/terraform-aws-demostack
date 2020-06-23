@@ -1,3 +1,4 @@
+/*
 resource "aws_iam_role" "eks" {
   name = "${var.namespace}-eks"
 
@@ -26,6 +27,7 @@ resource "aws_iam_role_policy_attachment" "eks-AmazonEKSServicePolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
   role       = aws_iam_role.eks.name
 }
+
 
 
 resource "aws_eks_cluster" "eks" {
@@ -101,3 +103,4 @@ resource "aws_eks_node_group" "eks-node" {
     aws_iam_role_policy_attachment.eks-node-AmazonEC2ContainerRegistryReadOnly,
   ]
 }
+*/

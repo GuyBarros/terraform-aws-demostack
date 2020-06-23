@@ -31,6 +31,7 @@ data "template_file" "workers" {
 
     # Nomad
     nomad_url      =  var.nomad_url
+    nomad_ent_url        = var.nomad_ent_url
     cni_plugin_url = var.cni_plugin_url
     run_nomad_jobs = var.run_nomad_jobs
 

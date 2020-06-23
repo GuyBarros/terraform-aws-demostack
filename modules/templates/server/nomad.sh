@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 echo "==> Nomad (server)"
-
-echo "--> Fetching"
-install_from_url "nomad" "${nomad_url}"
-sleep 10
+if [ ${enterprise} == 0 ]
+then
+echo "--> Fetching OSS binaries"
+install_from_url "consul" "${nomad_url}"
+else
+echo "--> Fetching enterprise binaries"
+install_from_url "consul" "${nomad_ent_url}"
+fi
 
 echo "--> Generating Vault token..."
 export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
@@ -152,5 +156,14 @@ echo "--> Waiting for Nomad leader"
 while [ -z "$(curl -s http://localhost:4646/v1/status/leader)" ]; do
   sleep 5
 done
+
+
+if [ ${enterprise} == 1 ]
+then
+echo "--> apply Nomad License"
+sudo nomad license put "${nomadlicense}" > /tmp/nomadlicense.out
+
+
+fi
 
 echo "==> Nomad is done!"

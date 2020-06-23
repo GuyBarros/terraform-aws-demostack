@@ -163,6 +163,11 @@ variable "consullicense" {
   default     = ""
 }
 
+variable "nomadlicense" {
+  description = "Enterprise License for Nomad"
+  default     = ""
+}
+
 variable "instance_type_server" {
   description = "The type(size) of data servers (consul, nomad, etc)."
   default     = "r4.large"

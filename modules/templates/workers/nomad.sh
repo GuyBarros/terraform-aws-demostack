@@ -2,8 +2,15 @@
 echo "==> Nomad (client)"
 
 echo "--> Fetching"
-install_from_url "nomad" "${nomad_url}"
-
+echo "==> Nomad (server)"
+if [ ${enterprise} == 0 ]
+then
+echo "--> Fetching OSS binaries"
+install_from_url "consul" "${nomad_url}"
+else
+echo "--> Fetching enterprise binaries"
+install_from_url "consul" "${nomad_ent_url}"
+fi
 
 echo "--> Create a Directory to Use as a Mount Target"
 sudo mkdir -p /opt/mysql/data/
