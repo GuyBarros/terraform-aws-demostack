@@ -170,7 +170,8 @@ done
 if [ ${enterprise} == 1 ]
 then
 echo "--> apply Nomad License"
-sudo nomad license put "${nomadlicense}" > /tmp/nomadlicense.out
+echo -n "${nomadlicense}" > /tmp/nomad.hclic
+sudo nomad license put /tmp/nomad.hclic > /tmp/nomadlicense.out
 
 fi
 
