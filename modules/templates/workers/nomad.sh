@@ -155,7 +155,7 @@ while ! host active.vault.service.consul &> /dev/null; do
 done
 
 echo "--> Waiting for Nomad leader"
-while [ -z "$(curl -s http://localhost:4646/v1/status/leader)" ]; do
+while [ -z "$(curl -s https://localhost:4646/v1/status/leader)" ]; do
   sleep 5
 done
 
@@ -170,4 +170,3 @@ echo "--> Running  Nomad Job"
 fi
 
 echo "==> Run Nomad is Done!"
-

@@ -9,10 +9,15 @@ echo "--> Fetching enterprise binaries"
 install_from_url "nomad" "${nomad_ent_url}"
 fi
 
+echo "--> Waiting for Vault leader"
+while ! host active.vault.service.consul &> /dev/null; do
+  sleep 5
+done
+
 echo "--> Generating Vault token..."
 export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
-  NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
-  VAULT_ADDR="https://vault.query.consul:8200" \
+export NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
+  VAULT_ADDR="https://active.vault.service.consul:8200" \
   VAULT_SKIP_VERIFY=true \
   vault token create -field=token -policy=superuser -policy=nomad-server -display-name=${node_name} -id=${node_name} -period=72h)"
 
@@ -145,24 +150,28 @@ EOF
 
 sudo systemctl enable nomad
 sudo systemctl start nomad
-sleep 2
+sleep 5
+
+echo "--> Waiting for Nomad leader"
+while ! curl -s -k https://localhost:4646/v1/status/leader --show-error; do
+  sleep 2
+done
+
+echo "--> Waiting for a list of Nomad peers"
+while ! curl -s -k https://localhost:4646/v1/status/peers --show-error; do
+  sleep 2
+done
 
 echo "--> Waiting for all Nomad servers"
 while [ "$(nomad server members 2>&1 | grep "alive" | wc -l)" -lt "${nomad_servers}" ]; do
   sleep 5
 done
 
-echo "--> Waiting for Nomad leader"
-while [ -z "$(curl -s http://localhost:4646/v1/status/leader)" ]; do
-  sleep 5
-done
-
-
 if [ ${enterprise} == 1 ]
 then
 echo "--> apply Nomad License"
-sudo nomad license put "${nomadlicense}" > /tmp/nomadlicense.out
-
+echo -n "${nomadlicense}" > /tmp/nomad.hclic
+nomad license put /tmp/nomad.hclic > /tmp/nomadlicense.out
 
 fi
 
