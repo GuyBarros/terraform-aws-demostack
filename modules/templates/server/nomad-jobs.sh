@@ -75,7 +75,6 @@ job "fabio" {
 EOF
 
 echo "--> Running"
-nomad_run /demostack/hashi-ui.hcl
 nomad_run /demostack/fabio.hcl
 
 echo "==> Nomad jobs submitted!"
