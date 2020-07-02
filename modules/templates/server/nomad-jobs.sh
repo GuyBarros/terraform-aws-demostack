@@ -19,9 +19,8 @@ EOF
 
 echo "--> Fabio"
 sudo tee /demostack/fabio.hcl > /dev/null <<"EOF"
-job "fabio" {
-  region = "global"
-  datacenters = ["${region}"]
+job "fabio-${region}" {
+  datacenters = ["${region}a","${region}b","${region}c"]
 
   type     = "system"
   priority = 75
