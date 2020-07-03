@@ -38,9 +38,9 @@ resource "aws_alb_listener" "consul" {
 
   load_balancer_arn = aws_alb.consul.arn
 
-  port     = "8500"
-  protocol = "HTTPS"
-  certificate_arn = "${aws_acm_certificate_validation.cert.certificate_arn}"
+  port            = "8500"
+  protocol        = "HTTPS"
+  certificate_arn = aws_acm_certificate_validation.cert.certificate_arn
   ssl_policy      = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
 
   default_action {
@@ -52,6 +52,6 @@ resource "aws_alb_listener" "consul" {
 resource "aws_alb_target_group_attachment" "consul" {
   count            = var.servers
   target_group_arn = aws_alb_target_group.consul.arn
-  target_id        = "${element(aws_instance.servers.*.id, count.index)}"
+  target_id        = element(aws_instance.servers.*.id, count.index)
   port             = "8500"
 }

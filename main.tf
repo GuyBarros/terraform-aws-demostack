@@ -4,19 +4,19 @@ terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
     organization = "emea-se-playground-2019"
-    workspaces  {
+    workspaces {
       name = "Guy-AWS-Demostack"
-  }
+    }
   }
 }
 
 // Workspace Data
 data "terraform_remote_state" "emea_se_playground_tls_root_certificate" {
-  backend =  "remote"
+  backend = "remote"
   config = {
     hostname     = "app.terraform.io"
     organization = "emea-se-playground-2019"
-    workspaces  = {
+    workspaces = {
       name = "tls-root-certificate"
     }
   }
@@ -73,10 +73,10 @@ module "primarycluster" {
 
 
 module "secondarycluster" {
-    source = "./modules"
+  source               = "./modules"
   owner                = var.owner
-  region              = var.secondary_region
-  namespace           = var.secondary_namespace
+  region               = var.secondary_region
+  namespace            = var.secondary_namespace
   public_key           = var.public_key
   servers              = var.servers
   workers              = var.workers

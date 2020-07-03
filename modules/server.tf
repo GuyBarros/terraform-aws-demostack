@@ -22,9 +22,9 @@ data "template_file" "servers" {
     node_name     = "${var.namespace}-server-${count.index}"
 
     # me_ca         = "${tls_self_signed_cert.root.cert_pem}"
-    me_ca   = var.ca_cert_pem
-    me_cert = "${element(tls_locally_signed_cert.server.*.cert_pem, count.index)}"
-    me_key  = "${element(tls_private_key.server.*.private_key_pem, count.index)}"
+    me_ca      = var.ca_cert_pem
+    me_cert    = "${element(tls_locally_signed_cert.server.*.cert_pem, count.index)}"
+    me_key     = "${element(tls_private_key.server.*.private_key_pem, count.index)}"
     public_key = var.public_key
 
     # Consul
@@ -39,15 +39,15 @@ data "template_file" "servers" {
 
     # Nomad
     nomad_url        = var.nomad_url
-    nomad_ent_url        = var.nomad_ent_url
+    nomad_ent_url    = var.nomad_ent_url
     nomad_gossip_key = var.nomad_gossip_key
     nomad_servers    = var.servers
     cni_plugin_url   = var.cni_plugin_url
     nomadlicense     = var.nomadlicense
 
     # Nomad jobs
-    fabio_url      = var.fabio_url
-    
+    fabio_url = var.fabio_url
+
     # Vault
     vault_url        = var.vault_url
     vault_ent_url    = var.vault_ent_url
@@ -77,20 +77,20 @@ resource "aws_instance" "servers" {
   instance_type = var.instance_type_server
   key_name      = aws_key_pair.demostack.id
 
-  subnet_id              = "${element(aws_subnet.demostack.*.id, count.index)}"
+  subnet_id              = element(aws_subnet.demostack.*.id, count.index)
   iam_instance_profile   = aws_iam_instance_profile.consul-join.name
   vpc_security_group_ids = [aws_security_group.demostack.id]
-  root_block_device{
+  root_block_device {
     volume_size           = "240"
     delete_on_termination = "true"
   }
 
-   ebs_block_device  {
+  ebs_block_device {
     device_name           = "/dev/xvdd"
     volume_type           = "gp2"
     volume_size           = "240"
     delete_on_termination = "true"
-}
+  }
 
   tags = {
     Name           = "${var.namespace}-server-${count.index}"
@@ -101,5 +101,5 @@ resource "aws_instance" "servers" {
     ConsulJoin     = var.consul_join_tag_value
   }
 
-  user_data = "${element(data.template_cloudinit_config.servers.*.rendered, count.index)}"
+  user_data = element(data.template_cloudinit_config.servers.*.rendered, count.index)
 }

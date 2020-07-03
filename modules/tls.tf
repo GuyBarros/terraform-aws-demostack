@@ -56,9 +56,9 @@ resource "tls_cert_request" "server" {
 
 # Server certificate
 resource "tls_locally_signed_cert" "server" {
-  count            = var.servers
-  cert_request_pem = "${element(tls_cert_request.server.*.cert_request_pem, count.index)}"
-  ca_key_algorithm = var.ca_key_algorithm
+  count              = var.servers
+  cert_request_pem   = "${element(tls_cert_request.server.*.cert_request_pem, count.index)}"
+  ca_key_algorithm   = var.ca_key_algorithm
   ca_private_key_pem = var.ca_private_key_pem
   ca_cert_pem        = var.ca_cert_pem
 
@@ -144,7 +144,7 @@ resource "tls_locally_signed_cert" "workers" {
   count            = var.workers
   cert_request_pem = "${element(tls_cert_request.workers.*.cert_request_pem, count.index)}"
 
-  ca_key_algorithm = var.ca_key_algorithm
+  ca_key_algorithm   = var.ca_key_algorithm
   ca_private_key_pem = var.ca_private_key_pem
   ca_cert_pem        = var.ca_cert_pem
 
@@ -162,14 +162,14 @@ resource "tls_locally_signed_cert" "workers" {
 
 // ALB certs
 resource "aws_acm_certificate" "cert" {
-   domain_name       = "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}"
+  domain_name       = "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}"
   validation_method = "DNS"
 
   tags = {
     Name           = "${var.namespace}-vault"
     owner          = var.owner
-    created-by     = "${var.created-by}"
-    sleep-at-night = "${var.sleep-at-night}"
+    created-by     = var.created-by
+    sleep-at-night = var.sleep-at-night
     TTL            = var.TTL
   }
 
@@ -179,11 +179,11 @@ resource "aws_acm_certificate" "cert" {
 }
 
 resource "aws_route53_record" "validation_record" {
-  name    = aws_acm_certificate.cert.domain_validation_options.0.resource_record_name
-  type    = aws_acm_certificate.cert.domain_validation_options.0.resource_record_type
-  zone_id = "${var.zone_id}"
-  records = [ aws_acm_certificate.cert.domain_validation_options.0.resource_record_value ]
-  ttl     = "60"
+  name            = aws_acm_certificate.cert.domain_validation_options.0.resource_record_name
+  type            = aws_acm_certificate.cert.domain_validation_options.0.resource_record_type
+  zone_id         = var.zone_id
+  records         = [aws_acm_certificate.cert.domain_validation_options.0.resource_record_value]
+  ttl             = "60"
   allow_overwrite = true
 
   lifecycle {
@@ -192,7 +192,7 @@ resource "aws_route53_record" "validation_record" {
 }
 
 resource "aws_acm_certificate_validation" "cert" {
-  certificate_arn = "${aws_acm_certificate.cert.arn}"
+  certificate_arn = aws_acm_certificate.cert.arn
   validation_record_fqdns = [
     aws_route53_record.validation_record.fqdn,
   ]
