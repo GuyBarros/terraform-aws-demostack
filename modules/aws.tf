@@ -90,7 +90,7 @@ resource "aws_security_group" "demostack" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = ["${ingress.value}"]
+      cidr_blocks = [ ingress.value ]
     }
   }
 

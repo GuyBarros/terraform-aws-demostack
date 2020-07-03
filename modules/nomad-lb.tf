@@ -1,8 +1,8 @@
 resource "aws_alb" "nomad" {
   name = "${var.namespace}-nomad"
 
-  security_groups = ["${aws_security_group.demostack.id}"]
-  subnets         = "${aws_subnet.demostack.*.id}"
+  security_groups = [ aws_security_group.demostack.id ]
+  subnets         = aws_subnet.demostack.*.id
 
   tags = {
     Name           = "${var.namespace}-nomad"
@@ -40,7 +40,7 @@ resource "aws_alb_listener" "nomad" {
 
   port            = "4646"
   protocol        = "HTTPS"
-  certificate_arn = "${aws_acm_certificate_validation.cert.certificate_arn}"
+  certificate_arn = aws_acm_certificate_validation.cert.certificate_arn
   ssl_policy      = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
 
   default_action {
@@ -52,6 +52,6 @@ resource "aws_alb_listener" "nomad" {
 resource "aws_alb_target_group_attachment" "nomad" {
   count            = var.servers
   target_group_arn = aws_alb_target_group.nomad.arn
-  target_id        = "${element(aws_instance.servers.*.id, count.index)}"
+  target_id        = element(aws_instance.servers.*.id, count.index)
   port             = "4646"
 }

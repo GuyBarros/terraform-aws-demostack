@@ -1,5 +1,5 @@
 data "template_file" "servers" {
-  count = "${var.servers}"
+  count = var.servers
 
   template = "${join("\n", list(
     file("${path.module}/templates/shared/base.sh"),
@@ -12,19 +12,19 @@ data "template_file" "servers" {
   ))}"
 
   vars = {
-    region = "${var.region}"
+    region = var.region
 
     enterprise    = var.enterprise
     vaultlicense  = var.vaultlicense
     consullicense = var.consullicense
-    kmskey        = "${aws_kms_key.demostackVaultKeys.id}"
+    kmskey        = aws_kms_key.demostackVaultKeys.id
     namespace     = var.namespace
     node_name     = "${var.namespace}-server-${count.index}"
 
     # me_ca         = "${tls_self_signed_cert.root.cert_pem}"
     me_ca      = var.ca_cert_pem
-    me_cert    = "${element(tls_locally_signed_cert.server.*.cert_pem, count.index)}"
-    me_key     = "${element(tls_private_key.server.*.private_key_pem, count.index)}"
+    me_cert    = element(tls_locally_signed_cert.server.*.cert_pem, count.index)
+    me_key     = element(tls_private_key.server.*.private_key_pem, count.index)
     public_key = var.public_key
 
     # Consul
@@ -58,14 +58,14 @@ data "template_file" "servers" {
 
 # Gzip cloud-init config
 data "template_cloudinit_config" "servers" {
-  count = "${var.servers}"
+  count = var.servers
 
   gzip          = true
   base64_encode = true
 
   part {
     content_type = "text/x-shellscript"
-    content      = "${element(data.template_file.servers.*.rendered, count.index)}"
+    content      = element(data.template_file.servers.*.rendered, count.index)
   }
 }
 
