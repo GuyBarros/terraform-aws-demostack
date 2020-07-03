@@ -38,6 +38,10 @@ SHELLCOMMANDS
 }
 
 // Primary
+output "Primary_Region" {
+  value = var.primary_region
+}
+
 output "Primary_Consul" {
   value = module.primarycluster.consul_ui
 }
@@ -84,6 +88,9 @@ output "Primary_k8s_eks_ca"{
 **/
 
 // Secondary
+output "Secondary_Region" {
+  value = var.secondary_region
+}
 
 output "Secondary_Consul" {
   value = module.secondarycluster.consul_ui
@@ -119,6 +126,10 @@ output "Secondary_nomad_tag_servers"{
 
 // Tertiary
 /*
+output "Tertiary_Region" {
+  value = var.tertiary_region
+}
+
 output "Tertiary_Consul" {
   value = module.tertiarycluster.consul_ui
 }
