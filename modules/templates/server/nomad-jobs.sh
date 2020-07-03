@@ -74,6 +74,6 @@ job "fabio-${region}" {
 EOF
 
 echo "--> Running"
-nomad_run /demostack/fabio.hcl
+# nomad_run /demostack/fabio.hcl
 
 echo "==> Nomad jobs submitted!"
