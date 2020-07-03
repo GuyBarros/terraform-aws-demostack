@@ -18,8 +18,8 @@ data "template_file" "workers" {
 
     #me_ca     = "${tls_self_signed_cert.root.cert_pem}"
     me_ca      = var.ca_cert_pem
-    me_cert    = "${element(tls_locally_signed_cert.workers.*.cert_pem, count.index)}"
-    me_key     = "${element(tls_private_key.workers.*.private_key_pem, count.index)}"
+    me_cert    = element(tls_locally_signed_cert.workers.*.cert_pem, count.index)
+    me_key     = element(tls_private_key.workers.*.private_key_pem, count.index)
     public_key = var.public_key
 
     # Consul
@@ -52,7 +52,7 @@ data "template_cloudinit_config" "workers" {
 
   part {
     content_type = "text/x-shellscript"
-    content      = "${element(data.template_file.workers.*.rendered, count.index)}"
+    content      = element(data.template_file.workers.*.rendered, count.index)
   }
 }
 
@@ -63,7 +63,7 @@ resource "aws_instance" "workers" {
   instance_type = var.instance_type_worker
   key_name      = aws_key_pair.demostack.id
 
-  subnet_id              = "${element(aws_subnet.demostack.*.id, count.index)}"
+  subnet_id              = element(aws_subnet.demostack.*.id, count.index)
   iam_instance_profile   = aws_iam_instance_profile.consul-join.name
   vpc_security_group_ids = [aws_security_group.demostack.id]
 
@@ -86,5 +86,5 @@ resource "aws_instance" "workers" {
     created-by = var.created-by
   }
 
-  user_data = "${element(data.template_cloudinit_config.workers.*.rendered, count.index)}"
+  user_data = element(data.template_cloudinit_config.workers.*.rendered, count.index)
 }
