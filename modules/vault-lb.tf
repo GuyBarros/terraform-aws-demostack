@@ -36,7 +36,7 @@ resource "aws_alb_listener" "vault" {
     aws_acm_certificate_validation.cert
   ]
 
-  load_balancer_arn = "${aws_alb.vault.arn}"
+  load_balancer_arn = aws_alb.vault.arn
 
   port            = "8200"
   protocol        = "HTTPS"

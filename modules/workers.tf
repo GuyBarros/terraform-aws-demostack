@@ -1,14 +1,14 @@
 data "template_file" "workers" {
   count = var.workers
 
-  template = "${join("\n", list(
+  template = join("\n", list(
     file("${path.module}/templates/shared/base.sh"),
     file("${path.module}/templates/shared/docker.sh"),
     file("${path.module}/templates/shared/run-proxy.sh"),
     file("${path.module}/templates/workers/consul.sh"),
     file("${path.module}/templates/workers/vault.sh"),
     file("${path.module}/templates/workers/nomad.sh"),
-  ))}"
+  ))
 
   vars = {
     namespace  = var.namespace
@@ -16,7 +16,7 @@ data "template_file" "workers" {
     node_name  = "${var.namespace}-worker-${count.index}"
     enterprise = var.enterprise
 
-    #me_ca     = "${tls_self_signed_cert.root.cert_pem}"
+    #me_ca     = tls_self_signed_cert.root.cert_pem
     me_ca      = var.ca_cert_pem
     me_cert    = element(tls_locally_signed_cert.workers.*.cert_pem, count.index)
     me_key     = element(tls_private_key.workers.*.private_key_pem, count.index)

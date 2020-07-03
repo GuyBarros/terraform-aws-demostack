@@ -1,7 +1,7 @@
 data "template_file" "servers" {
   count = var.servers
 
-  template = "${join("\n", list(
+  template = join("\n", list(
     file("${path.module}/templates/shared/base.sh"),
     file("${path.module}/templates/shared/docker.sh"),
     file("${path.module}/templates/shared/run-proxy.sh"),
@@ -9,7 +9,7 @@ data "template_file" "servers" {
     file("${path.module}/templates/server/vault.sh"),
     file("${path.module}/templates/server/nomad.sh"),
     file("${path.module}/templates/server/nomad-jobs.sh"),
-  ))}"
+  ))
 
   vars = {
     region = var.region
@@ -21,7 +21,7 @@ data "template_file" "servers" {
     namespace     = var.namespace
     node_name     = "${var.namespace}-server-${count.index}"
 
-    # me_ca         = "${tls_self_signed_cert.root.cert_pem}"
+    # me_ca         = tls_self_signed_cert.root.cert_pem
     me_ca      = var.ca_cert_pem
     me_cert    = element(tls_locally_signed_cert.server.*.cert_pem, count.index)
     me_key     = element(tls_private_key.server.*.private_key_pem, count.index)
