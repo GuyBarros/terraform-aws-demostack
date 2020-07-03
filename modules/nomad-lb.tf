@@ -1,7 +1,7 @@
 resource "aws_alb" "nomad" {
   name = "${var.namespace}-nomad"
 
-  security_groups = [ aws_security_group.demostack.id ]
+  security_groups = [aws_security_group.demostack.id]
   subnets         = aws_subnet.demostack.*.id
 
   tags = {
