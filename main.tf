@@ -10,18 +10,31 @@ terraform {
   }
 }
 
-// Workspace Data
-data "terraform_remote_state" "emea_se_playground_tls_root_certificate" {
-  backend =  "remote"
+
+# // Workspace Data
+data "terraform_remote_state" "tls" {
+  backend = "remote"
+
   config = {
     hostname     = "app.terraform.io"
     organization = "emea-se-playground-2019"
-    workspaces  = {
+    workspaces = {
       name = "tls-root-certificate"
     }
-  }
+  } //config
 }
 
+data "terraform_remote_state" "dns" {
+  backend = "remote"
+
+  config = {
+    hostname     = "app.terraform.io"
+    organization = "emea-se-playground-2019"
+    workspaces = {
+      name = "Guy-DNS-Zone"
+    }
+  } //network
+}
 //--------------------------------------------------------------------
 
 provider "aws" {
@@ -56,19 +69,19 @@ module "primarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
-  zone_id              = var.zone_id
+  zone_id              = "${data.terraform_remote_state.dns.outputs.aws_sub_zone_id[0]}"
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = local.host_access_ip
-  primary_datacenter   = var.primary_datacenter
+  primary_datacenter   = var.primary_namespace
 
   # EMEA-SE-PLAYGROUND
-  ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
-  ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem
-  ca_cert_pem           = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_cert_pem
-  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_join_tag_value}"
-  consul_gossip_key     = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_gossip_key
-  consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
-  nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
+  ca_key_algorithm      = data.terraform_remote_state.tls.outputs.ca_key_algorithm
+  ca_private_key_pem    = data.terraform_remote_state.tls.outputs.ca_private_key_pem
+  ca_cert_pem           = data.terraform_remote_state.tls.outputs.ca_cert_pem
+  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.tls.outputs.consul_join_tag_value}"
+  consul_gossip_key     = data.terraform_remote_state.tls.outputs.consul_gossip_key
+  consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
+  nomad_gossip_key      = data.terraform_remote_state.tls.outputs.nomad_gossip_key
 }
 
 
@@ -98,18 +111,18 @@ module "secondarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
-  zone_id              = var.zone_id
+  zone_id              = "${data.terraform_remote_state.dns.outputs.aws_sub_zone_id[0]}"
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = local.host_access_ip
-  primary_datacenter   = var.primary_datacenter
+  primary_datacenter   = var.primary_namespace
   # EMEA-SE-PLAYGROUND
-  ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
-  ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem
-  ca_cert_pem           = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_cert_pem
-  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_join_tag_value}"
-  consul_gossip_key     = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_gossip_key
-  consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
-  nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
+  ca_key_algorithm      = data.terraform_remote_state.tls.outputs.ca_key_algorithm
+  ca_private_key_pem    = data.terraform_remote_state.tls.outputs.ca_private_key_pem
+  ca_cert_pem           = data.terraform_remote_state.tls.outputs.ca_cert_pem
+  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.tls.outputs.consul_join_tag_value}"
+  consul_gossip_key     = data.terraform_remote_state.tls.outputs.consul_gossip_key
+  consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
+  nomad_gossip_key      = data.terraform_remote_state.tls.outputs.nomad_gossip_key
 }
 
 
@@ -140,17 +153,17 @@ module "tertiarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
-  zone_id            = var.zone_id
+  zone_id              = "${data.terraform_remote_state.dns.outputs.aws_sub_zone_id[0]}"
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
   primary_datacenter   = var.primary_datacenter
   # EMEA-SE-PLAYGROUND
-  ca_key_algorithm      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_key_algorithm
-  ca_private_key_pem    = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_private_key_pem
-  ca_cert_pem           = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.ca_cert_pem
-  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_join_tag_value}"
-  consul_gossip_key     = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_gossip_key
-  consul_master_token   = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.consul_master_token
-  nomad_gossip_key      = data.terraform_remote_state.emea_se_playground_tls_root_certificate.outputs.nomad_gossip_key
+  ca_key_algorithm      = data.terraform_remote_state.tls.outputs.ca_key_algorithm
+  ca_private_key_pem    = data.terraform_remote_state.tls.outputs.ca_private_key_pem
+  ca_cert_pem           = data.terraform_remote_state.tls.outputs.ca_cert_pem
+  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.tls.outputs.consul_join_tag_value}"
+  consul_gossip_key     = data.terraform_remote_state.tls.outputs.consul_gossip_key
+  consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
+  nomad_gossip_key      = data.terraform_remote_state.tls.outputs.nomad_gossip_key
 }
 */
