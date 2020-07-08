@@ -9,13 +9,12 @@ echo "--> Fetching enterprise binaries"
 install_from_url "consul" "${consul_ent_url}"
 fi
 
-
 echo "--> Writing configuration"
 sudo mkdir -p /mnt/consul
 sudo mkdir -p /etc/consul.d
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
-  "datacenter": "${region}",
+  "datacenter": "${namespace}",
   "primary_datacenter":  "${primary_datacenter}",
   "bootstrap_expect": ${consul_servers},
   "advertise_addr": "$(private_ip)",

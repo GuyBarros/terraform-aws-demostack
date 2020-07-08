@@ -41,8 +41,8 @@ name         = "${node_name}"
 data_dir     = "/mnt/nomad"
 enable_debug = true
 bind_addr = "0.0.0.0"
-datacenter = "${region}"
-region = "global"
+datacenter = "${namespace}"
+region = "${region}"
 advertise {
   http = "$(public_ip):4646"
   rpc  = "$(public_ip):4647"
