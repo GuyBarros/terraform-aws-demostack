@@ -134,7 +134,7 @@ sudo add-apt-repository \
 "deb [arch=amd64] https://dl.bintray.com/tetrate/getenvoy-deb \
 $(lsb_release -cs) \
 stable"
-sudo apt-get update && sudo apt-get install -y getenvoy-envoy
+sudo apt-get update && sudo apt-get install -y getenvoy-envoy=1.14.1.p0.g3504d40-1p63.g902f20f
 envoy --version
 
 echo "==> Base is done!"
