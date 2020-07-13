@@ -129,12 +129,9 @@ server=/consul/127.0.0.1#8600
 EOF
 
 echo "--> Install Envoy"
-curl -sL 'https://getenvoy.io/gpg' | sudo apt-key add -
-sudo add-apt-repository \
-"deb [arch=amd64] https://dl.bintray.com/tetrate/getenvoy-deb \
-$(lsb_release -cs) \
-stable"
-sudo apt-get update && sudo apt-get install -y getenvoy-envoy
+curl -L https://getenvoy.io/cli | sudo bash -s -- -b /usr/local/bin
+getenvoy run standard:1.14.2 -- --version
+sudo cp ~/.getenvoy/builds/standard/1.14.2/linux_glibc/bin/envoy /usr/bin/
 envoy --version
 
 echo "==> Base is done!"
