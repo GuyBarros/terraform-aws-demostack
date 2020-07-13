@@ -34,8 +34,7 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
     "grpc": 8502
   },
   "connect":{
-    "enabled": true,
-    "enable_mesh_gateway_wan_federation": true
+    "enabled": true
   },
   "ui": true,
   "enable_central_service_config":true,
