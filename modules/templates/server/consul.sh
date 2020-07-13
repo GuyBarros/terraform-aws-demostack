@@ -35,7 +35,7 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   },
   "connect":{
     "enabled": true,
-    "enable_mesh_gateway_wan_federation" = true
+    "enable_mesh_gateway_wan_federation": true
   },
   "ui": true,
   "enable_central_service_config":true,
