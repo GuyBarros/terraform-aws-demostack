@@ -14,7 +14,7 @@ sudo mkdir -p /mnt/consul
 sudo mkdir -p /etc/consul.d
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
-  "datacenter": "${namespace}",
+  "datacenter": "${region}",
   "primary_datacenter":  "${primary_datacenter}",
   "bootstrap_expect": ${consul_servers},
   "advertise_addr": "$(private_ip)",
