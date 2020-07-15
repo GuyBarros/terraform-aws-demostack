@@ -43,6 +43,11 @@ telemetry {
   prometheus_retention_time = "30s",
   disable_hostname = true
 }
+
+replication {
+      resolver_discover_servers = false 
+}
+
 api_addr = "https://$(public_ip):8200"
 disable_mlock = true
 ui = true

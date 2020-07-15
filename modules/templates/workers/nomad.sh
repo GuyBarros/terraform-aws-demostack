@@ -34,8 +34,10 @@ name         = "${node_name}"
 data_dir     = "/mnt/nomad"
 enable_debug = true
 bind_addr = "0.0.0.0"
+
 datacenter = "$AWS_AZ"
 region = "$AWS_REGION"
+
 advertise {
   http = "$(public_ip):4646"
   rpc  = "$(public_ip):4647"
@@ -166,8 +168,8 @@ sleep 180
 
 echo "--> Running  Nomad Job"
 
- nomad run hashibo.nomad
- nomad run nginx-pki.nomad
+ // nomad run hashibo.nomad
+ // nomad run nginx-pki.nomad
 
 fi
 
