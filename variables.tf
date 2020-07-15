@@ -1,9 +1,9 @@
 data "http" "myipaddr" {
-    url = "http://ipv4.icanhazip.com"
+  url = "http://ipv4.icanhazip.com"
 }
 
 locals {
-   host_access_ip = ["${chomp(data.http.myipaddr.body)}/32"]
+  host_access_ip = ["${chomp(data.http.myipaddr.body)}/32"]
 }
 
 
@@ -211,7 +211,7 @@ variable "run_nomad_jobs" {
 }
 
 
-variable "primary_datacenter"{
+variable "primary_datacenter" {
   description = "the primary datacenter for mesh gateways"
-  default = ""
+  default     = ""
 }

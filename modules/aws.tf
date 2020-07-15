@@ -62,10 +62,10 @@ resource "aws_route" "internet_access" {
 data "aws_availability_zones" "available" {}
 
 resource "aws_subnet" "demostack" {
-  count                   = "${length(var.cidr_blocks)}"
+  count                   = length(var.cidr_blocks)
   vpc_id                  = aws_vpc.demostack.id
-  availability_zone       = "${data.aws_availability_zones.available.names[count.index]}"
-  cidr_block              = "${var.cidr_blocks[count.index]}"
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  cidr_block              = var.cidr_blocks[count.index]
   map_public_ip_on_launch = true
 
   tags = {
@@ -87,14 +87,14 @@ resource "aws_security_group" "demostack" {
   dynamic "ingress" {
     for_each = var.host_access_ip
     content {
-      from_port = 22
-      to_port   = 22
-      protocol  = "tcp"
-      cidr_blocks = [ "${ingress.value}" ]
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
     }
   }
 
-#HTTP 
+  #HTTP
   ingress {
     from_port   = 80
     to_port     = 80
@@ -102,7 +102,7 @@ resource "aws_security_group" "demostack" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-#Demostack LDAP
+  #Demostack LDAP
   ingress {
     from_port   = 389
     to_port     = 389
@@ -111,7 +111,7 @@ resource "aws_security_group" "demostack" {
   }
 
 
-#Demostack HTTPS
+  #Demostack HTTPS
   ingress {
     from_port   = 443
     to_port     = 443
@@ -120,7 +120,7 @@ resource "aws_security_group" "demostack" {
   }
 
 
-#Grafana
+  #Grafana
   ingress {
     from_port   = 3000
     to_port     = 3000
@@ -138,35 +138,35 @@ resource "aws_security_group" "demostack" {
   }
 
 
-#Consul and Vault ports
+  #Consul and Vault ports
   ingress {
     from_port   = 8000
     to_port     = 9200
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-#Fabio Ports
+  #Fabio Ports
   ingress {
     from_port   = 9998
     to_port     = 9999
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-#Nomad
-ingress {
+  #Nomad
+  ingress {
     from_port   = 3000
     to_port     = 4999
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-#More nomad ports
+  #More nomad ports
   ingress {
     from_port   = 20000
     to_port     = 29999
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
- 
+
   ingress {
     from_port   = 30000
     to_port     = 39999
@@ -214,7 +214,7 @@ resource "aws_iam_policy" "consul-join" {
 
 resource "aws_iam_role" "consul-join" {
   name               = "${var.namespace}-consul-join"
-  assume_role_policy = "${file("${path.module}/templates/policies/assume-role.json")}"
+  assume_role_policy = file("${path.module}/templates/policies/assume-role.json")
 }
 
 resource "aws_iam_policy_attachment" "consul-join" {
@@ -255,4 +255,4 @@ data "aws_iam_policy_document" "vault-server" {
     resources = ["*"]
   }
 
-  }
+}

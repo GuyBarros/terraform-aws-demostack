@@ -8,7 +8,7 @@ variable "namespace" {
   description = <<EOH
 this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
 EOH
-  default = "connectdemo"
+  default     = "connectdemo"
 }
 
 variable "servers" {
@@ -159,16 +159,16 @@ variable "nomad_gossip_key" {
   default = ""
 }
 
-variable "run_nomad_jobs"{
- default = "0" 
+variable "run_nomad_jobs" {
+  default = "0"
 }
 
 variable "host_access_ip" {
   description = "CIDR blocks allowed to connect via SSH on port 22"
-  default = [  ]
+  default     = []
 }
 
-variable "primary_datacenter"{
+variable "primary_datacenter" {
   description = "the primary datacenter for mesh gateways"
-  default = ""
+  default     = ""
 }

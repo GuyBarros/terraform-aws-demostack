@@ -33,6 +33,9 @@ sudo mkdir -p /opt/cni/bin/
 wget -O cni.tgz ${cni_plugin_url}
 sudo tar -xzf cni.tgz -C /opt/cni/bin/
 
+export AWS_REGION=$(curl -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone |  sed 's/[a-z]$//')
+export AWS_AZ=$(curl http://169.254.169.254/latest/meta-data/placement/availability-zone)
+
 echo "--> Writing configuration"
 sudo mkdir -p /mnt/nomad
 sudo mkdir -p /etc/nomad.d
@@ -41,8 +44,8 @@ name         = "${node_name}"
 data_dir     = "/mnt/nomad"
 enable_debug = true
 bind_addr = "0.0.0.0"
-datacenter = "${namespace}"
-region = "${region}"
+datacenter = "$AWS_AZ"
+region = "$AWS_REGION"
 advertise {
   http = "$(public_ip):4646"
   rpc  = "$(public_ip):4647"

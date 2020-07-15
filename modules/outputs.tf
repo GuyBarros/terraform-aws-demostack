@@ -37,11 +37,11 @@ output "consul_ui" {
 }
 
 
-output "nomad_tag_workers"{
+output "nomad_tag_workers" {
   value = data.template_file.workers.*.vars.node_name
 }
 
-output "nomad_tag_servers"{
+output "nomad_tag_servers" {
   value = data.template_file.servers.*.vars.node_name
 }
 
