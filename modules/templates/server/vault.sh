@@ -2,6 +2,7 @@
 echo "==> Vault (server)"
 # Vault expects the key to be concatenated with the CA
 sudo mkdir -p /etc/vault.d/tls/
+sudo mkdir -p /opt/vault/raft/
 sudo tee /etc/vault.d/tls/vault.crt > /dev/null <<EOF
 $(cat /etc/ssl/certs/me.crt)
 $(cat /usr/local/share/ca-certificates/01-me.crt)
@@ -23,12 +24,23 @@ fi
 
 echo "--> Writing configuration"
 sudo mkdir -p /etc/vault.d
+
 sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
-storage "consul" {
-  path = "vault/"
-  service = "vault"
+
+
+service_registration "consul" {
+  address = "127.0.0.1:8500"
 }
+
+storage "raft" {
+  path = "/opt/vault/raft"
+  node = "${node_name}"
+  retry_join {
+    leader_api_addr = "https://vault.service.consul:8200"
+  }
+}
+
 listener "tcp" {
   address       = "0.0.0.0:8200"
   tls_cert_file = "/etc/vault.d/tls/vault.crt"
@@ -49,9 +61,11 @@ replication {
 }
 
 api_addr = "https://$(public_ip):8200"
+cluster_addr = "https://$(private_ip):8201"
 disable_mlock = true
 ui = true
 EOF
+
 
 echo "--> Writing profile"
 sudo tee /etc/profile.d/vault.sh > /dev/null <<"EOF"
