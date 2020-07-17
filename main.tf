@@ -69,7 +69,7 @@ module "primarycluster" {
   instance_type_worker = var.instance_type_worker
   zone_id              = "${data.terraform_remote_state.dns.outputs.aws_sub_zone_id[0]}"
   run_nomad_jobs       = var.run_nomad_jobs
-  host_access_ip       = local.host_access_ip
+  host_access_ip       = var.host_access_ip
   primary_datacenter   = var.primary_namespace
 
   # EMEA-SE-PLAYGROUND
@@ -111,7 +111,7 @@ module "secondarycluster" {
   instance_type_worker = var.instance_type_worker
   zone_id              = "${data.terraform_remote_state.dns.outputs.aws_sub_zone_id[0]}"
   run_nomad_jobs       = var.run_nomad_jobs
-  host_access_ip       = local.host_access_ip
+  host_access_ip       = var.host_access_ip
   primary_datacenter   = var.primary_namespace
   # EMEA-SE-PLAYGROUND
   ca_key_algorithm      = data.terraform_remote_state.tls.outputs.ca_key_algorithm

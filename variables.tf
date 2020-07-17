@@ -1,9 +1,16 @@
+/*
 data "http" "myipaddr" {
   url = "http://ipv4.icanhazip.com"
 }
 
 locals {
   host_access_ip = ["${chomp(data.http.myipaddr.body)}/32"]
+}
+*/
+
+variable "host_access_ip" {
+  description = "your IP address to allow ssh to work"
+  default     = []
 }
 
 

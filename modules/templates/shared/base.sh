@@ -14,17 +14,6 @@ function install_from_url {
   }
 }
 
-function ssh-apt {
-  sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq \
-    --allow-downgrades \
-    --allow-remove-essential \
-    --allow-change-held-packages \
-    -o Dpkg::Use-Pty=0 \
-    -o Dpkg::Options::="--force-confdef" \
-    -o Dpkg::Options::="--force-confold" \
-    "$@"
-}
-
 
 echo "--> Adding helper for IP retrieval"
 sudo tee /etc/profile.d/ips.sh > /dev/null <<EOF
@@ -72,7 +61,7 @@ echo "--> updated version of Nodejs"
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
 echo "--> Installing common dependencies"
-ssh-apt install \
+apt-get install -y \
   build-essential \
   nodejs \
   curl \
@@ -93,15 +82,9 @@ ssh-apt install \
   curl \
   gnupg-agent \
   software-properties-common \
-  openjdk-9-jdk-headless \
+  openjdk-14-jdk-headless \
   &>/dev/null
 
-echo "--> Installing git secrets"
-git clone https://github.com/awslabs/git-secrets
-cd git-secrets
-sudo make install
-cd -
-rm -rf git-secrets
 
 echo "--> Disabling checkpoint"
 sudo tee /etc/profile.d/checkpoint.sh > /dev/null <<"EOF"
@@ -120,13 +103,22 @@ sudo tee -a /etc/hosts > /dev/null <<EOF
 $(private_ip)  ${node_name}.node.consul
 EOF
 
-echo "--> Installing dnsmasq"
-sudo apt-get install -y -q dnsmasq
 
-echo "--> Configuring DNSmasq"
-sudo bash -c "cat >/etc/dnsmasq.d/10-consul" << EOF
-server=/consul/127.0.0.1#8600
-EOF
+
+# echo "--> Installing dnsmasq"
+# sudo apt-get install -y -q dnsmasq
+#
+# echo "--> Configuring DNSmasq"
+# sudo tee /etc/dnsmasq.d/10-consul > /dev/null << EOF
+# server=/consul/127.0.0.1#8600
+# no-poll
+# server=8.8.8.8
+# server=8.8.4.4
+# cache-size=0
+# EOF
+
+ # sudo systemctl enable dnsmasq
+ # sudo systemctl restart dnsmasq
 
 echo "--> Install Envoy"
 curl -L https://getenvoy.io/cli | sudo bash -s -- -b /usr/local/bin

@@ -15,9 +15,12 @@ data "aws_route53_zone" "fdqn" {
 data "aws_ami" "ubuntu" {
   most_recent = true
 
+# ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*
+#ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+    # values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
   }
 
   filter {

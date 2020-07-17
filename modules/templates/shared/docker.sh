@@ -8,10 +8,10 @@ echo "--> Adding repo"
 sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 echo "--> Updating cache"
-ssh-apt update
+apt update -y
 
 echo "--> Installing"
-ssh-apt install docker-ce
+apt install -y docker-ce
 
 echo "--> Allowing docker without sudo"
 sudo usermod -aG docker "$(whoami)"

@@ -16,7 +16,7 @@ sudo mkdir -p /mnt/consul
 sudo mkdir -p /etc/consul.d
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
-  "datacenter": "${namespace}",
+  "datacenter": "${region}",
   "advertise_addr": "$(private_ip)",
   "bind_addr": "0.0.0.0",
   "client_addr": "0.0.0.0",
@@ -82,16 +82,34 @@ EOF
 sudo systemctl enable consul
 sudo systemctl start consul
 
-echo "--> Installing dnsmasq"
-ssh-apt install dnsmasq
-sudo tee /etc/dnsmasq.d/10-consul > /dev/null <<"EOF"
-server=/consul/127.0.0.1#8600
-no-poll
-server=8.8.8.8
-server=8.8.4.4
-cache-size=0
-EOF
-sudo systemctl enable dnsmasq
-sudo systemctl restart dnsmasq
+#  echo "--> Installing dnsmasq"
+#  apt install -y dnsmasq
+#  sudo tee /etc/dnsmasq.d/10-consul > /dev/null <<"EOF"
+#  server=/consul/127.0.0.1#8600
+#  no-poll
+#  server=8.8.8.8
+#  server=8.8.4.4
+#  cache-size=0
+#  EOF
+#  sudo systemctl enable dnsmasq
+#  sudo systemctl restart dnsmasq
+
+echo "--> setting up resolv.conf"
+##################################
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+mkdir /etc/systemd/resolved.conf.d
+touch /etc/systemd/resolved.conf.d/forward-consul-domains.conf
+
+IPV4=$(ec2metadata --local-ipv4)
+
+printf "[Resolve]\nDNS=127.0.0.1\nDomains=~consul\n" > /etc/systemd/resolved.conf.d/forward-consul-domains.conf
+
+sudo iptables -t nat -A OUTPUT -d localhost -p udp -m udp --dport 53 -j REDIRECT --to-ports 8600
+sudo iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
+
+systemctl daemon-reload
+systemctl restart systemd-resolved
+##################################
 
 echo "==> Consul is done!"
