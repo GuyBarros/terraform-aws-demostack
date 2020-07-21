@@ -39,6 +39,12 @@ storage "raft" {
   retry_join {
     leader_api_addr = "https://vault.service.consul:8200"
   }
+  retry_join {
+    leader_api_addr = "https://vault.service.consul:8200"
+  }
+  retry_join {
+    leader_api_addr = "https://vault.service.consul:8200"
+  }
 }
 
 listener "tcp" {
