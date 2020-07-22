@@ -16,6 +16,12 @@ echo "--> Create a Directory to Use as a Mount Target"
 sudo mkdir -p /opt/mysql/data/
 sudo mkdir -p /opt/mongodb/data/
 sudo mkdir -p /opt/prometheus/data/
+sudo mkdir -p /opt/shared/data/
+sudo chmod 777 /opt/mysql/data/
+sudo chmod 777 /opt/mongodb/data/
+sudo chmod 777 /opt/prometheus/data/
+sudo chmod 777 /opt/shared/data/
+
 
 
 echo "--> Installing CNI plugin"
