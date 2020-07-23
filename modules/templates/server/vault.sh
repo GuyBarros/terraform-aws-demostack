@@ -8,6 +8,11 @@ $(cat /etc/ssl/certs/me.crt)
 $(cat /usr/local/share/ca-certificates/01-me.crt)
 EOF
 
+# hold for consul servers to all be there
+while [ "$(dig consul.service.consul +short | wc -l)" != "${vault_servers}" ]; do
+  sleep 3
+done
+
 echo "==> checking if we are using enterprise binaries"
 echo "==> value of enterprise is ${enterprise}"
 
@@ -28,23 +33,8 @@ sudo mkdir -p /etc/vault.d
 sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
 
-
 service_registration "consul" {
   address = "127.0.0.1:8500"
-}
-
-storage "raft" {
-  path = "/opt/vault/raft"
-  node = "${node_name}"
-  retry_join {
-    leader_api_addr = "https://vault.service.consul:8200"
-  }
-  retry_join {
-    leader_api_addr = "https://vault.service.consul:8200"
-  }
-  retry_join {
-    leader_api_addr = "https://vault.service.consul:8200"
-  }
 }
 
 listener "tcp" {
@@ -63,13 +53,31 @@ telemetry {
 }
 
 replication {
-      resolver_discover_servers = false 
+      resolver_discover_servers = false
 }
 
 api_addr = "https://$(public_ip):8200"
 cluster_addr = "https://$(private_ip):8201"
 disable_mlock = true
 ui = true
+EOF
+
+# appending storage
+sudo tee -a /etc/vault.d/config.hcl > /dev/null <<EOF
+storage "raft" {
+  path = "/opt/vault/raft"
+  node = "${node_name}"
+EOF
+servers=$(dig consul.service.consul +short | paste -sd " " -)
+for s in $servers; do
+sudo tee -a /etc/vault.d/config.hcl > /dev/null <<EOF
+  retry_join {
+    leader_api_addr = "https://$s:8200"
+  }
+EOF
+done
+sudo tee -a /etc/vault.d/config.hcl > /dev/null <<EOF
+}
 EOF
 
 
