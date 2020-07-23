@@ -94,6 +94,8 @@ resource "aws_instance" "servers" {
 
   tags = {
     Name           = "${var.namespace}-server-${count.index}"
+    namespace      = var.namespace
+    function        = "server"
     owner          = var.owner
     created-by     = var.created-by
     sleep-at-night = var.sleep-at-night
