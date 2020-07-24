@@ -93,8 +93,10 @@ resource "aws_instance" "servers" {
   tags = {
     Name           = "${var.namespace}-server-${count.index}"
     namespace      = var.namespace
-    function        = "server"
-    owner          = var.owner
+    function       = "server"
+    Owner          = var.owner
+    Region         = var.hashi_region
+    Purpose        = "demostack"
     created-by     = var.created-by
     sleep-at-night = var.sleep-at-night
     TTL            = var.TTL
