@@ -67,7 +67,8 @@ replication {
 }
 
 api_addr = "https://$(public_ip):8200"
-cluster_addr = "https://$(private_ip):8201"
+# cluster_addr = "https://$(private_ip):8201"
+cluster_addr = "https://$(public_ip):8201"
 disable_mlock = true
 ui = true
 EOF
