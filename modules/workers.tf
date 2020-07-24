@@ -84,7 +84,10 @@ resource "aws_instance" "workers" {
     Name       = "${var.namespace}-workers-${count.index}"
     namespace  = var.namespace
     function   = "worker"
-    owner      = var.owner
+    Owner      = var.owner
+    Region     = var.hashi_region
+    Purpose    = "demostack"
+    TTL        = var.TTL
     created-by = var.created-by
   }
 
