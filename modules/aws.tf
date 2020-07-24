@@ -3,7 +3,7 @@ terraform {
 }
 
 provider "aws" {
-  version = "~> 2.0"
+#  version = "~> 2.0"
   region  = var.region
 }
 //Getting the Domaing name
