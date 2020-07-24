@@ -62,7 +62,12 @@ variable "vault_ent_url" {
 }
 
 variable "owner" {
-  description = "IAM user responsible for lifecycle of cloud resources used for training"
+  description = "Email address of the user responsible for lifecycle of cloud resources used for training."
+}
+
+variable "hashi_region" {
+  description = "the region the owner belongs in.  e.g. NA-WEST-ENT, EU-CENTRAL"
+  default = "EMEA"
 }
 
 variable "created-by" {
