@@ -81,6 +81,8 @@ resource "aws_instance" "workers" {
 
   tags = {
     Name       = "${var.namespace}-workers-${count.index}"
+    namespace  = var.namespace
+    function   = "worker"
     owner      = var.owner
     created-by = var.created-by
   }
