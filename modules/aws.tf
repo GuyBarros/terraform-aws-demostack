@@ -2,10 +2,7 @@ terraform {
   required_version = ">= 0.11.0"
 }
 
-provider "aws" {
-alias = "demostack"
-region = var.region
-}
+
 //Getting the Domaing name
 data "aws_route53_zone" "fdqn" {
   zone_id = var.zone_id
