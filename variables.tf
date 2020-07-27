@@ -14,11 +14,6 @@ variable "host_access_ip" {
 }
 
 
-variable "region" {
-  description = "The region to create resources."
-  default     = "eu-west-2"
-}
-
 variable "namespace" {
   description = <<EOH
 this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value

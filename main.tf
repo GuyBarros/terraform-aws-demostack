@@ -36,11 +36,21 @@ data "terraform_remote_state" "dns" {
 //--------------------------------------------------------------------
 
 provider "aws" {
-  version = ">= 1.20.0"
   region  = var.primary_region
+  alias   = "primary"
 }
 
+provider "aws" {
+  region  = var.secondary_region
+  alias   = "secondary"
+}
+
+
 module "primarycluster" {
+  providers = {
+    aws.demostack = aws.primary
+    aws           = aws.primary
+  }
   source               = "./modules"
   owner                = var.owner
   region               = var.primary_region
@@ -84,6 +94,10 @@ module "primarycluster" {
 
 
 module "secondarycluster" {
+  providers = {
+    aws.demostack = aws.secondary
+    aws           = aws.secondary
+  }
   source               = "./modules"
   owner                = var.owner
   region               = var.secondary_region

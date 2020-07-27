@@ -3,8 +3,8 @@ terraform {
 }
 
 provider "aws" {
-#  version = "~> 2.0"
-  region  = var.region
+alias = "demostack"
+region = var.region
 }
 //Getting the Domaing name
 data "aws_route53_zone" "fdqn" {
