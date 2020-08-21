@@ -38,11 +38,13 @@ data "terraform_remote_state" "dns" {
 provider "aws" {
   region  = var.primary_region
   alias   = "primary"
+  version = "~> 2.0"
 }
 
 provider "aws" {
   region  = var.secondary_region
   alias   = "secondary"
+  version = "~> 2.0"
 }
 
 
