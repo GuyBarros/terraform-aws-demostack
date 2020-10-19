@@ -34,6 +34,7 @@ data "template_file" "servers" {
     consul_join_tag_value = var.consul_join_tag_value
     consul_master_token   = var.consul_master_token
     consul_servers        = var.servers
+    meta_zone_tag = "${var.namespace}-${count.index}"
 
     # Nomad
     nomad_url        = var.nomad_url

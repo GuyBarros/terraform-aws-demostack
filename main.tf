@@ -1,5 +1,6 @@
 //--------------------------EMEA-SE_PLAYGROUND-2019-----------------------------------------
 # Using a single workspace:
+  
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
@@ -79,7 +80,7 @@ module "primarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
-  zone_id              = "${data.terraform_remote_state.dns.outputs.aws_sub_zone_id[0]}"
+  zone_id              = data.terraform_remote_state.dns.outputs.aws_sub_zone_id
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
   primary_datacenter   = var.primary_namespace
@@ -125,7 +126,7 @@ module "secondarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
-  zone_id              = "${data.terraform_remote_state.dns.outputs.aws_sub_zone_id[0]}"
+  zone_id              = data.terraform_remote_state.dns.outputs.aws_sub_zone_id
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
   primary_datacenter   = var.primary_namespace

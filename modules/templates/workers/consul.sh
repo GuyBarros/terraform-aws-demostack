@@ -25,6 +25,7 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "leave_on_terminate": true,
   "node_name": "${node_name}",
   "retry_join": ["provider=aws tag_key=${consul_join_tag_key} tag_value=${consul_join_tag_value}"],
+  "server": true,
   "ports": {
     "http": 8500,
     "https": 8501,
@@ -34,7 +35,11 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "connect":{
     "enabled": true
   },
-  "autopilot": {
+  "node_meta": {
+"zone" : "${meta_zone_tag}"
+},
+"autopilot": {
+"redundancy_zone_tag" : "zone",
     "cleanup_dead_servers": true,
     "last_contact_threshold": "200ms",
     "max_trailing_logs": 250,

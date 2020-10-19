@@ -37,7 +37,11 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   },
   "ui": true,
   "enable_central_service_config":true,
-  "autopilot": {
+  "node_meta": {
+"zone" : "${meta_zone_tag}"
+},
+"autopilot": {
+"redundancy_zone_tag" : "zone",
     "cleanup_dead_servers": true,
     "last_contact_threshold": "200ms",
     "max_trailing_logs": 250,
@@ -138,5 +142,10 @@ sudo iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT
 systemctl daemon-reload
 systemctl restart systemd-resolved
 ##################################
+
+echo "--> Waiting for Consul leader"
+while [ -z "$(curl -skfS http://127.0.0.1:8500/v1/status/leader)" ]; do
+  sleep 3
+done
 
 echo "==> Consul is done!"

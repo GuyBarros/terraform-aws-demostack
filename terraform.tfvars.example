@@ -2,19 +2,39 @@
  # NOTE: Cloud credentials should be set in environment variables.
 #       https://www.terraform.io/docs/providers/aws/index.html#environment-variables
 # These variables should be set, at minimum. See `variables.tf` for others.
-owner = "exampleowner"
-region = "eu-west-2"
-primarynamespace = "primary-example-meanstack"
-secondarynamespace = "secondary-example-meanstack"
-public_key = "ssh-rsa AAAAB3NzaC1y"
-servers = 3
-workers = 3
-vaultlicense = "aaaaaaaaaa"
-consullicense = "bbbbbbbbb"
-enterprise = false
-awsaccesskey = "asdasdawe"
-awssecretkey = "oi876ytgfre"
-#---------------------------------------------------
-# To specify a version different from the default
-#---------------------------------------------------
- vault_url = "https://releases.hashicorp.com/vault/0.11.1/vault_0.11.1_linux_amd64.zip"
+#####################
+# Base
+#####################
+TTL            = "72"
+owner          = "guybarros"
+servers        = "3"
+workers        = "3"
+enterprise     = true
+vaultlicense   = "<VAULT_LICENSE>"
+consullicense  = "<CONSUL_LICENSE>"
+nomadlicense   = "<NOMAD_LICENSE>"
+run_nomad_jobs = "1"
+#####################
+# URLs
+#####################
+consul_url     = "https://releases.hashicorp.com/consul/1.8.4/consul_1.8.4_linux_amd64.zip"
+consul_ent_url = "https://releases.hashicorp.com/consul/1.8.4+ent/consul_1.8.4+ent_linux_amd64.zip"
+fabio_url      = "https://github.com/fabiolb/fabio/releases/download/v1.5.13/fabio-1.5.13-go1.13.4-linux_amd64"
+nomad_url      = "https://releases.hashicorp.com/nomad/0.12.5/nomad_0.12.5_linux_amd64.zip"
+nomad_ent_url  = "https://releases.hashicorp.com/nomad/0.12.5+ent/nomad_0.12.5+ent_linux_amd64.zip"
+vault_url      = "https://releases.hashicorp.com/vault/1.5.4/vault_1.5.4_linux_amd64.zip"
+vault_ent_url  = "https://releases.hashicorp.com/vault/1.5.4+ent/vault_1.5.4+ent_linux_amd64.zip"
+cni_plugin_url = "https://github.com/containernetworking/plugins/releases/download/v0.8.6/cni-plugins-linux-amd64-v0.8.6.tgz"
+#####################
+#AWS
+#####################
+primary_region        = "eu-west-2"
+secondary_region      = "eu-west-1"
+tertiary_region       = "ap-northeast-1"
+primary_namespace     = "EU-guystack"
+secondary_namespace   = "DE-guystack"
+tertiary_namespace    = "AP-guystack"
+instance_type_server  = "t2.medium"
+instance_type_worker  = "t2.medium"
+public_key            = "ssh-rsa AAAAB3NzaC1yc2E"
+host_access_ip        = ["300.74.72.8/32"]

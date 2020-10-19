@@ -27,6 +27,7 @@ data "template_file" "workers" {
     consul_gossip_key     = var.consul_gossip_key
     consul_join_tag_key   = "ConsulJoin"
     consul_join_tag_value = var.consul_join_tag_value
+    meta_zone_tag = "${var.namespace}-${count.index}"
 
     # Nomad
     nomad_url      = var.nomad_url

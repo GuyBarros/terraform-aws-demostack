@@ -1,3 +1,4 @@
+#backup
 #!/usr/bin/env bash
 echo "==> Vault (server)"
 # Vault expects the key to be concatenated with the CA
@@ -7,11 +8,6 @@ sudo tee /etc/vault.d/tls/vault.crt > /dev/null <<EOF
 $(cat /etc/ssl/certs/me.crt)
 $(cat /usr/local/share/ca-certificates/01-me.crt)
 EOF
-
-# hold for consul servers to all be there
-while [ "$(dig consul.service.consul +short | wc -l)" != "${vault_servers}" ]; do
-  sleep 3
-done
 
 echo "==> checking if we are using enterprise binaries"
 echo "==> value of enterprise is ${enterprise}"
@@ -33,8 +29,23 @@ sudo mkdir -p /etc/vault.d
 sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
 
+
 service_registration "consul" {
   address = "127.0.0.1:8500"
+}
+
+storage "raft" {
+  path = "/opt/vault/raft"
+  node = "${node_name}"
+  retry_join {
+    leader_api_addr = "https://vault.service.consul:8200"
+  }
+  retry_join {
+    leader_api_addr = "https://vault.service.consul:8200"
+  }
+  retry_join {
+    leader_api_addr = "https://vault.service.consul:8200"
+  }
 }
 
 listener "tcp" {
@@ -53,32 +64,13 @@ telemetry {
 }
 
 replication {
-      resolver_discover_servers = false
+      resolver_discover_servers = false 
 }
 
 api_addr = "https://$(public_ip):8200"
-# cluster_addr = "https://$(private_ip):8201"
-cluster_addr = "https://$(public_ip):8201"
+cluster_addr = "https://$(private_ip):8201"
 disable_mlock = true
 ui = true
-EOF
-
-# appending storage
-sudo tee -a /etc/vault.d/config.hcl > /dev/null <<EOF
-storage "raft" {
-  path = "/opt/vault/raft"
-  node = "${node_name}"
-EOF
-servers=$(dig consul.service.consul +short | paste -sd " " -)
-for s in $servers; do
-sudo tee -a /etc/vault.d/config.hcl > /dev/null <<EOF
-  retry_join {
-    leader_api_addr = "https://$s:8200"
-  }
-EOF
-done
-sudo tee -a /etc/vault.d/config.hcl > /dev/null <<EOF
-}
 EOF
 
 
@@ -110,13 +102,13 @@ sudo systemctl start vault
 sleep 8
 
 echo "--> Initializing vault"
-consul lock tmp/vault/lock "$(cat <<"EOF"
-set -e
-sleep 2
+# consul lock tmp/vault/lock "$(cat <<"EOF"
+# set -e
+# sleep 2
 export VAULT_ADDR="https://127.0.0.1:8200"
 export VAULT_SKIP_VERIFY=true
 if ! vault operator init -status >/dev/null; then
-  vault operator init  -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1 > /tmp/out.txt
+  vault operator init  -recovery-shares=1 -recovery-threshold=1  > /tmp/out.txt
   cat /tmp/out.txt | grep "Recovery Key 1" | sed 's/Recovery Key 1: //' | consul kv put service/vault/recovery-key -
    cat /tmp/out.txt | grep "Initial Root Token" | sed 's/Initial Root Token: //' | consul kv put service/vault/root-token -
 
@@ -133,9 +125,9 @@ echo "ROOT TOKEN: $VAULT_TOKEN"
 sudo systemctl enable vault
 sudo systemctl restart vault
 fi
-sleep 8
-EOF
-)"
+# sleep 8
+# EOF
+# )"
 
 
 echo "--> Waiting for Vault leader"
@@ -144,7 +136,7 @@ while ! host active.vault.service.consul &> /dev/null; do
 done
 
 
-
+# consul lock tmp/vault/lock "$(cat <<"EOF"
 if [ ${enterprise} == 0 ]
 then
 echo "--> OSS - no license necessary"
@@ -158,14 +150,14 @@ echo "ROOT TOKEN: $VAULT_TOKEN"
 vault write sys/license text=${vaultlicense}
 echo "--> Ent - License applied"
 fi
+# EOF
+# )"
 
 
-echo "--> Attempting to create nomad role"
+echo "--> Waiting for Vault root token to be available"
+while [ -z "$(curl -skfS http://127.0.0.1:8500/v1/kv/service/vault/root-token)" ]; do
+  sleep 3
+done
 
-  echo "--> Adding Nomad policy"
-  echo "--> Retrieving root token..."
-  export VAULT_ADDR="https://active.vault.service.consul:8200"
-  export VAULT_SKIP_VERIFY=true
-  consul kv get service/vault/root-token | vault login -
 
 echo "==> Vault is done!"
