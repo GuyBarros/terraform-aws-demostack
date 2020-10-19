@@ -29,23 +29,9 @@ sudo mkdir -p /etc/vault.d
 sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
 
-
-service_registration "consul" {
-  address = "127.0.0.1:8500"
-}
-
-storage "raft" {
-  path = "/opt/vault/raft"
-  node = "${node_name}"
-  retry_join {
-    leader_api_addr = "https://vault.service.consul:8200"
-  }
-  retry_join {
-    leader_api_addr = "https://vault.service.consul:8200"
-  }
-  retry_join {
-    leader_api_addr = "https://vault.service.consul:8200"
-  }
+storage "consul" {
+  path = "vault/"
+  service = "vault"
 }
 
 listener "tcp" {
