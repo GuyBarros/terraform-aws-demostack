@@ -83,6 +83,7 @@ apt-get install -y \
   gnupg-agent \
   software-properties-common \
   openjdk-14-jdk-headless \
+  prometheus-node-exporter \
   &>/dev/null
 
 

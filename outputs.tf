@@ -62,6 +62,10 @@ output "Primary_Traefik" {
   value = module.primarycluster.traefik_lb
 }
 
+output "Primary_Boundary" {
+  value = module.primarycluster.boundary_ui
+}
+
 output "Primary_servers_nodes" {
   value = module.primarycluster.servers
 }

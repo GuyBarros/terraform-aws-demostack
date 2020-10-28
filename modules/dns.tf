@@ -1,5 +1,13 @@
 
 
+resource "aws_route53_record" "boundary" {
+  zone_id = var.zone_id
+  name    = "boundary.${var.namespace}"
+  #name    = "traefik"
+  type    = "CNAME"
+  records = [aws_alb.traefik.dns_name]
+  ttl     = "300"
+}
 resource "aws_route53_record" "traefik" {
   zone_id = var.zone_id
   name    = "traefik.${var.namespace}"

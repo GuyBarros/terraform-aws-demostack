@@ -36,6 +36,10 @@ output "consul_ui" {
   value = "https://${aws_route53_record.consul.fqdn}:8500"
 }
 
+output "boundary_ui" {
+  value = "https://${aws_route53_record.boundary.fqdn}:9200"
+}
+
 
 output "nomad_tag_workers" {
   value = data.template_file.workers.*.vars.node_name
