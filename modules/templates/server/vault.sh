@@ -45,7 +45,7 @@ telemetry {
 }
 
 replication {
-      resolver_discover_servers = false 
+      resolver_discover_servers = false
 }
 
 api_addr = "https://$(public_ip):8200"
@@ -340,12 +340,12 @@ vault write /data-protection/masking/transform/transformation/ccn \
         template="card-mask" \
         masking_character="#" \
         allowed_roles=ccn
-        
+
 echo "-->Configuring template masking"
 vault write /data-protection/masking/transform/template/card-mask type=regex \
         pattern="(\d{4})-(\d{4})-(\d{4})-\d{4}" \
         alphabet="builtin/numeric"
-        
+
 echo "-->Test transform"
 vault write /data-protection/masking/transform/encode/ccn value=2345-2211-3333-4356
 
@@ -360,7 +360,7 @@ vault namespace create boundary
 echo "-->mount transit in boundary namespace"
 {
 
-vault secrets enable  -namespace=boundary path=transit -path=transit
+vault secrets enable  -namespace=boundary -path=transit transit
 
  }||
 {
@@ -369,7 +369,7 @@ vault secrets enable  -namespace=boundary path=transit -path=transit
 
 echo "--> creating boundary root key"
 {
-vault write -f -namespace=boundary transit/keys/root
+vault  write -namespace=boundary -f  transit/keys/root
  }||
 {
   echo "--> root key already exists, moving on"
@@ -377,7 +377,8 @@ vault write -f -namespace=boundary transit/keys/root
 
 echo "--> creating boundary worker-auth key"
 {
-vault write -f -namespace=boundary transit/keys/worker-auth
+vault write -namespace=boundary  -f  transit/keys/worker-auth
+
  }||
 {
   echo "--> worker-auth key already exists, moving on"

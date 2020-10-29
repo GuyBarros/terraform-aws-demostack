@@ -53,16 +53,30 @@ resource "aws_alb_listener" "boundary-ui" {
   }
 }
 
-resource "aws_alb_target_group_attachment" "boundary" {
+resource "aws_alb_target_group_attachment" "boundary-workers" {
   count            = var.workers
   target_group_arn = aws_alb_target_group.boundary.arn
   target_id        = element(aws_instance.workers.*.id, count.index)
   port             = "9202"
 }
 
-resource "aws_alb_target_group_attachment" "boundary-ui" {
+resource "aws_alb_target_group_attachment" "boundary-ui-workers" {
   count            = var.workers
   target_group_arn = aws_alb_target_group.boundary-ui.arn
   target_id        = element(aws_instance.workers.*.id, count.index)
+  port             = "9200"
+}
+
+resource "aws_alb_target_group_attachment" "boundary-servers" {
+  count            = var.servers
+  target_group_arn = aws_alb_target_group.boundary.arn
+  target_id        = element(aws_instance.servers.*.id, count.index)
+  port             = "9202"
+}
+
+resource "aws_alb_target_group_attachment" "boundary-ui-servers" {
+  count            = var.servers
+  target_group_arn = aws_alb_target_group.boundary-ui.arn
+  target_id        = element(aws_instance.servers.*.id, count.index)
   port             = "9200"
 }
