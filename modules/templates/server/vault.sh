@@ -81,7 +81,7 @@ sudo systemctl start vault
 sleep 8
 
 echo "--> Initializing vault"
-consul lock tmp/vault/lock "$(cat <<"EOF"
+consul lock -name=vault-init tmp/vault/lock "$(cat <<"EOF"
 set -e
 sleep 2
 export VAULT_ADDR="https://127.0.0.1:8200"

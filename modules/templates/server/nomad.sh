@@ -88,7 +88,7 @@ client {
     path      = "/opt/shared/data/"
     read_only = false
   }
-  
+
 }
 tls {
   rpc  = true
@@ -151,7 +151,7 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-Environment=VAULT_TOKEN=$(consul kv put service/vault/${node_name}-token)
+Environment=VAULT_TOKEN=$NOMAD_VAULT_TOKEN
 ExecStart=/usr/local/bin/nomad agent -config="/etc/nomad.d"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT

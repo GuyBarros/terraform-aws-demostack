@@ -1,6 +1,6 @@
 //--------------------------EMEA-SE_PLAYGROUND-2019-----------------------------------------
 # Using a single workspace:
-  
+
 terraform {
   backend "remote" {
     hostname     = "app.terraform.io"
@@ -95,7 +95,7 @@ module "primarycluster" {
   nomad_gossip_key      = data.terraform_remote_state.tls.outputs.nomad_gossip_key
 }
 
-
+/*
 module "secondarycluster" {
   providers = {
     aws.demostack = aws.secondary
@@ -139,7 +139,7 @@ module "secondarycluster" {
   consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
   nomad_gossip_key      = data.terraform_remote_state.tls.outputs.nomad_gossip_key
 }
-
+*/
 
 /*
 module "tertiarycluster" {

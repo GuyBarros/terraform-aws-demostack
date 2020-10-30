@@ -5,7 +5,7 @@ resource "aws_route53_record" "boundary" {
   name    = "boundary.${var.namespace}"
   #name    = "traefik"
   type    = "CNAME"
-  records = [aws_alb.boundary.dns_name]
+  records = [aws_lb.boundary-controller.dns_name]
   ttl     = "300"
 }
 
