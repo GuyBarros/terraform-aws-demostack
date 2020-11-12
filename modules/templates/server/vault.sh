@@ -49,6 +49,7 @@ replication {
 }
 
 api_addr = "https://$(public_ip):8200"
+# api_addr = "https://vault.service.${region}.consul:8200"
 disable_mlock = true
 ui = true
 EOF

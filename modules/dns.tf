@@ -9,6 +9,7 @@ resource "aws_route53_record" "boundary" {
   ttl     = "300"
 }
 
+
 resource "aws_route53_record" "traefik" {
   zone_id = var.zone_id
   name    = "traefik.${var.namespace}"

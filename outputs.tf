@@ -92,7 +92,7 @@ output "Primary_k8s_eks_ca"{
 **/
 
 // Secondary
-/*
+
 output "Secondary_Region" {
   value = var.secondary_region
 }
@@ -113,6 +113,16 @@ output "Secondary_Fabio" {
   value = module.secondarycluster.fabio_lb
 }
 
+output "Secondary_Traefik" {
+  value = module.secondarycluster.traefik_lb
+}
+
+
+output "Secondary_Boundary" {
+  value = module.secondarycluster.boundary_ui
+}
+
+
 output "Secondary_servers_nodes" {
   value = module.secondarycluster.servers
 }
@@ -126,7 +136,7 @@ output "Secondary_nomad_tag_workers" {
 output "Secondary_nomad_tag_servers" {
   value = module.secondarycluster.nomad_tag_servers
 }
-*/
+
 
 
 // Tertiary

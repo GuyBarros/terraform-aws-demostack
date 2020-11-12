@@ -1,3 +1,4 @@
+
 resource "aws_lb" "boundary-controller" {
    name = "${var.namespace}-boundary-controller"
   load_balancer_type = "network"

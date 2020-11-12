@@ -37,7 +37,8 @@ output "consul_ui" {
 }
 
 output "boundary_ui" {
-  value = "http://${aws_route53_record.boundary.fqdn}:9200"
+ value = "http://${aws_route53_record.boundary.fqdn}:9200"
+ # value = "troubleshooting"
 }
 
 

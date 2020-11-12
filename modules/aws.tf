@@ -83,6 +83,14 @@ resource "aws_security_group" "demostack" {
   name_prefix = var.namespace
   vpc_id      = aws_vpc.demostack.id
 
+  #Allow internal communication between nodes
+  ingress {
+    from_port   = -1
+    to_port     = -1
+    protocol    = -1
+  }
+
+
   # SSH access if host_access_ip has CIDR blocks
   dynamic "ingress" {
     for_each = var.host_access_ip

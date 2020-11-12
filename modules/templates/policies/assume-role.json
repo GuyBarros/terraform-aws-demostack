@@ -8,6 +8,14 @@
       },
       "Effect": "Allow",
       "Sid": ""
+    },
+     {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:sts::711129375688:assumed-role/se_demos_dev-developer/guy@hashicorp.com"
+      },
+      "Action": "sts:AssumeRole"
     }
   ]
+
 }
