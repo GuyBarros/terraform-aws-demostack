@@ -13,6 +13,25 @@ variable "host_access_ip" {
   default     = []
 }
 
+variable "create_primary_cluster" {
+  description = "Set to true if you want to deploy the AWS delegated zone."
+  type        = bool
+  default     = "true"
+}
+
+variable "create_secondary_cluster" {
+  description = "Set to true if you want to deploy the AWS delegated zone."
+  type        = bool
+  default     = "false"
+}
+
+variable "create_tertiary_cluster" {
+  description = "Set to true if you want to deploy the AWS delegated zone."
+  type        = bool
+  default     = "false"
+}
+
+
 
 variable "namespace" {
   description = <<EOH

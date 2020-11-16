@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+set -x
+exec > >(tee /var/log/tf-user-data.log|logger -t user-data ) 2>&1
+logger() {
+  DT=$(date '+%Y/%m/%d %H:%M:%S')
+  echo "$DT $0: $1"
+}
+logger "Running"
+
 echo "==> Base"
 
 echo "==> libc6 issue workaround"
@@ -13,6 +21,7 @@ function install_from_url {
     rm -rf "$${1}.zip"
   }
 }
+
 
 
 echo "--> Adding helper for IP retrieval"
@@ -84,6 +93,7 @@ apt-get install -y \
   software-properties-common \
   openjdk-14-jdk-headless \
   prometheus-node-exporter \
+  golang-go \
   &>/dev/null
 
 
@@ -134,5 +144,6 @@ sudo cp ~/.getenvoy/builds/standard/1.14.2/linux_glibc/bin/envoy /usr/bin/
 # sudo apt-get update && sudo apt-get install -y getenvoy-envoy=1.14.1.p0.g3504d40-1p63.g902f20f
 
 envoy --version
+
 
 echo "==> Base is done!"

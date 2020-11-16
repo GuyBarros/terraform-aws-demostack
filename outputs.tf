@@ -92,7 +92,7 @@ output "Primary_k8s_eks_ca"{
 **/
 
 // Secondary
-
+/**
 output "Secondary_Region" {
   value = var.secondary_region
 }
@@ -136,7 +136,7 @@ output "Secondary_nomad_tag_workers" {
 output "Secondary_nomad_tag_servers" {
   value = module.secondarycluster.nomad_tag_servers
 }
-
+*/
 
 
 // Tertiary

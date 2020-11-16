@@ -127,6 +127,13 @@ resource "aws_security_group" "demostack" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+#Grafana
+  ingress {
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   #Grafana
   ingress {

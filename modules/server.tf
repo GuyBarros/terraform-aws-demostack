@@ -48,10 +48,13 @@ data "template_file" "servers" {
     fabio_url = var.fabio_url
 
     # Vault
+    vault_oracle_client_url = var.vault_oracle_client_url
     vault_url        = var.vault_url
     vault_ent_url    = var.vault_ent_url
     vault_root_token = random_id.vault-root-token.hex
     vault_servers    = var.servers
+    vault_api_addr = "https://${aws_route53_record.vault.fqdn}:8200"
+
   }
 }
 

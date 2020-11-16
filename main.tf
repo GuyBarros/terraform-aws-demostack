@@ -48,6 +48,11 @@ provider "aws" {
   version = "~> 2.0"
 }
 
+provider "aws" {
+  region  = var.tertiary_region
+  alias   = "tertiary"
+  version = "~> 2.0"
+}
 
 module "primarycluster" {
   providers = {
@@ -55,6 +60,7 @@ module "primarycluster" {
     aws           = aws.primary
   }
   source               = "./modules"
+  # count   = var.create_primary_cluster ? 1 : 0
   owner                = var.owner
   region               = var.primary_region
   namespace            = var.primary_namespace
@@ -102,6 +108,7 @@ module "secondarycluster" {
     aws           = aws.secondary
   }
   source               = "./modules"
+  count   = var.create_secondary_cluster ? 1 : 0
   owner                = var.owner
   region               = var.secondary_region
   namespace            = var.secondary_namespace
@@ -141,9 +148,14 @@ module "secondarycluster" {
 }
 
 
-/*
+
 module "tertiarycluster" {
-    source = "./modules"
+   providers = {
+    aws.demostack = aws.tertiary
+    aws           = aws.tertiary
+  }
+   source = "./modules"
+   count   = var.create_secondary_cluster ? 1 : 0
   owner                = var.owner
   region              = var.tertiary_region
   namespace           = var.tertiary_namespace
@@ -168,7 +180,7 @@ module "tertiarycluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
-  zone_id              = "${data.terraform_remote_state.dns.outputs.aws_sub_zone_id[0]}"
+  zone_id              = data.terraform_remote_state.dns.outputs.aws_sub_zone_id
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
   primary_datacenter   = var.primary_datacenter
@@ -181,4 +193,4 @@ module "tertiarycluster" {
   consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
   nomad_gossip_key      = data.terraform_remote_state.tls.outputs.nomad_gossip_key
 }
-*/
+
