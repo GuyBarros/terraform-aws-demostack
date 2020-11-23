@@ -1,11 +1,5 @@
 #!/usr/bin/env bash
 set -x
-exec > >(tee /var/log/tf-user-data.log|logger -t user-data ) 2>&1
-logger() {
-  DT=$(date '+%Y/%m/%d %H:%M:%S')
-  echo "$DT $0: $1"
-}
-logger "Running"
 
 echo "==> Base"
 
@@ -94,6 +88,7 @@ apt-get install -y \
   openjdk-14-jdk-headless \
   prometheus-node-exporter \
   golang-go \
+  alien \
   &>/dev/null
 
 
