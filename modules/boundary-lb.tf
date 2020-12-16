@@ -5,13 +5,7 @@ resource "aws_lb" "boundary-controller" {
   internal           = false
 subnets         = aws_subnet.demostack.*.id
 
- tags = {
-    Name           = "${var.namespace}-boundary-controller"
-    owner          = var.owner
-    created-by     = var.created-by
-    sleep-at-night = var.sleep-at-night
-    TTL            = var.TTL
-  }
+  tags = local.common_tags
 }
 
 resource "aws_lb_target_group" "boundary-controller" {
@@ -24,13 +18,7 @@ resource "aws_lb_target_group" "boundary-controller" {
     enabled = false
      type    = "lb_cookie"
   }
-  tags = {
-    Name           = "${var.namespace}-boundary-controller"
-    owner          = var.owner
-    created-by     = var.created-by
-    sleep-at-night = var.sleep-at-night
-    TTL            = var.TTL
-  }
+   tags = local.common_tags
 }
 
 resource "aws_lb_target_group_attachment" "boundary-controller" {

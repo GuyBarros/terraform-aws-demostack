@@ -165,13 +165,7 @@ resource "aws_acm_certificate" "cert" {
   domain_name       = "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}"
   validation_method = "DNS"
 
-  tags = {
-    Name           = "${var.namespace}-vault"
-    owner          = var.owner
-    created-by     = var.created-by
-    sleep-at-night = var.sleep-at-night
-    TTL            = var.TTL
-  }
+   tags = local.common_tags
 
   lifecycle {
     create_before_destroy = true

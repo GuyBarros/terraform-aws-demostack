@@ -32,31 +32,21 @@ resource "aws_vpc" "demostack" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = true
 
-  tags = {
-    Name           = var.namespace
-    owner          = var.owner
-    created-by     = var.created-by
-    sleep-at-night = var.sleep-at-night
-    TTL            = var.TTL
-  }
+  tags = local.common_tags
+
 }
 
 resource "aws_internet_gateway" "demostack" {
   vpc_id = aws_vpc.demostack.id
 
-  tags = {
-    Name           = var.namespace
-    owner          = var.owner
-    created-by     = var.created-by
-    sleep-at-night = var.sleep-at-night
-    TTL            = var.TTL
-  }
+  tags = local.common_tags
 }
 
 resource "aws_route" "internet_access" {
   route_table_id         = aws_vpc.demostack.main_route_table_id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.demostack.id
+
 }
 
 data "aws_availability_zones" "available" {}
@@ -68,13 +58,7 @@ resource "aws_subnet" "demostack" {
   cidr_block              = var.cidr_blocks[count.index]
   map_public_ip_on_launch = true
 
-  tags = {
-    Name           = var.namespace
-    owner          = var.owner
-    created-by     = var.created-by
-    sleep-at-night = var.sleep-at-night
-    TTL            = var.TTL
-  }
+  tags = local.common_tags
 }
 
 
@@ -83,6 +67,7 @@ resource "aws_security_group" "demostack" {
   name_prefix = var.namespace
   vpc_id      = aws_vpc.demostack.id
 
+tags = local.common_tags
   #Allow internal communication between nodes
   ingress {
     from_port   = -1
@@ -199,24 +184,21 @@ resource "aws_security_group" "demostack" {
 resource "aws_key_pair" "demostack" {
   key_name   = var.namespace
   public_key = var.public_key
+
+  tags = local.common_tags
 }
 
 resource "aws_iam_instance_profile" "consul-join" {
   name = "${var.namespace}-consul-join"
   role = aws_iam_role.consul-join.name
+
 }
 
 resource "aws_kms_key" "demostackVaultKeys" {
   description             = "KMS for the Consul Demo Vault"
   deletion_window_in_days = 10
 
-  tags = {
-    Name           = var.namespace
-    owner          = var.owner
-    created-by     = var.created-by
-    sleep-at-night = var.sleep-at-night
-    TTL            = var.TTL
-  }
+   tags = local.common_tags
 }
 
 resource "aws_iam_policy" "consul-join" {
@@ -224,18 +206,22 @@ resource "aws_iam_policy" "consul-join" {
   description = "Allows Consul nodes to describe instances for joining."
 
   policy = data.aws_iam_policy_document.vault-server.json
+
 }
 
 
 resource "aws_iam_role" "consul-join" {
   name               = "${var.namespace}-consul-join"
   assume_role_policy = file("${path.module}/templates/policies/assume-role.json")
+
+  tags = local.common_tags
 }
 
 resource "aws_iam_policy_attachment" "consul-join" {
   name       = "${var.namespace}-consul-join"
   roles      = [aws_iam_role.consul-join.name]
   policy_arn = aws_iam_policy.consul-join.arn
+
 }
 
 

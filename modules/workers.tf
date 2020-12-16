@@ -80,16 +80,13 @@ resource "aws_instance" "workers" {
     delete_on_termination = "true"
   }
 
-  tags = {
-    Name       = "${var.namespace}-workers-${count.index}"
-    namespace  = var.namespace
-    function   = "worker"
-    Owner      = var.owner
-    Region     = var.hashi_region
-    Purpose    = "demostack"
-    TTL        = var.TTL
-    created-by = var.created-by
-  }
+  tags = merge(local.common_tags ,{
+   ConsulJoin     = "${var.consul_join_tag_value}" ,
+   Purpose        = "demostack" ,
+   function       = "worker" 
+   }
+  )
+  
 
   user_data = element(data.template_cloudinit_config.workers.*.rendered, count.index)
 }

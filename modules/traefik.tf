@@ -4,13 +4,7 @@ resource "aws_alb" "traefik" {
   security_groups = [aws_security_group.demostack.id]
   subnets         = aws_subnet.demostack.*.id
 
-  tags = {
-    Name           = "${var.namespace}-traefik"
-    owner          = var.owner
-    created-by     = var.created-by
-    sleep-at-night = var.sleep-at-night
-    TTL            = var.TTL
-  }
+   tags = local.common_tags
 }
 
 resource "aws_alb_target_group" "traefik" {
@@ -18,7 +12,7 @@ resource "aws_alb_target_group" "traefik" {
   port     = "8080"
   vpc_id   = aws_vpc.demostack.id
   protocol = "HTTP"
-
+  
   health_check {
     interval          = "5"
     timeout           = "2"

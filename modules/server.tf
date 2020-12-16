@@ -94,18 +94,13 @@ resource "aws_instance" "servers" {
     delete_on_termination = "true"
   }
 
-  tags = {
-    Name           = "${var.namespace}-server-${count.index}"
-    namespace      = var.namespace
-    function       = "server"
-    Owner          = var.owner
-    Region         = var.hashi_region
-    Purpose        = "demostack"
-    created-by     = var.created-by
-    sleep-at-night = var.sleep-at-night
-    TTL            = var.TTL
-    ConsulJoin     = var.consul_join_tag_value
-  }
+ 
+  tags = merge(local.common_tags ,{
+   ConsulJoin     = "${var.consul_join_tag_value}" ,
+   Purpose        = "demostack" ,
+   function       = "server"  
+   }
+  )
 
   user_data = element(data.template_cloudinit_config.servers.*.rendered, count.index)
 }

@@ -1,4 +1,17 @@
 
+locals {
+  # Common tags to be assigned to all resources
+  common_tags = {
+    name            = var.namespace
+    owner           = var.owner
+    created-by      = var.created-by
+    sleep-at-night  = var.sleep-at-night
+    ttl             = var.TTL
+    se-region      = var.region
+    terraform      = true
+    purpose        = "SE Demostack"
+  }
+}
 variable "vault_oracle_client_url" {
   description = "The url to download vault."
   default     = "https://releases.hashicorp.com/vault-plugin-database-oracle/0.2.1/vault-plugin-database-oracle_0.2.1_linux_amd64.zip"

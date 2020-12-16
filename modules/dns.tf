@@ -7,6 +7,7 @@ resource "aws_route53_record" "boundary" {
   type    = "CNAME"
   records = [aws_lb.boundary-controller.dns_name]
   ttl     = "300"
+
 }
 
 
@@ -17,6 +18,7 @@ resource "aws_route53_record" "traefik" {
   type    = "CNAME"
   records = [aws_alb.traefik.dns_name]
   ttl     = "300"
+
 }
 resource "aws_route53_record" "fabio" {
   zone_id = var.zone_id
@@ -25,6 +27,7 @@ resource "aws_route53_record" "fabio" {
   type    = "CNAME"
   records = [aws_alb.fabio.dns_name]
   ttl     = "300"
+
 }
 resource "aws_route53_record" "consul" {
   zone_id = var.zone_id
@@ -33,6 +36,7 @@ resource "aws_route53_record" "consul" {
   type    = "CNAME"
   records = [aws_alb.consul.dns_name]
   ttl     = "300"
+
 }
 resource "aws_route53_record" "nomad" {
   zone_id = var.zone_id
@@ -41,6 +45,8 @@ resource "aws_route53_record" "nomad" {
   type    = "CNAME"
   records = [aws_alb.nomad.dns_name]
   ttl     = "300"
+
+  
 }
 resource "aws_route53_record" "vault" {
   zone_id = var.zone_id
@@ -49,6 +55,8 @@ resource "aws_route53_record" "vault" {
   type    = "CNAME"
   records = [aws_alb.vault.dns_name]
   ttl     = "300"
+
+  
 }
 
 resource "aws_route53_record" "servers" {
@@ -59,6 +67,8 @@ resource "aws_route53_record" "servers" {
   type    = "CNAME"
   records = [element(aws_instance.servers.*.public_dns, count.index)]
   ttl     = "300"
+
+ 
 }
 
 resource "aws_route53_record" "workers" {
@@ -69,5 +79,7 @@ resource "aws_route53_record" "workers" {
   type    = "CNAME"
   records = [element(aws_instance.workers.*.public_dns, count.index)]
   ttl     = "300"
+
+ 
 }
 
