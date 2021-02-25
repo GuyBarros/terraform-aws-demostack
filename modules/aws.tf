@@ -251,6 +251,11 @@ data "aws_iam_policy_document" "vault-server" {
       "ec2:DescribeInstanceStatus",
       "logs:*",
       "ec2messages:*",
+      "ec2:DescribeInstances",
+      "ec2:DescribeTags",
+      "ec2:DescribeVolumes",
+      "ec2:AttachVolume",
+      "ec2:DetachVolume",
     ]
 
     resources = ["*"]

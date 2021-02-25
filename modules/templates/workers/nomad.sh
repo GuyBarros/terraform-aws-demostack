@@ -23,7 +23,7 @@ export AWS_AZ=$(curl http://169.254.169.254/latest/meta-data/placement/availabil
 
 echo "--> Installing"
 sudo mkdir -p /mnt/nomad
-sudo mkdir -p /etc/nomad.d
+sudo mkdir -p /etc/nomad.d/default_jobs
 sudo tee /etc/nomad.d/config.hcl > /dev/null <<EOF
 name         = "${node_name}"
 data_dir     = "/mnt/nomad"

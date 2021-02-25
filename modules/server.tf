@@ -98,7 +98,8 @@ resource "aws_instance" "servers" {
   tags = merge(local.common_tags ,{
    ConsulJoin     = "${var.consul_join_tag_value}" ,
    Purpose        = "demostack" ,
-   function       = "server"  
+   function       = "server" ,
+   name            = "demostack-server-${count.index}" ,
    }
   )
 

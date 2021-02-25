@@ -43,7 +43,11 @@ data "template_file" "workers" {
     run_nomad_jobs = var.run_nomad_jobs
 
     # Nomad EBS Volumes
-
+    index      = count.index+1
+    count      = var.workers
+    dc1       = data.aws_availability_zones.available.names[0]
+    dc2       = data.aws_availability_zones.available.names[1]
+    dc3       = data.aws_availability_zones.available.names[2]
     aws_ebs_volume_mysql_id = aws_ebs_volume.shared.id
     aws_ebs_volume_mongodb_id = aws_ebs_volume.mongodb.id
     aws_ebs_volume_prometheus_id = aws_ebs_volume.prometheus.id
@@ -94,6 +98,7 @@ resource "aws_instance" "workers" {
    ConsulJoin     = "${var.consul_join_tag_value}" ,
    Purpose        = "demostack" ,
    function       = "worker" 
+   name            = "demostack-worker-${count.index}" ,
    }
   )
   
