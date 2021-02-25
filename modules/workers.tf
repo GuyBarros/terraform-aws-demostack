@@ -7,6 +7,7 @@ data "template_file" "workers" {
     file("${path.module}/templates/workers/consul.sh"),
     file("${path.module}/templates/workers/vault.sh"),
     file("${path.module}/templates/workers/nomad.sh"),
+    file("${path.module}/templates/workers/ebs_volumes.sh"),
   ))
 
   vars = {
@@ -29,17 +30,26 @@ data "template_file" "workers" {
     consul_join_tag_value = var.consul_join_tag_value
     meta_zone_tag = "${var.namespace}-${count.index}"
 
+    # Vault
+    vault_url        = var.vault_url
+    vault_ent_url    = var.vault_ent_url
+    vault_root_token = random_id.vault-root-token.hex
+    vault_servers    = var.workers
+
     # Nomad
     nomad_url      = var.nomad_url
     nomad_ent_url  = var.nomad_ent_url
     cni_plugin_url = var.cni_plugin_url
     run_nomad_jobs = var.run_nomad_jobs
 
-    # Vault
-    vault_url        = var.vault_url
-    vault_ent_url    = var.vault_ent_url
-    vault_root_token = random_id.vault-root-token.hex
-    vault_servers    = var.workers
+    # Nomad EBS Volumes
+
+    aws_ebs_volume_mysql_id = aws_ebs_volume.shared.id
+    aws_ebs_volume_mongodb_id = aws_ebs_volume.mongodb.id
+    aws_ebs_volume_prometheus_id = aws_ebs_volume.prometheus.id
+    aws_ebs_volume_shared_id = aws_ebs_volume.shared.id
+    
+ 
   }
 }
 

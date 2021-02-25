@@ -12,17 +12,6 @@ echo "--> Fetching enterprise binaries"
 install_from_url "nomad" "${nomad_ent_url}"
 fi
 
-echo "--> Create a Directory to Use as a Mount Target"
-sudo mkdir -p /opt/mysql/data/
-sudo mkdir -p /opt/mongodb/data/
-sudo mkdir -p /opt/prometheus/data/
-sudo mkdir -p /opt/shared/data/
-sudo chmod 777 /opt/mysql/data/
-sudo chmod 777 /opt/mongodb/data/
-sudo chmod 777 /opt/prometheus/data/
-sudo chmod 777 /opt/shared/data/
-
-
 
 echo "--> Installing CNI plugin"
 sudo mkdir -p /opt/cni/bin/
@@ -59,19 +48,8 @@ client {
     "type" = "worker",
     "name" = "${node_name}"
   }
-  host_volume "mysql_mount" {
-    path      = "/opt/mysql/data"
-    read_only = false
-  }
-  host_volume "mongodb_mount" {
-    path      = "/opt/mongodb/data"
-    read_only = false
-  }
-  host_volume "prometheus_mount" {
-    path      = "/opt/prometheus/data/"
-    read_only = false
-  }
 }
+
 tls {
   rpc  = true
   http = true
@@ -146,6 +124,5 @@ EOF
 echo "--> Starting nomad"
 sudo systemctl enable nomad
 sudo systemctl start nomad
-
 
 echo "==> Run Nomad is Done!"
