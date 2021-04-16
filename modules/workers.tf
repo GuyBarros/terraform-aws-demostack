@@ -1,14 +1,14 @@
 data "template_file" "workers" {
   count = var.workers
 
-  template = join("\n", list(
+  template = join("\n", tolist([
     file("${path.module}/templates/shared/base.sh"),
     file("${path.module}/templates/shared/docker.sh"),
     file("${path.module}/templates/workers/consul.sh"),
     file("${path.module}/templates/workers/vault.sh"),
     file("${path.module}/templates/workers/nomad.sh"),
     file("${path.module}/templates/workers/ebs_volumes.sh"),
-  ))
+  ]))
 
   vars = {
     namespace  = var.namespace
