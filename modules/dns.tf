@@ -36,8 +36,8 @@ resource "aws_route53_record" "consul" {
   type    = "CNAME"
   records = [aws_alb.consul.dns_name]
   ttl     = "300"
-
 }
+
 resource "aws_route53_record" "nomad" {
   zone_id = var.zone_id
   name    = "nomad.${var.namespace}"

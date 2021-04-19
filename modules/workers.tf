@@ -1,13 +1,14 @@
 data "template_file" "workers" {
   count = var.workers
 
-  template = join("\n", list(
+  template = join("\n", tolist([
     file("${path.module}/templates/shared/base.sh"),
     file("${path.module}/templates/shared/docker.sh"),
     file("${path.module}/templates/workers/consul.sh"),
     file("${path.module}/templates/workers/vault.sh"),
     file("${path.module}/templates/workers/nomad.sh"),
-  ))
+    file("${path.module}/templates/workers/ebs_volumes.sh"),
+  ]))
 
   vars = {
     namespace  = var.namespace
@@ -29,17 +30,30 @@ data "template_file" "workers" {
     consul_join_tag_value = var.consul_join_tag_value
     meta_zone_tag = "${var.namespace}-${count.index}"
 
+    # Vault
+    vault_url        = var.vault_url
+    vault_ent_url    = var.vault_ent_url
+    vault_root_token = random_id.vault-root-token.hex
+    vault_servers    = var.workers
+
     # Nomad
     nomad_url      = var.nomad_url
     nomad_ent_url  = var.nomad_ent_url
     cni_plugin_url = var.cni_plugin_url
     run_nomad_jobs = var.run_nomad_jobs
 
-    # Vault
-    vault_url        = var.vault_url
-    vault_ent_url    = var.vault_ent_url
-    vault_root_token = random_id.vault-root-token.hex
-    vault_servers    = var.workers
+    # Nomad EBS Volumes
+    index      = count.index+1
+    count      = var.workers
+    dc1       = data.aws_availability_zones.available.names[0]
+    dc2       = data.aws_availability_zones.available.names[1]
+    dc3       = data.aws_availability_zones.available.names[2]
+    aws_ebs_volume_mysql_id = aws_ebs_volume.shared.id
+    aws_ebs_volume_mongodb_id = aws_ebs_volume.mongodb.id
+    aws_ebs_volume_prometheus_id = aws_ebs_volume.prometheus.id
+    aws_ebs_volume_shared_id = aws_ebs_volume.shared.id
+    
+ 
   }
 }
 
@@ -84,6 +98,7 @@ resource "aws_instance" "workers" {
    ConsulJoin     = "${var.consul_join_tag_value}" ,
    Purpose        = "demostack" ,
    function       = "worker" 
+   name            = "demostack-worker-${count.index}" ,
    }
   )
   

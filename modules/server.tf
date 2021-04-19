@@ -1,13 +1,13 @@
 data "template_file" "servers" {
   count = var.servers
 
-  template = join("\n", list(
+  template = join("\n", tolist([
     file("${path.module}/templates/shared/base.sh"),
     file("${path.module}/templates/shared/docker.sh"),
     file("${path.module}/templates/server/consul.sh"),
     file("${path.module}/templates/server/vault.sh"),
     file("${path.module}/templates/server/nomad.sh"),
-  ))
+  ]))
 
   vars = {
     region = var.region
@@ -98,7 +98,8 @@ resource "aws_instance" "servers" {
   tags = merge(local.common_tags ,{
    ConsulJoin     = "${var.consul_join_tag_value}" ,
    Purpose        = "demostack" ,
-   function       = "server"  
+   function       = "server" ,
+   name            = "demostack-server-${count.index}" ,
    }
   )
 
