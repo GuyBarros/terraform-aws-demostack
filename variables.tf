@@ -12,7 +12,7 @@ variable "host_access_ip" {
   description = "your IP address to allow ssh to work"
   default     = []
 }
-
+/*
 variable "create_primary_cluster" {
   description = "Set to true if you want to deploy the AWS delegated zone."
   type        = bool
@@ -78,7 +78,26 @@ variable "tertiary_region" {
   description = "The region to create resources."
   default     = "ap-northeast-1"
 }
+*/
 
+variable "clusters" {
+  description = "Map of Cluster to deploy"
+  type = map(any)
+  default = {
+    primary = {
+      region = "eu-west-1"
+      namespace = "primarystack"
+    },
+  secondary = {
+      region = "eu-east-1"
+      namespace = "secondarystack"
+    },
+  tertiary = {
+      region = "ap-northeast-1"
+      namespace = "tertiarystack"
+    },
+  }
+}
 
 variable "servers" {
   description = "The number of data servers (consul, nomad, etc)."

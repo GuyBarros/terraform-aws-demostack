@@ -1,6 +1,6 @@
 
 resource "aws_lb" "boundary-controller" {
-   name = "${var.namespace}-boundary-controller"
+   name = "${var.namespace}-boundary-ctrl"
   load_balancer_type = "network"
   internal           = false
 subnets         = aws_subnet.demostack.*.id
@@ -9,7 +9,7 @@ subnets         = aws_subnet.demostack.*.id
 }
 
 resource "aws_lb_target_group" "boundary-controller" {
-  name     = "${var.namespace}-boundary-controller"
+  name     = "${var.namespace}-boundary-ctrl"
   port     = 9200
   protocol = "TCP"
   vpc_id   = aws_vpc.demostack.id
