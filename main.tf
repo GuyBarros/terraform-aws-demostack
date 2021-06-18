@@ -6,7 +6,7 @@ terraform {
     hostname     = "app.terraform.io"
     organization = "emea-se-playground-2019"
     workspaces {
-      name = "Guy-AWS-Demostack"
+      name = "GUY-AWS-demostack"
     }
   }
 }
@@ -37,11 +37,11 @@ data "terraform_remote_state" "dns" {
 //--------------------------------------------------------------------
 
 provider "aws" {
-  region  = var.primary_region
-  alias   = "primary"
-  version = "~> 2.0"
+#  region  = var.primary_region
+#  alias   = "primary"
 }
 
+/*
 provider "aws" {
   region  = var.secondary_region
   alias   = "secondary"
@@ -53,17 +53,19 @@ provider "aws" {
   alias   = "tertiary"
   version = "~> 2.0"
 }
+*/
 
 module "primarycluster" {
-  providers = {
-    aws.demostack = aws.primary
-    aws           = aws.primary
-  }
+  #providers = {
+  #  aws.demostack = aws.primary
+  #  aws           = aws.primary
+  #}
   source               = "./modules"
   # count   = var.create_primary_cluster ? 1 : 0
+  for_each = var.clusters
   owner                = var.owner
-  region               = var.primary_region
-  namespace            = var.primary_namespace
+  region               = each.value.region
+  namespace            = each.value.namespace
   public_key           = var.public_key
   servers              = var.servers
   workers              = var.workers
@@ -89,19 +91,19 @@ module "primarycluster" {
   zone_id              = data.terraform_remote_state.dns.outputs.aws_sub_zone_id
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
-  primary_datacenter   = var.primary_namespace
+  primary_datacenter   = each.value.namespace
 
   # EMEA-SE-PLAYGROUND
   ca_key_algorithm      = data.terraform_remote_state.tls.outputs.ca_key_algorithm
   ca_private_key_pem    = data.terraform_remote_state.tls.outputs.ca_private_key_pem
   ca_cert_pem           = data.terraform_remote_state.tls.outputs.ca_cert_pem
-  consul_join_tag_value = "${var.namespace}-${data.terraform_remote_state.tls.outputs.consul_join_tag_value}"
+  consul_join_tag_value = "${each.value.namespace}-${data.terraform_remote_state.tls.outputs.consul_join_tag_value}"
   consul_gossip_key     = data.terraform_remote_state.tls.outputs.consul_gossip_key
   consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
   nomad_gossip_key      = data.terraform_remote_state.tls.outputs.nomad_gossip_key
 }
 
-
+/*
 module "secondarycluster" {
   providers = {
     aws.demostack = aws.secondary
@@ -193,4 +195,4 @@ module "tertiarycluster" {
   consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
   nomad_gossip_key      = data.terraform_remote_state.tls.outputs.nomad_gossip_key
 }
-
+*/
