@@ -18,6 +18,7 @@ data "template_file" "servers" {
     kmskey        = aws_kms_key.demostackVaultKeys.id
     namespace     = var.namespace
     node_name     = "${var.namespace}-server-${count.index}"
+    count_index   = "${count.index}"
 
     # me_ca         = tls_self_signed_cert.root.cert_pem
     me_ca      = var.ca_cert_pem
@@ -94,7 +95,7 @@ resource "aws_instance" "servers" {
     delete_on_termination = "true"
   }
 
- 
+
   tags = merge(local.common_tags ,{
    ConsulJoin     = "${var.consul_join_tag_value}" ,
    Purpose        = "demostack" ,

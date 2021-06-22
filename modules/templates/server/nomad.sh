@@ -131,7 +131,8 @@ ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 Restart=on-failure
 LimitNOFILE=65536
-
+#Enterprise License
+Environment=NOMAD_LICENSE=${nomadlicense}
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -154,13 +155,5 @@ echo "--> Waiting for all Nomad servers"
 while [ "$(nomad server members 2>&1 | grep "alive" | wc -l)" -lt "${nomad_servers}" ]; do
   sleep 5
 done
-
-if [ ${enterprise} == 1 ]
-then
-echo "--> apply Nomad License"
-echo -n "${nomadlicense}" > /tmp/nomad.hclic
-nomad license put /tmp/nomad.hclic > /tmp/nomadlicense.out
-
-fi
 
 echo "==> Nomad is done!"

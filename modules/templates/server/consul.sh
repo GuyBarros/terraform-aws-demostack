@@ -35,8 +35,15 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "connect":{
     "enabled": true
   },
-  "ui": true,
-  "enable_central_service_config":true,
+  "ui_config":{
+  "enabled" : true
+},
+ "acl":{
+  "enabled":true,
+  "default_policy":"allow",
+  "enable_token_persistence":true
+},
+"enable_central_service_config":true,
   "node_meta": {
 "zone" : "${meta_zone_tag}"
 },
@@ -63,6 +70,28 @@ alias ocnsul="consul"
 EOF
 source /etc/profile.d/consul.sh
 
+#TODO - CONSUL ACL Bootstrap
+echo "--> setting up ACL system"
+############################################
+sudo tee /etc/consul.d/${node_name}.hcl > /dev/null <<EOF
+node "${node_name}" {
+  policy = "write"
+}
+EOF
+
+if ["${count_index}" == "0"]
+then
+  echo "--> bootstraping ACL from node 0"
+  consul acl bootstrap -format=json > /etc/consul.d/bootstrap_token.json
+else
+  echo "--> not bootstraping ACL because not node 0"
+fi
+
+consul acl policy create -name consul_${node_name} -rules @/etc/consul.d/${node_name}.hcl
+
+consul acl token create -format=json -description "consul ${node_name} agent token" -policy-name consul_${node_name} > /etc/consul.d/consul_${node_name}_token.json
+
+#######################################################
 echo "--> Generating systemd configuration"
 sudo tee /etc/systemd/system/consul.service > /dev/null <<"EOF"
 [Unit]
@@ -76,24 +105,14 @@ Restart=on-failure
 ExecStart=/usr/local/bin/consul agent -config-dir="/etc/consul.d"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
-
+#Enterprise License
+Environment=CONSUL_LICENSE=${consullicense}
 [Install]
 WantedBy=multi-user.target
 EOF
 sudo systemctl enable consul
 sudo systemctl restart consul
 
-#  echo "--> Installing dnsmasq"
-#  apt install -y dnsmasq
-#  sudo tee /etc/dnsmasq.d/10-consul > /dev/null <<"EOF"
-#  server=/consul/127.0.0.1#8600
-#  no-poll
-#  server=8.8.8.8
-#  server=8.8.4.4
-#  cache-size=0
-#  EOF
-#  sudo systemctl enable dnsmasq
-#  sudo systemctl restart dnsmasq
 
 echo "--> Waiting for all Consul servers"
 while [ "$(consul members 2>&1 | grep "server" | grep "alive" | wc -l)" -lt "${consul_servers}" ]; do
@@ -105,24 +124,7 @@ while [ -z "$(curl -s http://127.0.0.1:8500/v1/status/leader)" ]; do
   sleep 3
 done
 
-if [ ${enterprise} == 1 ]
-then
-echo "--> apply Consul License"
-sudo consul license put "${consullicense}" > /tmp/consullicense.out
 
-
-fi
-
-
-echo "--> Denying anonymous access to vault/ and tmp/"
-curl -so /dev/null -X PUT http://127.0.0.1:8500/v1/acl/update \
-  -H "X-Consul-Token: ${consul_master_token}" \
-  -d @- <<BODY
-{
-  "ID": "anonymous",
-  "Rules": "key \"vault\" { policy = \"deny\" }\n\nkey \"tmp\" { policy = \"deny\" }"
-}
-BODY
 
 echo "--> setting up resolv.conf"
 ##################################
@@ -147,5 +149,7 @@ echo "--> Waiting for Consul leader"
 while [ -z "$(curl -skfS http://127.0.0.1:8500/v1/status/leader)" ]; do
   sleep 3
 done
+
+#########
 
 echo "==> Consul is done!"

@@ -78,6 +78,8 @@ After=network-online.target
 Restart=on-failure
 ExecStart=/usr/local/bin/vault server -config="/etc/vault.d/config.hcl"
 ExecReload=/bin/kill -HUP $MAINPID
+#Enterprise License
+Environment=VAULT_LICENSE=${vaultlicense}
 KillSignal=SIGINT
 [Install]
 WantedBy=multi-user.target
@@ -120,23 +122,6 @@ echo "--> Waiting for Vault leader"
 while ! host active.vault.service.consul &> /dev/null; do
   sleep 5
 done
-
-
-
-if [ ${enterprise} == 0 ]
-then
-echo "--> OSS - no license necessary"
-
-else
-echo "--> Ent - Appyling License"
-export VAULT_ADDR="https://active.vault.service.consul:8200"
-export VAULT_SKIP_VERIFY=true
-export VAULT_TOKEN=$(consul kv get service/vault/root-token)
-echo "ROOT TOKEN: $VAULT_TOKEN"
-vault write sys/license text=${vaultlicense}
-echo "--> Ent - License applied"
-fi
-
 
 echo "--> Attempting to create nomad role"
 

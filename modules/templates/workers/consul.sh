@@ -25,13 +25,20 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "leave_on_terminate": true,
   "node_name": "${node_name}",
   "retry_join": ["provider=aws tag_key=${consul_join_tag_key} tag_value=${consul_join_tag_value}"],
-  "server": true,
+  "server": false,
   "ports": {
     "http": 8500,
     "https": 8501,
     "grpc": 8502
   },
-  "ui": true,
+   "ui_config":{
+  "enabled" : true
+},
+ "acl":{
+  "enabled":true,
+  "default_policy":"allow",
+  "enable_token_persistence":true
+},
   "connect":{
     "enabled": true
   },
@@ -87,17 +94,6 @@ EOF
 sudo systemctl enable consul
 sudo systemctl start consul
 
-#  echo "--> Installing dnsmasq"
-#  apt install -y dnsmasq
-#  sudo tee /etc/dnsmasq.d/10-consul > /dev/null <<"EOF"
-#  server=/consul/127.0.0.1#8600
-#  no-poll
-#  server=8.8.8.8
-#  server=8.8.4.4
-#  cache-size=0
-#  EOF
-#  sudo systemctl enable dnsmasq
-#  sudo systemctl restart dnsmasq
 
 echo "--> setting up resolv.conf"
 ##################################

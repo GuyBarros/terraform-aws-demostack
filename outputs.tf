@@ -2,50 +2,51 @@
 
 output "Consul" {
   value = [
-    for consul in module.primarycluster :
+    for consul in module.cluster :
     consul.consul_ui
   ]
-#  module.primarycluster.consul_ui
 }
 
 output "Nomad" {
   value =  [
-    for nomad in module.primarycluster :
+    for nomad in module.cluster :
     nomad.nomad_ui
   ]
-#  module.primarycluster.nomad_ui
 }
 
 output "Vault" {
   value =  [
-    for vault in module.primarycluster :
+    for vault in module.cluster :
     vault.vault_ui
   ]
-#  module.primarycluster.vault_ui
 }
 
 output "Fabio" {
   value = [
-    for fabio in module.primarycluster :
+    for fabio in module.cluster :
     fabio.fabio_lb
   ]
-#  module.primarycluster.fabio_lb
 }
 
 output "Traefik" {
   value =  [
-    for traefik in module.primarycluster :
+    for traefik in module.cluster :
     traefik.traefik_lb
   ]
-#  module.primarycluster.traefik_lb
 }
 
 output "Boundary" {
   value =  [
-    for boundary in module.primarycluster :
+    for boundary in module.cluster :
     boundary.boundary_ui
   ]
-  #module.primarycluster.boundary_ui
+}
+
+output "Servers" {
+  value =  [
+    for server in module.cluster :
+    server.servers
+  ]
 }
 /**
 output "Primary_k8s_eks_endpoint"{

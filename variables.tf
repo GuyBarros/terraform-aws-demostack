@@ -1,91 +1,15 @@
-/*
-data "http" "myipaddr" {
-  url = "http://ipv4.icanhazip.com"
-}
-
-locals {
-  host_access_ip = ["${chomp(data.http.myipaddr.body)}/32"]
-}
-*/
 
 variable "host_access_ip" {
   description = "your IP address to allow ssh to work"
   default     = []
 }
-/*
-variable "create_primary_cluster" {
-  description = "Set to true if you want to deploy the AWS delegated zone."
-  type        = bool
-  default     = "true"
-}
-
-variable "create_secondary_cluster" {
-  description = "Set to true if you want to deploy the AWS delegated zone."
-  type        = bool
-  default     = "false"
-}
-
-variable "create_tertiary_cluster" {
-  description = "Set to true if you want to deploy the AWS delegated zone."
-  type        = bool
-  default     = "false"
-}
-
-
-
-variable "namespace" {
-  description = <<EOH
-this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
-EOH
-  default     = "primarystack"
-}
-
-variable "primary_namespace" {
-  description = <<EOH
-this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
-EOH
-
-  default = "primarystack"
-}
-
-variable "secondary_namespace" {
-  description = <<EOH
-this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
-EOH
-
-  default = "secondarystack"
-}
-
-variable "tertiary_namespace" {
-  description = <<EOH
-this is the differantiates different demostack deployment on the same subscription, everycluster should have a different value
-EOH
-
-  default = "tertiarystack"
-}
-
-variable "primary_region" {
-  description = "The region to create resources."
-  default     = "eu-west-2"
-}
-
-variable "secondary_region" {
-  description = "The region to create resources."
-  default     = "eu-west-2"
-}
-
-variable "tertiary_region" {
-  description = "The region to create resources."
-  default     = "ap-northeast-1"
-}
-*/
 
 variable "clusters" {
   description = "Map of Cluster to deploy"
   type = map(any)
   default = {
     primary = {
-      region = "eu-west-1"
+      region = "eu-west-2"
       namespace = "primarystack"
     },
   secondary = {
