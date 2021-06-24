@@ -39,9 +39,10 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "enabled" : true
 },
  "acl":{
-  "enabled":true,
-  "default_policy":"allow",
-  "enable_token_persistence":true
+  "enabled": true,
+  "default_policy": "allow",
+  "enable_token_persistence": true,
+  "down_policy" : "extend-cache"
 },
 "enable_central_service_config":true,
   "node_meta": {
@@ -79,7 +80,7 @@ node "${node_name}" {
 }
 EOF
 
-if ["${count_index}" == "0"]
+if [ ${count_index} == 0 ]
 then
   echo "--> bootstraping ACL from node 0"
   consul acl bootstrap -format=json > /etc/consul.d/bootstrap_token.json
