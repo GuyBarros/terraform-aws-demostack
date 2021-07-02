@@ -31,6 +31,7 @@ cluster_name = "${namespace}-demostack"
 storage "consul" {
   path = "vault/"
   service = "vault"
+  token=${consul_master_token}
 }
 
 listener "tcp" {
@@ -90,6 +91,7 @@ sudo systemctl start vault
 sleep 8
 
 echo "--> Initializing vault"
+export CONSUL_TOKEN=${consul_master_token}
 consul lock -name=vault-init tmp/vault/lock "$(cat <<"EOF"
 set -e
 sleep 2
@@ -296,28 +298,6 @@ echo "--> Setting up Github auth"
  {
    echo "--> github auth mounted, moving on"
  }
-
- echo "--> Setting up vault prepared query"
- {
- curl http://localhost:8500/v1/query \
-    --request POST \
-    --data \
-'{
-  "Name": "vault",
-  "Service": {
-    "Service": "vault",
-    "Tags":  ["active"],
-    "Failover": {
-      "NearestN": 2
-    }
-  }
-}'
-  echo "--> consul query done"
- } ||
- {
-   echo "-->consul query already done, moving on"
- }
-
 
  echo "-->Enabling transform"
 vault secrets enable  -path=/data-protection/masking/transform transform

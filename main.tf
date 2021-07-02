@@ -82,6 +82,8 @@ module "cluster" {
   ca_cert_pem           = data.terraform_remote_state.tls.outputs.ca_cert_pem
   consul_join_tag_value = "${each.value.namespace}-${data.terraform_remote_state.tls.outputs.consul_join_tag_value}"
   consul_gossip_key     = data.terraform_remote_state.tls.outputs.consul_gossip_key
-  consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
+   #consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
+  #consul_master_token   = "5fder467-5gf5-8ju7-1q2w-y6gj78kl9gfd"
+  consul_master_token   = uuid()
   nomad_gossip_key      = data.terraform_remote_state.tls.outputs.nomad_gossip_key
 }
