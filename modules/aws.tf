@@ -189,8 +189,9 @@ resource "aws_key_pair" "demostack" {
 }
 
 resource "aws_iam_instance_profile" "consul-join" {
-  name = "${var.namespace}-consul-join"
+  name = "${var.namespace}-consul-join-instance-profile"
   role = aws_iam_role.consul-join.name
+tags = local.common_tags
 
 }
 
@@ -202,23 +203,24 @@ resource "aws_kms_key" "demostackVaultKeys" {
 }
 
 resource "aws_iam_policy" "consul-join" {
-  name        = "${var.namespace}-consul-join"
+  name        = "${var.namespace}-consul-join-iam-policy"
   description = "Allows Consul nodes to describe instances for joining."
 
   policy = data.aws_iam_policy_document.vault-server.json
 
+tags = local.common_tags
 }
 
 
 resource "aws_iam_role" "consul-join" {
-  name               = "${var.namespace}-consul-join"
+  name               = "${var.namespace}-consul-join-role"
   assume_role_policy = file("${path.module}/templates/policies/assume-role.json")
 
   tags = local.common_tags
 }
 
 resource "aws_iam_policy_attachment" "consul-join" {
-  name       = "${var.namespace}-consul-join"
+  name       = "${var.namespace}-consul-join-policy-attach"
   roles      = [aws_iam_role.consul-join.name]
   policy_arn = aws_iam_policy.consul-join.arn
 

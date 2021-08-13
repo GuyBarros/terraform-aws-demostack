@@ -168,13 +168,13 @@ resource "aws_acm_certificate" "cert" {
   domain_name       = "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}"
   validation_method = "DNS"
 
-   tags = local.common_tags
 
   lifecycle {
     create_before_destroy = true
   }
 }
 
+/*
 resource "aws_route53_record" "validation_record" {
   name            = aws_acm_certificate.cert.domain_validation_options.0.resource_record_name
   type            = aws_acm_certificate.cert.domain_validation_options.0.resource_record_type
@@ -187,6 +187,21 @@ resource "aws_route53_record" "validation_record" {
     create_before_destroy = true
   }
 }
+*/
+#  "${element(azurerm_public_ip.example.*.id, count.index)}"
+resource "aws_route53_record" "validation_record" {
+  name            = "${element(aws_acm_certificate.cert.domain_validation_options.*.resource_record_name, 0)}"
+  type            = "${element(aws_acm_certificate.cert.domain_validation_options.*.resource_record_type, 0)}"
+  zone_id         = var.zone_id
+  records         = ["${element(aws_acm_certificate.cert.domain_validation_options.*.resource_record_value, 0)}"]
+  ttl             = "60"
+  allow_overwrite = true
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 
 resource "aws_acm_certificate_validation" "cert" {
   certificate_arn = aws_acm_certificate.cert.arn

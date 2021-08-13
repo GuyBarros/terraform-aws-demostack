@@ -70,6 +70,7 @@ acl = {
   tokens {
     master = "${consul_master_token}"
   }
+  down_policy = "extend-cache"
 }
 EOF
 
@@ -112,6 +113,16 @@ sudo tee /etc/consul.d/acl_policies/${node_name}.hcl > /dev/null <<EOF
 node "${node_name}" {
   policy = "write"
 }
+
+service_prefix "" {
+  policy = "write"
+}
+
+query_prefix ""{
+  policy = "write"
+}
+
+
 EOF
 
 consul acl policy create -name consul_${node_name} -rules @/etc/consul.d/acl_policies/${node_name}.hcl

@@ -2,7 +2,7 @@
 locals {
   # Common tags to be assigned to all resources
   common_tags = {
-    name            = var.namespace
+    Name            = var.namespace
     owner           = var.owner
     created-by      = var.created-by
     sleep-at-night  = var.sleep-at-night

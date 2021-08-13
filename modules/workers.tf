@@ -16,6 +16,10 @@ data "template_file" "workers" {
     node_name  = "${var.namespace}-worker-${count.index}"
     enterprise = var.enterprise
 
+    enterprise    = var.enterprise
+    vaultlicense  = var.vaultlicense
+    consullicense = var.consullicense
+
     #me_ca     = tls_self_signed_cert.root.cert_pem
     me_ca      = var.ca_cert_pem
     me_cert    = element(tls_locally_signed_cert.workers.*.cert_pem, count.index)
@@ -28,6 +32,7 @@ data "template_file" "workers" {
     consul_gossip_key     = var.consul_gossip_key
     consul_join_tag_key   = "ConsulJoin"
     consul_join_tag_value = var.consul_join_tag_value
+    consul_master_token   = var.consul_master_token
     meta_zone_tag = "${var.namespace}-${count.index}"
 
     # Vault

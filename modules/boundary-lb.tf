@@ -15,8 +15,8 @@ resource "aws_lb_target_group" "boundary-controller" {
   vpc_id   = aws_vpc.demostack.id
 
   stickiness  {
-    enabled = false
-     type    = "lb_cookie"
+    enabled = true
+     type    = "source_ip"
   }
    tags = local.common_tags
 }

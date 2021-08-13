@@ -34,11 +34,6 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
    "ui_config":{
   "enabled" : true
 },
- "acl":{
-  "enabled":true,
-  "default_policy":"allow",
-  "enable_token_persistence":true
-},
   "connect":{
     "enabled": true
   },
@@ -59,6 +54,21 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   }
 }
 EOF
+
+
+# Set up ACLs.
+cat <<EOF > /etc/consul.d/acl.hcl
+acl = {
+  enabled = true
+  default_policy = "allow"
+  enable_token_persistence = true
+  tokens {
+    master = "${consul_master_token}"
+  }
+  down_policy = "extend-cache"
+}
+EOF
+
 
 echo "--> Writing profile"
 sudo tee /etc/profile.d/consul.sh > /dev/null <<"EOF"
@@ -87,6 +97,8 @@ Restart=on-failure
 ExecStart=/usr/local/bin/consul agent -config-dir="/etc/consul.d"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
+#Enterprise License
+Environment=CONSUL_LICENSE=${consullicense}
 
 [Install]
 WantedBy=multi-user.target

@@ -1,4 +1,34 @@
 
+locals {
+  # Common tags to be assigned to all resources
+  common_tags = {
+    Name      = var.name
+    owner     = var.owner
+    se-region = var.se-region
+    terraform = true
+    purpose   = var.purpose
+    ttl       = var.TTL
+  }
+}
+
+variable "se-region"{
+  description = "Mandatory tags for the SE organization"
+}
+
+
+variable "purpose" {
+  description = <<EOH
+purpose to be added to the default tags
+EOH
+}
+
+variable "name" {
+  description = <<EOH
+Name to be added to the default tags
+EOH
+}
+
+
 variable "host_access_ip" {
   description = "your IP address to allow ssh to work"
   default     = []
