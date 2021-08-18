@@ -31,7 +31,7 @@ cluster_name = "${namespace}-demostack"
 storage "consul" {
   path = "vault/"
   service = "vault"
-  token=${consul_master_token}
+  token="${consul_master_token}"
 }
 
 listener "tcp" {
@@ -355,51 +355,6 @@ vault write -namespace=boundary  -f  transit/keys/worker-auth
 {
   echo "--> worker-auth key already exists, moving on"
 }
-
-# echo "-->Installing Oracle DB plugin"
-# ###################################################################################################################
-# {
-# logger "-->install Oracle dependencies"
-
-# # Install dependencies
-# sudo apt install -y alien
-
-# # Download files. Example specific to 19.3
-# # Some links were not correct on the downloads page
-# # (still pointing to a license page), but easy enough to
-# # figure out from working ones
-# wget https://download.oracle.com/otn_software/linux/instantclient/193000/oracle-instantclient19.3-basiclite-19.3.0.0.0-1.x86_64.rpm
-# wget https://download.oracle.com/otn_software/linux/instantclient/193000/oracle-instantclient19.3-devel-19.3.0.0.0-1.x86_64.rpm
-# wget https://download.oracle.com/otn_software/linux/instantclient/193000/oracle-instantclient19.3-sqlplus-19.3.0.0.0-1.x86_64.rpm
-
-# # Install all 3 RPM's downloaded
-# sudo alien -i oracle-instantclient19.3-*.rpm
-
-# # Install SQL*Plus dependency
-# sudo apt install -y libaio1
-
-# # Create Oracle environment script
-# export ORACLE_HOME=/usr/lib/oracle/19.3/client64
-
-# logger "-->Installing Oracle DB plugin"
-# sudo wget -P /tmp/ -O vault-plugin-database-oracle_linux_amd64.zip  "${vault_oracle_client_url}"
-# sudo unzip -q /tmp/vault-plugin-database-oracle_linux_amd64.zip -d /etc/vault.d/plugins/
-
-# sudo chmod +x /etc/vault.d/plugins/vault-plugin-database-oracle
-# shasum -a 256 /etc/vault.d/plugins/vault-plugin-database-oracle > /tmp/oracle-plugin.sha256
-# sudo chmod 777 /tmp/oracle-plugin.sha256
-# sudo setcap cap_ipc_lock=+ep /etc/vault.d/plugins/vault-plugin-database-oracle
-
-# export VAULT_SKIP_VERIFY=true
-
-# logger "==> Enable Oracle Plugin"
-# vault write sys/plugins/catalog/database/vault-plugin-database-oracle \
-#     sha256=$(cat /tmp/oracle-plugin.sha256 | head -n1 | awk '{print $1;}') \
-#     command="vault-plugin-database-oracle"
-
-#  }
-# ############################################################################################################
-
 
 
 echo "==> Vault is done!"

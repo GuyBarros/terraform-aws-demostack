@@ -122,6 +122,10 @@ query_prefix ""{
   policy = "write"
 }
 
+kv "" {
+  policy = "write"
+}
+
 
 EOF
 
