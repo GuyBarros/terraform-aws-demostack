@@ -87,6 +87,18 @@ tags = local.common_tags
     }
   }
 
+ # RDP access if host_access_ip has CIDR blocks
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
+      from_port   = 3389
+      to_port     = 3389
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
+  }
+
+
   #HTTP
   ingress {
     from_port   = 80

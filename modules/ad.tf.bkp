@@ -1,0 +1,20 @@
+resource "aws_directory_service_directory" "demostack" {
+  name     = "hashidemos.io"
+  password = "SuperSecretPassw0rd"
+  edition  = "Standard"
+  type     = "MicrosoftAD"
+
+  vpc_settings {
+    vpc_id     = aws_vpc.demostack.id
+    subnet_ids =  aws_subnet.demostack.*.id
+  }
+
+ tags = merge(local.common_tags ,{
+   ConsulJoin     = "${var.consul_join_tag_value}" ,
+   Purpose        = "demostack" ,
+   function       = "ActiveDirectory" 
+   Name            = "${var.namespace}-AD" ,
+   }
+  )
+
+}

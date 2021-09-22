@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# just trying 
+sudo apt install unzip
+
 echo "==> Consul (server)"
 if [ ${enterprise} == 0 ]
 then
@@ -97,6 +100,7 @@ ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 #Enterprise License
 Environment=CONSUL_LICENSE=${consullicense}
+Environment=CONSUL_TOKEN=${consul_master_token}
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -129,8 +133,28 @@ kv "" {
 
 EOF
 
-consul acl policy create -name consul_${node_name} -rules @/etc/consul.d/acl_policies/${node_name}.hcl
-# consul acl token create -format=json -description "consul ${node_name} agent token" -policy-name consul_${node_name} > /etc/consul.d/consul_${node_name}_token.json
+sudo tee /etc/consul.d/acl_policies/anonymous.hcl > /dev/null <<EOF
+node "${node_name}" {
+  policy = "write"
+}
+
+service_prefix "" {
+  policy = "write"
+}
+
+query_prefix ""{
+  policy = "write"
+}
+
+kv "" {
+  policy = "write"
+}
+
+
+EOF
+
+ consul acl policy create -name consul_${node_name} -rules @/etc/consul.d/acl_policies/${node_name}.hcl
+ consul acl token create -format=json -description "consul ${node_name} agent token" -policy-name consul_${node_name} > /etc/consul.d/consul_${node_name}_token.json
 
 ##################################
 

@@ -100,7 +100,7 @@ resource "aws_instance" "servers" {
    ConsulJoin     = "${var.consul_join_tag_value}" ,
    Purpose        = "demostack" ,
    function       = "server" ,
-   name            = "demostack-server-${count.index}" ,
+   Name            = "${var.namespace}-server-${count.index}" ,
    }
   )
 
