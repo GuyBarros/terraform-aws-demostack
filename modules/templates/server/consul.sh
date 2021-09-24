@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# just trying 
-sudo apt install unzip
+# just trying
+sudo apt install unzip -y
+sleep 2
 
 echo "==> Consul (server)"
 if [ ${enterprise} == 0 ]
@@ -21,7 +22,7 @@ sudo mkdir -p /etc/consul.d/acl_policies
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
-  
+
   "bootstrap_expect": ${consul_servers},
   "advertise_addr": "$(private_ip)",
   "advertise_addr_wan": "$(public_ip)",
