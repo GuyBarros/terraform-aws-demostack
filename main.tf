@@ -59,14 +59,8 @@ module "cluster" {
   consullicense        = var.consullicense
   nomadlicense         = var.nomadlicense
   enterprise           = var.enterprise
-  consul_url           = var.consul_url
-  consul_ent_url       = var.consul_ent_url
   fabio_url            = var.fabio_url
-  nomad_url            = var.nomad_url
-  nomad_ent_url        = var.nomad_ent_url
   cni_plugin_url       = var.cni_plugin_url
-  vault_url            = var.vault_url
-  vault_ent_url        = var.vault_ent_url
   created-by           = var.created-by
   sleep-at-night       = var.sleep-at-night
   TTL                  = var.TTL
