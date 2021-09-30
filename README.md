@@ -1,5 +1,9 @@
 # terraform-aws-demostack
-    This Project configures Nomad, Vault and Consul on a variable amount of servers and workers. it already set up some nomad jobs, vault configurations and Consul queries. this is meant as a reference (and a demo enviroment) and really shouldnt be used for production.
+Meant as a reference (and a demo enviroment) and not for production use,
+this project configures Nomad, Vault, and Consul (all from Hashicorp) on a variable number of servers and workers. 
+
+Set up are Nomad jobs, Vault configurations, and Consul queries. 
+
 ## Solution Diagram
 ![Solution Diagram](./assets/Demostack_overview.webp)
 
@@ -22,7 +26,7 @@
 
  <TODO>
 
-## troubleshooting
+## Troubleshooting
 To begin debugging, check the cloud-init output:
 
 ```shell
