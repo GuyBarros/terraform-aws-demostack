@@ -8,20 +8,6 @@ $(cat /etc/ssl/certs/me.crt)
 $(cat /usr/local/share/ca-certificates/01-me.crt)
 EOF
 
-echo "==> checking if we are using enterprise binaries"
-echo "==> value of enterprise is ${enterprise}"
-
-if [ ${enterprise} == 0 ]
-then
-echo "--> Fetching Vault OSS"
-install_from_url "vault" "${vault_url}"
-
-else
-echo "--> Fetching Vault Ent"
-install_from_url "vault" "${vault_ent_url}"
-fi
-
-
 
 echo "--> Writing configuration"
 sudo mkdir -p /etc/vault.d
@@ -77,7 +63,7 @@ Requires=network-online.target
 After=network-online.target
 [Service]
 Restart=on-failure
-ExecStart=/usr/local/bin/vault server -config="/etc/vault.d/config.hcl"
+ExecStart=/usr/bin/vault server -config="/etc/vault.d/config.hcl"
 ExecReload=/bin/kill -HUP $MAINPID
 #Enterprise License
 Environment=VAULT_LICENSE=${vaultlicense}

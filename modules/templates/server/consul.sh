@@ -1,17 +1,4 @@
 #!/usr/bin/env bash
-# just trying
-sudo apt install unzip -y
-sleep 2
-
-echo "==> Consul (server)"
-if [ ${enterprise} == 0 ]
-then
-echo "--> Fetching OSS binaries"
-install_from_url "consul" "${consul_url}"
-else
-echo "--> Fetching enterprise binaries"
-install_from_url "consul" "${consul_ent_url}"
-fi
 
 echo "--> Writing configuration"
 sudo mkdir -p /mnt/consul
@@ -96,7 +83,7 @@ After=network-online.target
 
 [Service]
 Restart=on-failure
-ExecStart=/usr/local/bin/consul agent -config-dir="/etc/consul.d"
+ExecStart=/usr/bin/consul agent -config-dir="/etc/consul.d"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 #Enterprise License

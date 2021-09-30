@@ -63,6 +63,10 @@ EOF
 echo "--> updated version of Nodejs"
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 
+echo "--> Adding Hashicorp repo"
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+ sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+
 echo "--> Installing common dependencies"
 apt-get install -y \
   build-essential \
@@ -89,8 +93,26 @@ apt-get install -y \
   prometheus-node-exporter \
   golang-go \
   alien \
+  terraform \
   &>/dev/null
 
+
+if [ ${enterprise} == 0 ]
+then
+apt-get install -y \
+  vault \
+  consul \
+  nomad  \
+  &>/dev/null
+
+else
+apt-get install -y \
+vault-enterprise \
+  consul-enterprise \
+  nomad-enterprise  \
+  &>/dev/null
+
+fi
 
 echo "--> Disabling checkpoint"
 sudo tee /etc/profile.d/checkpoint.sh > /dev/null <<"EOF"
@@ -109,22 +131,6 @@ sudo tee -a /etc/hosts > /dev/null <<EOF
 $(private_ip)  ${node_name}.node.consul
 EOF
 
-
-
-# echo "--> Installing dnsmasq"
-# sudo apt-get install -y -q dnsmasq
-#
-# echo "--> Configuring DNSmasq"
-# sudo tee /etc/dnsmasq.d/10-consul > /dev/null << EOF
-# server=/consul/127.0.0.1#8600
-# no-poll
-# server=8.8.8.8
-# server=8.8.4.4
-# cache-size=0
-# EOF
-
- # sudo systemctl enable dnsmasq
- # sudo systemctl restart dnsmasq
 
 echo "--> Install Envoy"
  curl -L https://getenvoy.io/cli | sudo bash -s -- -b /usr/local/bin

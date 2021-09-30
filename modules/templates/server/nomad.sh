@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-echo "==> Nomad (server)"
-if [ ${enterprise} == 0 ]
-then
-echo "--> Fetching OSS binaries"
-install_from_url "nomad" "${nomad_url}"
-else
-echo "--> Fetching enterprise binaries"
-install_from_url "nomad" "${nomad_ent_url}"
-fi
 
 echo "--> Waiting for Vault leader"
 while ! host active.vault.service.consul &> /dev/null; do
@@ -126,7 +117,7 @@ After=network-online.target
 
 [Service]
 Environment=VAULT_TOKEN=$NOMAD_VAULT_TOKEN
-ExecStart=/usr/local/bin/nomad agent -config="/etc/nomad.d"
+ExecStart=/usr/bin/nomad agent -config="/etc/nomad.d"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 Restart=on-failure
