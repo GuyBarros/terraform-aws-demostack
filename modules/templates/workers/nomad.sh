@@ -1,17 +1,6 @@
 #!/usr/bin/env bash
 echo "==> Nomad (client)"
 
-echo "--> Fetching"
-echo "==> Nomad (server)"
-if [ ${enterprise} == 0 ]
-then
-echo "--> Fetching OSS binaries"
-install_from_url "nomad" "${nomad_url}"
-else
-echo "--> Fetching enterprise binaries"
-install_from_url "nomad" "${nomad_ent_url}"
-fi
-
 
 echo "--> Installing CNI plugin"
 sudo mkdir -p /opt/cni/bin/

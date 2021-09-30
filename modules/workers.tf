@@ -27,8 +27,6 @@ data "template_file" "workers" {
     public_key = var.public_key
 
     # Consul
-    consul_url            = var.consul_url
-    consul_ent_url        = var.consul_ent_url
     consul_gossip_key     = var.consul_gossip_key
     consul_join_tag_key   = "ConsulJoin"
     consul_join_tag_value = var.consul_join_tag_value
@@ -36,14 +34,10 @@ data "template_file" "workers" {
     meta_zone_tag = "${var.namespace}-${count.index}"
 
     # Vault
-    vault_url        = var.vault_url
-    vault_ent_url    = var.vault_ent_url
     vault_root_token = random_id.vault-root-token.hex
     vault_servers    = var.workers
 
     # Nomad
-    nomad_url      = var.nomad_url
-    nomad_ent_url  = var.nomad_ent_url
     cni_plugin_url = var.cni_plugin_url
     run_nomad_jobs = var.run_nomad_jobs
 

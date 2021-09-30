@@ -28,8 +28,6 @@ data "template_file" "servers" {
 
     # Consul
     primary_datacenter    = var.primary_datacenter
-    consul_url            = var.consul_url
-    consul_ent_url        = var.consul_ent_url
     consul_gossip_key     = var.consul_gossip_key
     consul_join_tag_key   = "ConsulJoin"
     consul_join_tag_value = var.consul_join_tag_value
@@ -38,8 +36,6 @@ data "template_file" "servers" {
     meta_zone_tag = "${var.namespace}-${count.index}"
 
     # Nomad
-    nomad_url        = var.nomad_url
-    nomad_ent_url    = var.nomad_ent_url
     nomad_gossip_key = var.nomad_gossip_key
     nomad_servers    = var.servers
     cni_plugin_url   = var.cni_plugin_url
@@ -50,8 +46,6 @@ data "template_file" "servers" {
 
     # Vault
     vault_oracle_client_url = var.vault_oracle_client_url
-    vault_url        = var.vault_url
-    vault_ent_url    = var.vault_ent_url
     vault_root_token = random_id.vault-root-token.hex
     vault_servers    = var.servers
     vault_api_addr = "https://${aws_route53_record.vault.fqdn}:8200"

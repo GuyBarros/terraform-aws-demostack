@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 echo "==> Vault (client)"
 
-echo "--> Fetching"
-install_from_url "vault" "${vault_url}"
-
 echo "--> Writing profile"
 sudo tee /etc/profile.d/vault.sh > /dev/null <<"EOF"
 alias v="vault"
