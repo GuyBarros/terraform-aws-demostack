@@ -5,6 +5,11 @@ echo "==> Consul (client)"
 echo "--> Writing configuration"
 sudo mkdir -p /mnt/consul
 sudo mkdir -p /etc/consul.d
+
+echo "--> clean up any default config."
+sudo rm  /etc/consul.d/*
+
+
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
@@ -85,7 +90,7 @@ After=network-online.target
 
 [Service]
 Restart=on-failure
-ExecStart=/usr/local/bin/consul agent -config-dir="/etc/consul.d"
+ExecStart=/usr/bin/consul agent -config-dir="/etc/consul.d"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 #Enterprise License

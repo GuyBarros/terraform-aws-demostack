@@ -45,7 +45,7 @@ resource "aws_alb_target_group" "fabio-ui" {
 
 resource "aws_alb_listener" "fabio" {
   load_balancer_arn = aws_alb.fabio.arn
-  
+
   port     = "9999"
   protocol = "HTTP"
 
@@ -66,18 +66,35 @@ resource "aws_alb_listener" "fabio-ui" {
   }
 }
 
-resource "aws_alb_target_group_attachment" "fabio" {
+resource "aws_alb_target_group_attachment" "fabio-workers" {
   count            = var.workers
   target_group_arn = aws_alb_target_group.fabio.arn
-  target_id        = element(aws_instance.workers.*.id, count.index)
+  target_id        = aws_instance.workers[count.index].id
   port             = "9999"
-  
+
 }
 
-resource "aws_alb_target_group_attachment" "fabio-ui" {
+resource "aws_alb_target_group_attachment" "fabio-ui-workers" {
   count            = var.workers
   target_group_arn = aws_alb_target_group.fabio-ui.arn
-  target_id        = element(aws_instance.workers.*.id, count.index)
+  target_id        = aws_instance.workers[count.index].id
   port             = "9998"
-  
+
+}
+
+
+resource "aws_alb_target_group_attachment" "fabio-servers" {
+  count            = var.servers
+  target_group_arn = aws_alb_target_group.fabio.arn
+  target_id        = aws_instance.servers[count.index].id
+  port             = "9999"
+
+}
+
+resource "aws_alb_target_group_attachment" "fabio-ui-servers" {
+  count            = var.servers
+  target_group_arn = aws_alb_target_group.fabio-ui.arn
+  target_id        = aws_instance.servers[count.index].id
+  port             = "9998"
+
 }

@@ -13,6 +13,10 @@ export AWS_AZ=$(curl http://169.254.169.254/latest/meta-data/placement/availabil
 echo "--> Installing"
 sudo mkdir -p /mnt/nomad
 sudo mkdir -p /etc/nomad.d/default_jobs
+
+echo "--> clean up any default config."
+sudo rm  /etc/nomad.d/*
+
 sudo tee /etc/nomad.d/config.hcl > /dev/null <<EOF
 name         = "${node_name}"
 data_dir     = "/mnt/nomad"
@@ -100,7 +104,7 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-ExecStart=/usr/local/bin/nomad agent -config="/etc/nomad.d"
+ExecStart=/usr/bin/nomad agent -config="/etc/nomad.d"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 Restart=on-failure

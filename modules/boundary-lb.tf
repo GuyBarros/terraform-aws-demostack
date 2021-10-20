@@ -21,7 +21,7 @@ resource "aws_lb_target_group" "boundary-controller" {
    tags = local.common_tags
 }
 
-resource "aws_lb_target_group_attachment" "boundary-controller" {
+resource "aws_lb_target_group_attachment" "boundary-controller-servers" {
   count            = var.servers
   target_group_arn = aws_lb_target_group.boundary-controller.arn
   target_id        = aws_instance.servers[count.index].id

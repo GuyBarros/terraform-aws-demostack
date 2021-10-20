@@ -5,6 +5,9 @@ sudo mkdir -p /mnt/consul
 sudo mkdir -p /etc/consul.d
 sudo mkdir -p /etc/consul.d/acl_policies
 
+echo "--> clean up any default config."
+sudo rm  /etc/consul.d/*
+
 #"primary_datacenter":  "${primary_datacenter}",
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {

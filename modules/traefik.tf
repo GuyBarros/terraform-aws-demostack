@@ -12,7 +12,7 @@ resource "aws_alb_target_group" "traefik" {
   port     = "8080"
   vpc_id   = aws_vpc.demostack.id
   protocol = "HTTP"
-  
+
   health_check {
     interval          = "5"
     timeout           = "2"
@@ -65,16 +65,30 @@ resource "aws_alb_listener" "traefik-ui" {
   }
 }
 
-resource "aws_alb_target_group_attachment" "traefik" {
+resource "aws_alb_target_group_attachment" "traefik-workers" {
   count            = var.workers
   target_group_arn = aws_alb_target_group.traefik.arn
-  target_id        = element(aws_instance.workers.*.id, count.index)
+  target_id        = aws_instance.workers[count.index].id
   port             = "8080"
 }
 
-resource "aws_alb_target_group_attachment" "traefik-ui" {
+resource "aws_alb_target_group_attachment" "traefik-ui-workers" {
   count            = var.workers
   target_group_arn = aws_alb_target_group.traefik-ui.arn
-  target_id        = element(aws_instance.workers.*.id, count.index)
+  target_id        = aws_instance.workers[count.index].id
+  port             = "8081"
+}
+
+resource "aws_alb_target_group_attachment" "traefik-servers" {
+  count            = var.servers
+  target_group_arn = aws_alb_target_group.traefik.arn
+  target_id        = aws_instance.servers[count.index].id
+  port             = "8080"
+}
+
+resource "aws_alb_target_group_attachment" "traefik-ui-servers" {
+  count            = var.servers
+  target_group_arn = aws_alb_target_group.traefik-ui.arn
+  target_id        = aws_instance.servers[count.index].id
   port             = "8081"
 }

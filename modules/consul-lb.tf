@@ -43,9 +43,16 @@ resource "aws_alb_listener" "consul" {
   }
 }
 
-resource "aws_alb_target_group_attachment" "consul" {
+resource "aws_alb_target_group_attachment" "consul-servers" {
   count            = var.servers
   target_group_arn = aws_alb_target_group.consul.arn
-  target_id        = element(aws_instance.servers.*.id, count.index)
+  target_id        = aws_instance.servers[count.index].id
+  port             = "8500"
+}
+
+resource "aws_alb_target_group_attachment" "consul-workers" {
+  count            = var.workers
+  target_group_arn = aws_alb_target_group.consul.arn
+  target_id        = aws_instance.workers[count.index].id
   port             = "8500"
 }
