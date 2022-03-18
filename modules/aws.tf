@@ -75,6 +75,65 @@ tags = local.common_tags
     protocol    = -1
   }
 
+  ingress {
+    from_port   = 4000
+    to_port     = 10000
+    protocol    = "tcp"
+      cidr_blocks = ["10.1.0.0/18"]
+  }
+
+    ingress {
+    from_port   = 8200
+    to_port     = 8201
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+    ingress {
+    from_port   = 4646
+    to_port     = 4648
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+   ingress {
+    from_port   = 8300
+    to_port     = 8301
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+    ingress {
+    from_port   = 8300
+    to_port     = 8302
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+   ingress {
+    from_port   = 8500
+    to_port     = 8503
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+   ingress {
+    from_port   = 8600
+    to_port     = 8603
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+
+
+     ingress {
+    from_port   = 20000
+    to_port     = 32000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   # SSH access if host_access_ip has CIDR blocks
   dynamic "ingress" {
@@ -100,97 +159,124 @@ tags = local.common_tags
 
 
   #HTTP
-  ingress {
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ingress.value]
+  }
   }
 
   #Demostack LDAP
-  ingress {
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
     from_port   = 389
     to_port     = 389
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ingress.value]
+  }
   }
 
 
   #Demostack HTTPS
-  ingress {
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ingress.value]
+  }
   }
 
 #Grafana
-  ingress {
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ingress.value]
+  }
   }
 
   #Grafana
-  ingress {
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
     from_port   = 3000
     to_port     = 3000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ingress.value]
+  }
   }
 
-
   #Demostack Postgres + pgadmin
-  ingress {
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
     from_port   = 5000
     to_port     = 5500
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ingress.value]
+  }
   }
 
-
   #Consul and Vault and Boundary ports
-  ingress {
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
     from_port   = 8000
     to_port     = 9300
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ingress.value]
   }
+  }
+
   #Fabio Ports
-  ingress {
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
     from_port   = 9998
     to_port     = 9999
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ingress.value]
   }
+  }
+
   #Nomad
-  ingress {
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
     from_port   = 3000
     to_port     = 4999
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ingress.value]
   }
-  #More nomad ports
-  ingress {
-    from_port   = 20000
-    to_port     = 29999
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    from_port   = 30000
-    to_port     = 39999
+  #More nomad ports
+
+  dynamic "ingress" {
+    for_each = var.host_access_ip
+    content {
+    from_port   = 20000
+    to_port     = 32000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [ingress.value]
   }
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
 }
 
 resource "aws_key_pair" "demostack" {

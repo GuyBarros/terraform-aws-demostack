@@ -1,9 +1,9 @@
 
 
 provider "aws" {
-#  region  = var.primary_region
-#  alias   = "primary"
-default_tags {
+  #  region  = var.primary_region
+  #  alias   = "primary"
+  default_tags {
     tags = local.common_tags
   }
 }
@@ -12,7 +12,7 @@ default_tags {
 
 module "cluster" {
   source               = "./modules"
-  for_each = var.clusters
+  for_each             = var.clusters
   owner                = var.owner
   region               = each.value.region
   namespace            = each.value.namespace
@@ -43,8 +43,8 @@ module "cluster" {
   ca_cert_pem           = data.terraform_remote_state.tls.outputs.ca_cert_pem
   consul_join_tag_value = "${each.value.namespace}-${data.terraform_remote_state.tls.outputs.consul_join_tag_value}"
   consul_gossip_key     = data.terraform_remote_state.tls.outputs.consul_gossip_key
-   #consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
+  #consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
   #consul_master_token   = "5fder467-5gf5-8ju7-1q2w-y6gj78kl9gfd"
-  consul_master_token   = uuid()
-  nomad_gossip_key      = data.terraform_remote_state.tls.outputs.nomad_gossip_key
+  consul_master_token = uuid()
+  nomad_gossip_key    = data.terraform_remote_state.tls.outputs.nomad_gossip_key
 }

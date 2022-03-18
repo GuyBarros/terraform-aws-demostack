@@ -8,14 +8,14 @@ output "Consul" {
 }
 
 output "Nomad" {
-  value =  [
+  value = [
     for nomad in module.cluster :
     nomad.nomad_ui
   ]
 }
 
 output "Vault" {
-  value =  [
+  value = [
     for vault in module.cluster :
     vault.vault_ui
   ]
@@ -29,21 +29,21 @@ output "Fabio" {
 }
 
 output "Traefik" {
-  value =  [
+  value = [
     for traefik in module.cluster :
     traefik.traefik_lb
   ]
 }
 
 output "Boundary" {
-  value =  [
+  value = [
     for boundary in module.cluster :
     boundary.boundary_ui
   ]
 }
 
 output "Servers" {
-  value =  [
+  value = [
     for server in module.cluster :
     server.servers
   ]

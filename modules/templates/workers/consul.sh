@@ -13,16 +13,17 @@ sudo rm  /etc/consul.d/*
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
-  "advertise_addr": "$(private_ip)",
+  "advertise_addr": "$(public_ip)",
+  "advertise_addr_wan": "$(public_ip)",
   "bind_addr": "0.0.0.0",
   "client_addr": "0.0.0.0",
   "data_dir": "/mnt/consul",
   "encrypt": "${consul_gossip_key}",
   "leave_on_terminate": true,
   "node_name": "${node_name}",
-  "retry_join": ["provider=aws tag_key=${consul_join_tag_key} tag_value=${consul_join_tag_value}"],
+  "retry_join": ["provider=aws tag_key=${consul_join_tag_key} tag_value=${consul_join_tag_value} addr_type=private_v4"],
   "server": false,
-  "ports": {
+  "ports":{
     "http": 8500,
     "https": 8501,
     "grpc": 8502
@@ -59,7 +60,7 @@ acl = {
   default_policy = "allow"
   enable_token_persistence = true
   tokens {
-    master = "${consul_master_token}"
+    initial_management = "${consul_master_token}"
   }
   down_policy = "extend-cache"
 }
@@ -95,6 +96,7 @@ ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
 #Enterprise License
 Environment=CONSUL_LICENSE=${consullicense}
+Environment=CONSUL_HTTP_TOKEN=${consul_master_token}
 
 [Install]
 WantedBy=multi-user.target

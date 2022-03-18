@@ -37,13 +37,15 @@ name         = "${node_name}"
 data_dir     = "/mnt/nomad"
 enable_debug = true
 bind_addr = "0.0.0.0"
-datacenter = "$AWS_AZ"
-region = "$AWS_REGION"
+
 advertise {
   http = "$(public_ip):4646"
-  rpc  = "$(public_ip):4647"
-  serf = "$(public_ip):4648"
+  rpc  = "$(private_ip):4647"
+  serf = "$(private_ip):4648"
 }
+
+datacenter = "$AWS_AZ"
+region = "$AWS_REGION"
 server {
   enabled          = true
   bootstrap_expect = ${nomad_servers}
@@ -122,7 +124,7 @@ Requires=network-online.target
 After=network-online.target
 
 [Service]
-Environment=VAULT_TOKEN=$NOMAD_VAULT_TOKEN
+
 ExecStart=/usr/bin/nomad agent -config="/etc/nomad.d"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGINT
@@ -130,6 +132,8 @@ Restart=on-failure
 LimitNOFILE=65536
 #Enterprise License
 Environment=NOMAD_LICENSE=${nomadlicense}
+Environment=VAULT_TOKEN="$(vault token create -field=token -policy=superuser -policy=nomad-server -display-name=${node_name} -period=72h)"
+
 [Install]
 WantedBy=multi-user.target
 EOF

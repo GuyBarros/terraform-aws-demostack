@@ -77,7 +77,7 @@ sudo systemctl start vault
 sleep 8
 
 echo "--> Initializing vault"
-export CONSUL_TOKEN=${consul_master_token}
+export CONSUL_HTTP_TOKEN=${consul_master_token}
 consul lock -name=vault-init tmp/vault/lock "$(cat <<"EOF"
 set -e
 sleep 2
@@ -106,6 +106,7 @@ EOF
 )"
 
 
+
 echo "--> Waiting for Vault leader"
 while ! host active.vault.service.consul &> /dev/null; do
   sleep 5
@@ -115,9 +116,10 @@ echo "--> Attempting to create nomad role"
 
   echo "--> Adding Nomad policy"
   echo "--> Retrieving root token..."
+ export VAULT_TOKEN=$(consul kv get service/vault/root-token)
+
   export VAULT_ADDR="https://active.vault.service.consul:8200"
   export VAULT_SKIP_VERIFY=true
-  consul kv get service/vault/root-token | vault login -
 
   vault policy write nomad-server - <<EOR
   path "auth/token/create/nomad-cluster" {
@@ -274,38 +276,6 @@ EOR
   echo "--> superuser role already configured, moving on"
 }
 
-echo "--> Setting up Github auth"
- {
- vault auth enable github &&
- vault write auth/github/config organization=hashicorp &&
- vault write auth/github/map/teams/team-se  value=default,superuser
-  echo "--> github auth done"
- } ||
- {
-   echo "--> github auth mounted, moving on"
- }
-
- echo "-->Enabling transform"
-vault secrets enable  -path=/data-protection/masking/transform transform
-
-echo "-->Configuring CCN role for transform"
-vault write /data-protection/masking/transform/role/ccn transformations=ccn
-
-
-echo "-->Configuring transformation template"
-vault write /data-protection/masking/transform/transformation/ccn \
-        type=masking \
-        template="card-mask" \
-        masking_character="#" \
-        allowed_roles=ccn
-
-echo "-->Configuring template masking"
-vault write /data-protection/masking/transform/template/card-mask type=regex \
-        pattern="(\d{4})-(\d{4})-(\d{4})-\d{4}" \
-        alphabet="builtin/numeric"
-
-echo "-->Test transform"
-vault write /data-protection/masking/transform/encode/ccn value=2345-2211-3333-4356
 
 echo "-->Boundary setup"
 {

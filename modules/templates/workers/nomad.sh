@@ -28,9 +28,10 @@ region = "$AWS_REGION"
 
 advertise {
   http = "$(public_ip):4646"
-  rpc  = "$(public_ip):4647"
-  serf = "$(public_ip):4648"
+  rpc  = "$(private_ip):4647"
+  serf = "$(private_ip):4648"
 }
+
 client {
   enabled = true
    options {

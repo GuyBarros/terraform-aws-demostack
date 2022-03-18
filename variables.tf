@@ -11,7 +11,7 @@ locals {
   }
 }
 
-variable "se-region"{
+variable "se-region" {
   description = "Mandatory tags for the SE organization"
 }
 
@@ -36,18 +36,18 @@ variable "host_access_ip" {
 
 variable "clusters" {
   description = "Map of Cluster to deploy"
-  type = map(any)
+  type        = map(any)
   default = {
     primary = {
-      region = "eu-west-2"
+      region    = "eu-west-2"
       namespace = "primarystack"
     },
-  secondary = {
-      region = "eu-east-1"
+    secondary = {
+      region    = "eu-east-1"
       namespace = "secondarystack"
     },
-  tertiary = {
-      region = "ap-northeast-1"
+    tertiary = {
+      region    = "ap-northeast-1"
       namespace = "tertiarystack"
     },
   }
