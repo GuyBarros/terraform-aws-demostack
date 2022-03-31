@@ -99,7 +99,7 @@ variable "vpc_cidr_block" {
 
 variable "cidr_blocks" {
   description = "The CIDR blocks to create the workstations in."
-  default     = ["10.1.1.0/24", "10.1.2.0/24"]
+  default     = ["10.1.1.0/24", "10.1.2.0/24",  "10.1.3.0/24"]
 }
 
 variable "zone_id" {
@@ -187,4 +187,14 @@ variable "dns-workspace-name" {
 variable "tls-workspace-name" {
   description = "the workspace name to access dns configuration for this deployment"
   default     = "tls-root-certificate"
+}
+variable "f5_username" {
+  description = "F5 username"
+  default     = "admin"
+}
+
+variable "f5_password" {
+  description = "F5 password"
+  default     = "admin"
+  sensitive = true
 }

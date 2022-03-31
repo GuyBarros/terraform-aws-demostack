@@ -1,5 +1,4 @@
-data "template_file" "servers" {
-  count = var.servers
+data "template_file" "servers-asg" {
 
   template = join("\n", tolist([
     file("${path.module}/templates/shared/base.sh"),
@@ -34,7 +33,6 @@ data "template_file" "servers" {
     consul_master_token   = var.consul_master_token
     consul_servers        = var.servers
 
-
     # Nomad
     nomad_gossip_key = var.nomad_gossip_key
     nomad_servers    = var.servers
@@ -53,7 +51,7 @@ data "template_file" "servers" {
 }
 
 # Gzip cloud-init config
-data "template_cloudinit_config" "servers" {
+data "template_cloudinit_config" "servers-asg" {
   count = var.servers
 
   gzip          = true
@@ -66,28 +64,18 @@ data "template_cloudinit_config" "servers" {
 }
 
 
-resource "aws_instance" "servers" {
-  count = var.servers
 
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = var.instance_type_server
-  key_name      = aws_key_pair.demostack.id
+resource "aws_autoscaling_group" "servers-asg" {
+  name                 = "${var.namespace}-servers-asg"
+  launch_configuration = aws_launch_configuration.demostack.name
+  desired_capacity     = var.servers
+  min_size             = 1
+  max_size             = var.servers+5
+  vpc_zone_identifier  = [module.vpc.public_subnets[0]]
 
-  subnet_id              = element(aws_subnet.demostack.*.id, count.index)
-  iam_instance_profile   = aws_iam_instance_profile.consul-join.name
-  vpc_security_group_ids = [aws_security_group.demostack.id]
-  root_block_device {
-    volume_size           = "240"
-    delete_on_termination = "true"
+  lifecycle {
+    create_before_destroy = true
   }
-
-  ebs_block_device {
-    device_name           = "/dev/xvdd"
-    volume_type           = "gp2"
-    volume_size           = "240"
-    delete_on_termination = "true"
-  }
-
 
   tags = merge(local.common_tags ,{
    ConsulJoin     = "${var.consul_join_tag_value}" ,
@@ -97,5 +85,19 @@ resource "aws_instance" "servers" {
    }
   )
 
+}
+
+resource "aws_launch_configuration" "servers-asg" {
+  name_prefix                 = "${var.prefix}-servers-"
+  image_id                    = data.aws_ami.ubuntu.id
+  instance_type = var.instance_type_server
+  associate_public_ip_address = true
+
+  vpc_security_group_ids = [aws_security_group.demostack.id]
+  key_name      = aws_key_pair.demostack.id
   user_data = element(data.template_cloudinit_config.servers.*.rendered, count.index)
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }

@@ -12,10 +12,7 @@ locals {
     purpose        = "SE Demostack"
   }
 }
-variable "vault_oracle_client_url" {
-  description = "The url to download vault."
-  default     = "https://releases.hashicorp.com/vault-plugin-database-oracle/0.2.1/vault-plugin-database-oracle_0.2.1_linux_amd64.zip"
-}
+
 
 variable "region" {
   description = "The region to create resources."
@@ -83,7 +80,7 @@ variable "vpc_cidr_block" {
 
 variable "cidr_blocks" {
   description = "The CIDR blocks to create the workstations in."
-  default     = ["10.1.1.0/24", "10.1.2.0/24"]
+  default     = ["10.1.1.0/24", "10.1.2.0/24", "10.1.3.0/24"]
 }
 
 variable "zone_id" {
@@ -167,4 +164,22 @@ variable "host_access_ip" {
 variable "primary_datacenter" {
   description = "the primary datacenter for mesh gateways"
   default     = ""
+}
+
+
+variable "f5_username" {
+  description = "F5 username"
+  default     = "admin"
+}
+
+variable "f5_password" {
+  description = "F5 password"
+  default     = "admin"
+  sensitive = true
+}
+
+variable "f5_ami_search_name" {
+  description = "BIG-IP AMI name to search for"
+  type        = string
+  default     = "F5 BIGIP-16.1.0* PAYG-Good 25Mbps*"
 }

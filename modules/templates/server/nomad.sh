@@ -5,6 +5,8 @@ while ! host active.vault.service.consul &> /dev/null; do
   sleep 5
 done
 
+export CONSUL_HTTP_ADDR=http://$(private_ip):8500
+
 echo "--> Generating Vault token..."
 export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
 export NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
@@ -39,7 +41,7 @@ enable_debug = true
 bind_addr = "0.0.0.0"
 
 advertise {
-  http = "$(public_ip):4646"
+  http = "$(private_ip):4646"
   rpc  = "$(private_ip):4647"
   serf = "$(private_ip):4648"
 }
@@ -72,7 +74,7 @@ tls {
   verify_server_hostname = false
 }
 consul {
-    address = "localhost:8500"
+    address = "$(private_ip):8500"
     server_service_name = "nomad-server"
     client_service_name = "nomad-client"
     auto_advertise = true

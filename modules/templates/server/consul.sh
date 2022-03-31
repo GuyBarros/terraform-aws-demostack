@@ -8,14 +8,13 @@ sudo mkdir -p /etc/consul.d/acl_policies
 echo "--> clean up any default config."
 sudo rm  /etc/consul.d/*
 
-#"primary_datacenter":  "${primary_datacenter}",
+#"primary_datacenter":  "${primary_datacenter}", "bind_addr": "0.0.0.0",
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
   "bootstrap_expect": ${consul_servers},
-  "bind_addr": "0.0.0.0",
-  "client_addr": "0.0.0.0",
-  "advertise_addr": "$(public_ip)",
+  "client_addr": "$(private_ip)",
+  "advertise_addr": "$(private_ip)",
   "advertise_addr_wan": "$(public_ip)",
   "data_dir": "/mnt/consul",
   "encrypt": "${consul_gossip_key}",
@@ -35,9 +34,7 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "enabled" : true
 },
 "enable_central_service_config":true,
-  "node_meta": {
-"zone" : "${meta_zone_tag}"
-},
+
 "autopilot": {
 "redundancy_zone_tag" : "zone",
     "cleanup_dead_servers": true,
@@ -98,7 +95,8 @@ EOF
 sudo systemctl enable consul
 sudo systemctl restart consul
 
-export CONSUL_TOKEN=${consul_master_token}
+export CONSUL_HTTP_TOKEN=${consul_master_token}
+export CONSUL_HTTP_ADDR=http://$(private_ip):8500
 
 
 #TODO - CONSUL ACL Bootstrap

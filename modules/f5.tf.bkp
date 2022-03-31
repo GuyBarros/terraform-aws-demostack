@@ -1,0 +1,24 @@
+
+data "template_file" "f5_init" {
+  template = file("${path.module}/templates/cts/f5.tpl")
+
+  vars = {
+    encrypted_password = “$6$GUCUbIesqjOyMwxp$d5Yy394d2pJmnYovLdISjyDfNzvf2/OjBFtaWMl4yvVkVXaltO/6JnPN8EPtfoVZoUty20wLIxVbOD2t0xu5Q1”
+
+  }
+
+}
+# mPOmU09m6a
+
+module "bigip" {
+  count                  = 1
+  source                 = "git::https://github.com/f5devcentral/terraform-aws-bigip-module?ref=v0.9.6"
+  prefix                 = "${var.namespace}-f5-bigip"
+  ec2_instance_type      = "m5.large"
+  ec2_key_name           = aws_key_pair.demostack.key_name
+  f5_ami_search_name     = var.f5_ami_search_name
+  f5_username            = var.f5_username
+  mgmt_subnet_ids        = [{ "subnet_id" = element(aws_subnet.demostack.*.id, count.index), "public_ip" = true, "private_ip_primary" = element(aws_instance.servers.*.private_ip, count.index) }]
+  mgmt_securitygroup_ids = [aws_security_group.demostack.id]
+  custom_user_data       = data.template_file.f5_init.rendered
+}

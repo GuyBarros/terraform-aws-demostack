@@ -27,7 +27,7 @@ datacenter = "$AWS_AZ"
 region = "$AWS_REGION"
 
 advertise {
-  http = "$(public_ip):4646"
+  http = "$(private_ip):4646"
   rpc  = "$(private_ip):4647"
   serf = "$(private_ip):4648"
 }
@@ -53,7 +53,7 @@ tls {
   verify_server_hostname = false
 }
 consul {
-    address = "localhost:8500"
+    address = "http://$(private_ip):8500"
     server_service_name = "nomad-server"
     client_service_name = "nomad-client"
     auto_advertise = true

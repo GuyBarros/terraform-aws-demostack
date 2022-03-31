@@ -47,4 +47,8 @@ module "cluster" {
   #consul_master_token   = "5fder467-5gf5-8ju7-1q2w-y6gj78kl9gfd"
   consul_master_token = uuid()
   nomad_gossip_key    = data.terraform_remote_state.tls.outputs.nomad_gossip_key
+
+  #F5 Creds
+  f5_username = var.f5_username
+  f5_password = var.f5_password
 }

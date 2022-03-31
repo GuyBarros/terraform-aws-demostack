@@ -89,7 +89,7 @@ apt-get install -y \
   curl \
   gnupg-agent \
   software-properties-common \
-  openjdk-14-jdk-headless \
+  openjdk-17-jdk-headless \
   prometheus-node-exporter \
   golang-go \
   alien \

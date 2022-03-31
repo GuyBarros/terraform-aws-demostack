@@ -31,6 +31,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_vpc" "demostack" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = true
+  enable_dns_support   = true
 
   tags = local.common_tags
 
@@ -82,6 +83,28 @@ tags = local.common_tags
       cidr_blocks = ["10.1.0.0/18"]
   }
 
+  ingress {
+    from_port   = 4000
+    to_port     = 10000
+    protocol    = "udp"
+      cidr_blocks = ["10.1.0.0/18"]
+  }
+
+
+  ingress {
+    from_port   = 4000
+    to_port     = 10000
+    protocol    = "tcp"
+      cidr_blocks = ["10.2.0.0/18"]
+  }
+
+  ingress {
+    from_port   = 4000
+    to_port     = 10000
+    protocol    = "udp"
+      cidr_blocks = ["10.2.0.0/18"]
+  }
+/*
     ingress {
     from_port   = 8200
     to_port     = 8201
@@ -134,7 +157,7 @@ tags = local.common_tags
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+*/
   # SSH access if host_access_ip has CIDR blocks
   dynamic "ingress" {
     for_each = var.host_access_ip
@@ -356,6 +379,7 @@ data "aws_iam_policy_document" "vault-server" {
       "ec2:DescribeVolumes",
       "ec2:AttachVolume",
       "ec2:DetachVolume",
+      "autoscaling:DescribeAutoScalingGroups",
     ]
 
     resources = ["*"]

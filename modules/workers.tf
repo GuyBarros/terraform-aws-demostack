@@ -31,7 +31,6 @@ data "template_file" "workers" {
     consul_join_tag_key   = "ConsulJoin"
     consul_join_tag_value = var.consul_join_tag_value
     consul_master_token   = var.consul_master_token
-    meta_zone_tag = "${var.namespace}-${count.index}"
 
     # Vault
     vault_root_token = random_id.vault-root-token.hex
@@ -51,8 +50,8 @@ data "template_file" "workers" {
     aws_ebs_volume_mongodb_id = aws_ebs_volume.mongodb.id
     aws_ebs_volume_prometheus_id = aws_ebs_volume.prometheus.id
     aws_ebs_volume_shared_id = aws_ebs_volume.shared.id
-    
- 
+
+
   }
 }
 
@@ -96,11 +95,11 @@ resource "aws_instance" "workers" {
   tags = merge(local.common_tags ,{
    ConsulJoin     = "${var.consul_join_tag_value}" ,
    Purpose        = "demostack" ,
-   function       = "worker" 
+   function       = "worker"
    Name            = "${var.namespace}-worker-${count.index}" ,
    }
   )
-  
+
 
   user_data = element(data.template_cloudinit_config.workers.*.rendered, count.index)
 }

@@ -15,6 +15,7 @@ sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
 
 storage "consul" {
+  address = "$(private_ip):8500"
   path = "vault/"
   service = "vault"
   token="${consul_master_token}"

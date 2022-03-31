@@ -13,7 +13,8 @@ sudo rm  /etc/consul.d/*
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
-  "advertise_addr": "$(public_ip)",
+  "client_addr": "$(private_ip)",
+  "advertise_addr": "$(private_ip)",
   "advertise_addr_wan": "$(public_ip)",
   "bind_addr": "0.0.0.0",
   "client_addr": "0.0.0.0",
@@ -34,9 +35,7 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "connect":{
     "enabled": true
   },
-  "node_meta": {
-"zone" : "${meta_zone_tag}"
-},
+
 "autopilot": {
 "redundancy_zone_tag" : "zone",
     "cleanup_dead_servers": true,
@@ -104,6 +103,7 @@ EOF
 sudo systemctl enable consul
 sudo systemctl start consul
 
+export CONSUL_HTTP_ADDR=http://$(private_ip):8500
 
 echo "--> setting up resolv.conf"
 ##################################
