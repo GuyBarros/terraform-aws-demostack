@@ -15,11 +15,12 @@ sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
 
 storage "consul" {
-  address = "$(private_ip):8500"
+  address = "http://$(private_ip):8500"
   path = "vault/"
   service = "vault"
   token="${consul_master_token}"
 }
+
 
 listener "tcp" {
   address       = "0.0.0.0:8200"
@@ -27,6 +28,8 @@ listener "tcp" {
   tls_key_file  = "/etc/ssl/certs/me.key"
    tls-skip-verify = true
 }
+
+
 seal "awskms" {
   region = "${region}"
   kms_key_id = "${kmskey}"
@@ -40,7 +43,7 @@ replication {
       resolver_discover_servers = false
 }
 
-api_addr = "https://$(public_ip):8200"
+api_addr = "https://$(private_ip):8200"
 # api_addr = "https://vault.service.${region}.consul:8200"
 # api_addr = "${vault_api_addr}"
 plugin_directory = "/etc/vault.d/plugins"

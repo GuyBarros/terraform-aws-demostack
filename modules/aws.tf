@@ -78,86 +78,33 @@ tags = local.common_tags
 
   ingress {
     from_port   = 4000
-    to_port     = 10000
-    protocol    = "tcp"
-      cidr_blocks = ["10.1.0.0/18"]
-  }
-
-  ingress {
-    from_port   = 4000
-    to_port     = 10000
-    protocol    = "udp"
-      cidr_blocks = ["10.1.0.0/18"]
-  }
-
-
-  ingress {
-    from_port   = 4000
-    to_port     = 10000
-    protocol    = "tcp"
-      cidr_blocks = ["10.2.0.0/18"]
-  }
-
-  ingress {
-    from_port   = 4000
-    to_port     = 10000
-    protocol    = "udp"
-      cidr_blocks = ["10.2.0.0/18"]
-  }
-/*
-    ingress {
-    from_port   = 8200
-    to_port     = 8201
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-    ingress {
-    from_port   = 4646
-    to_port     = 4648
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-   ingress {
-    from_port   = 8300
-    to_port     = 8301
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-    ingress {
-    from_port   = 8300
-    to_port     = 8302
-    protocol    = "udp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-
-   ingress {
-    from_port   = 8500
-    to_port     = 8503
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-   ingress {
-    from_port   = 8600
-    to_port     = 8603
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-
-
-
-     ingress {
-    from_port   = 20000
     to_port     = 32000
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+      cidr_blocks = ["10.1.0.0/18"]
   }
-*/
+
+  ingress {
+    from_port   = 4000
+    to_port     = 32000
+    protocol    = "udp"
+      cidr_blocks = ["10.1.0.0/18"]
+  }
+
+
+  ingress {
+    from_port   = 4000
+    to_port     = 32000
+    protocol    = "tcp"
+      cidr_blocks = ["10.2.0.0/18"]
+  }
+
+  ingress {
+    from_port   = 4000
+    to_port     = 32000
+    protocol    = "udp"
+      cidr_blocks = ["10.2.0.0/18"]
+  }
+
   # SSH access if host_access_ip has CIDR blocks
   dynamic "ingress" {
     for_each = var.host_access_ip

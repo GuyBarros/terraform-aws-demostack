@@ -39,13 +39,13 @@ name         = "${node_name}"
 data_dir     = "/mnt/nomad"
 enable_debug = true
 bind_addr = "0.0.0.0"
-
+/*
 advertise {
   http = "$(private_ip):4646"
   rpc  = "$(private_ip):4647"
   serf = "$(private_ip):4648"
 }
-
+*/
 datacenter = "$AWS_AZ"
 region = "$AWS_REGION"
 server {
@@ -74,7 +74,7 @@ tls {
   verify_server_hostname = false
 }
 consul {
-    address = "$(private_ip):8500"
+    address = "localhost:8500"
     server_service_name = "nomad-server"
     client_service_name = "nomad-client"
     auto_advertise = true
@@ -145,12 +145,12 @@ sudo systemctl start nomad
 sleep 5
 
 echo "--> Waiting for Nomad leader"
-while ! curl -s -k https://localhost:4646/v1/status/leader --show-error; do
+while ! curl -s -k https://$(private_ip):4646/v1/status/leader --show-error; do
   sleep 2
 done
 
 echo "--> Waiting for a list of Nomad peers"
-while ! curl -s -k https://localhost:4646/v1/status/peers --show-error; do
+while ! curl -s -k https://$(private_ip):4646/v1/status/peers --show-error; do
   sleep 2
 done
 

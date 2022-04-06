@@ -9,15 +9,13 @@ sudo mkdir -p /etc/consul.d
 echo "--> clean up any default config."
 sudo rm  /etc/consul.d/*
 
-
+#"client_addr": "$(private_ip) 127.0.0.1",
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
-  "client_addr": "$(private_ip)",
   "advertise_addr": "$(private_ip)",
   "advertise_addr_wan": "$(public_ip)",
-  "bind_addr": "0.0.0.0",
-  "client_addr": "0.0.0.0",
+  "client_addr": "$(private_ip) 127.0.0.1",
   "data_dir": "/mnt/consul",
   "encrypt": "${consul_gossip_key}",
   "leave_on_terminate": true,
@@ -116,11 +114,16 @@ IPV4=$(ec2metadata --local-ipv4)
 
 printf "[Resolve]\nDNS=127.0.0.1\nDomains=~consul\n" > /etc/systemd/resolved.conf.d/forward-consul-domains.conf
 
-sudo iptables -t nat -A OUTPUT -d localhost -p udp -m udp --dport 53 -j REDIRECT --to-ports 8600
-sudo iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
+iptables -t nat -A PREROUTING -p udp -m udp --dport 53 -j REDIRECT --to-ports 8600
+iptables -t nat -A PREROUTING -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
+iptables -t nat -A OUTPUT -d localhost -p udp -m udp --dport 53 -j REDIRECT --to-ports 8600
+iptables -t nat -A OUTPUT -d localhost -p tcp -m tcp --dport 53 -j REDIRECT --to-ports 8600
 
 systemctl daemon-reload
 systemctl restart systemd-resolved
+
+ sleep 3
+
 ##################################
 
 echo "==> Consul is done!"
