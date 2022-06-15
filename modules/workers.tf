@@ -1,59 +1,3 @@
-data "template_file" "workers" {
-  count = var.workers
-
-  template = join("\n", tolist([
-    file("${path.module}/templates/shared/base.sh"),
-    file("${path.module}/templates/shared/docker.sh"),
-    file("${path.module}/templates/workers/consul.sh"),
-    file("${path.module}/templates/workers/vault.sh"),
-    file("${path.module}/templates/workers/nomad.sh"),
-    file("${path.module}/templates/workers/ebs_volumes.sh"),
-  ]))
-
-  vars = {
-    namespace  = var.namespace
-    region     = var.region
-    node_name  = "${var.namespace}-worker-${count.index}"
-    enterprise = var.enterprise
-
-    enterprise    = var.enterprise
-    vaultlicense  = var.vaultlicense
-    consullicense = var.consullicense
-
-    #me_ca     = tls_self_signed_cert.root.cert_pem
-    me_ca      = var.ca_cert_pem
-    me_cert    = element(tls_locally_signed_cert.workers.*.cert_pem, count.index)
-    me_key     = element(tls_private_key.workers.*.private_key_pem, count.index)
-    public_key = var.public_key
-
-    # Consul
-    consul_gossip_key     = var.consul_gossip_key
-    consul_join_tag_key   = "ConsulJoin"
-    consul_join_tag_value = var.consul_join_tag_value
-    consul_master_token   = var.consul_master_token
-
-    # Vault
-    vault_root_token = random_id.vault-root-token.hex
-    vault_servers    = var.workers
-
-    # Nomad
-    cni_plugin_url = var.cni_plugin_url
-    run_nomad_jobs = var.run_nomad_jobs
-
-    # Nomad EBS Volumes
-    index      = count.index+1
-    count      = var.workers
-    dc1       = data.aws_availability_zones.available.names[0]
-    dc2       = data.aws_availability_zones.available.names[1]
-    dc3       = data.aws_availability_zones.available.names[2]
-    aws_ebs_volume_mysql_id = aws_ebs_volume.shared.id
-    aws_ebs_volume_mongodb_id = aws_ebs_volume.mongodb.id
-    aws_ebs_volume_prometheus_id = aws_ebs_volume.prometheus.id
-    aws_ebs_volume_shared_id = aws_ebs_volume.shared.id
-
-
-  }
-}
 
 # Gzip cloud-init config
 data "template_cloudinit_config" "workers" {
@@ -62,10 +6,69 @@ data "template_cloudinit_config" "workers" {
   gzip          = true
   base64_encode = true
 
+    #base
   part {
     content_type = "text/x-shellscript"
-    content      = element(data.template_file.workers.*.rendered, count.index)
+    content      = templatefile("${path.module}/templates/shared/base.sh",{
+    region     = var.region
+    node_name  = "${var.namespace}-worker-${count.index}"
+    enterprise = var.enterprise
+    me_ca      = var.ca_cert_pem
+    me_cert    = element(tls_locally_signed_cert.workers.*.cert_pem, count.index)
+    me_key     = element(tls_private_key.workers.*.private_key_pem, count.index)
+    public_key = var.public_key
+    })
+   }
+
+  #docker
+  part {
+    content_type = "text/x-shellscript"
+    content      = file("${path.module}/templates/shared/docker.sh")
+   }
+
+  #consul
+  part {
+    content_type = "text/x-shellscript"
+    content      = templatefile("${path.module}/templates/workers/consul.sh",{
+    node_name  = "${var.namespace}-worker-${count.index}" #"
+     # Consul
+    consullicense = var.consullicense
+    consul_gossip_key     = var.consul_gossip_key
+    consul_join_tag_key   = "ConsulJoin"
+    consul_join_tag_value = var.consul_join_tag_value
+    consul_master_token   = var.consul_master_token
+    })
+  } 
+
+   #nomad
+  part {
+    content_type = "text/x-shellscript"
+    content      = templatefile("${path.module}/templates/workers/nomad.sh",{
+    node_name  = "${var.namespace}-worker-${count.index}"
+    # Nomad
+    cni_plugin_url   = var.cni_plugin_url
+    })
   }
+
+      #EBS
+  part {
+    content_type = "text/x-shellscript"
+    content      = templatefile("${path.module}/templates/workers/ebs_volumes.sh",{
+    region     = var.region
+    run_nomad_jobs = var.run_nomad_jobs
+    # Nomad EBS Volumes
+    index                        = count.index + 1
+    count                        = var.workers
+    dc1                          = data.aws_availability_zones.available.names[0]
+    dc2                          = data.aws_availability_zones.available.names[1]
+    dc3                          = data.aws_availability_zones.available.names[2]
+    aws_ebs_volume_mysql_id      = aws_ebs_volume.shared.id
+    aws_ebs_volume_mongodb_id    = aws_ebs_volume.mongodb.id
+    aws_ebs_volume_prometheus_id = aws_ebs_volume.prometheus.id
+    aws_ebs_volume_shared_id     = aws_ebs_volume.shared.id
+    })
+  }
+#end  
 }
 
 resource "aws_instance" "workers" {

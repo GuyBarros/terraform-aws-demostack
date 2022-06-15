@@ -42,14 +42,6 @@ output "boundary_ui" {
 }
 
 
-output "nomad_tag_workers" {
-  value = data.template_file.workers.*.vars.node_name
-}
-
-output "nomad_tag_servers" {
-  value = data.template_file.servers.*.vars.node_name
-}
-
 /*
 output "eks_endpoint" {
   value = aws_eks_cluster.eks.endpoint

@@ -1,56 +1,3 @@
-data "template_file" "servers" {
-  count = var.servers
-
-  template = join("\n", tolist([
-    file("${path.module}/templates/shared/base.sh"),
-    file("${path.module}/templates/shared/docker.sh"),
-    file("${path.module}/templates/server/consul.sh"),
-    file("${path.module}/templates/server/vault.sh"),
-    file("${path.module}/templates/server/nomad.sh"),
-  ]))
-
-  vars = {
-    region = var.region
-
-    enterprise    = var.enterprise
-    vaultlicense  = var.vaultlicense
-    consullicense = var.consullicense
-    kmskey        = aws_kms_key.demostackVaultKeys.id
-    namespace     = var.namespace
-    node_name     = "${var.namespace}-server-${count.index}"
-
-
-    # me_ca         = tls_self_signed_cert.root.cert_pem
-    me_ca      = var.ca_cert_pem
-    me_cert    = element(tls_locally_signed_cert.server.*.cert_pem, count.index)
-    me_key     = element(tls_private_key.server.*.private_key_pem, count.index)
-    public_key = var.public_key
-
-    # Consul
-    primary_datacenter    = var.primary_datacenter
-    consul_gossip_key     = var.consul_gossip_key
-    consul_join_tag_key   = "ConsulJoin"
-    consul_join_tag_value = var.consul_join_tag_value
-    consul_master_token   = var.consul_master_token
-    consul_servers        = var.servers
-
-
-    # Nomad
-    nomad_gossip_key = var.nomad_gossip_key
-    nomad_servers    = var.servers
-    cni_plugin_url   = var.cni_plugin_url
-    nomadlicense     = var.nomadlicense
-
-    # Nomad jobs
-    fabio_url = var.fabio_url
-
-    # Vault
-    vault_root_token = random_id.vault-root-token.hex
-    vault_servers    = var.servers
-    vault_api_addr = "https://${aws_route53_record.vault.fqdn}:8200"
-
-  }
-}
 
 # Gzip cloud-init config
 data "template_cloudinit_config" "servers" {
@@ -59,12 +6,75 @@ data "template_cloudinit_config" "servers" {
   gzip          = true
   base64_encode = true
 
+  #base
   part {
     content_type = "text/x-shellscript"
-    content      = element(data.template_file.servers.*.rendered, count.index)
-  }
-}
+    content      = templatefile("${path.module}/templates/shared/base.sh",{
+    region = var.region
+    enterprise    = var.enterprise
+    node_name     = "${var.namespace}-server-${count.index}"
+    me_ca      = var.ca_cert_pem
+    me_cert    = element(tls_locally_signed_cert.server.*.cert_pem, count.index)
+    me_key     = element(tls_private_key.server.*.private_key_pem, count.index)
+    public_key = var.public_key
+    })
+   }
 
+  #docker
+  part {
+    content_type = "text/x-shellscript"
+    content      = file("${path.module}/templates/shared/docker.sh")
+   }
+
+  #consul
+  part {
+    content_type = "text/x-shellscript"
+    content      = templatefile("${path.module}/templates/server/consul.sh",{
+    region = var.region
+    node_name     = "${var.namespace}-server-${count.index}"
+    # Consul
+    consullicense = var.consullicense
+    primary_datacenter    = var.primary_datacenter
+    consul_gossip_key     = var.consul_gossip_key
+    consul_join_tag_key   = "ConsulJoin"
+    consul_join_tag_value = var.consul_join_tag_value
+    consul_master_token   = var.consul_master_token
+    consul_servers        = var.servers
+    })
+   }
+
+  #vault
+  part {
+    content_type = "text/x-shellscript"
+    content      = templatefile("${path.module}/templates/server/vault.sh",{
+    region = var.region
+    enterprise    = var.enterprise
+    node_name     = "${var.namespace}-server-${count.index}"
+    kmskey        = aws_kms_key.demostackVaultKeys.id
+    # Consul
+    consul_master_token   = var.consul_master_token
+    # Vault
+    namespace     = var.namespace
+    vault_root_token = random_id.vault-root-token.hex
+    vault_servers    = var.servers
+    vault_api_addr = "https://${aws_route53_record.vault.fqdn}:8200"
+    })
+   }
+
+ #nomad
+  part {
+    content_type = "text/x-shellscript"
+    content      = templatefile("${path.module}/templates/server/nomad.sh",{
+    node_name     = "${var.namespace}-server-${count.index}"
+    # Nomad
+    nomad_gossip_key = var.nomad_gossip_key
+    nomad_servers    = var.servers
+    cni_plugin_url   = var.cni_plugin_url
+    nomadlicense     = var.nomadlicense
+    })
+   }
+ #end
+}
 
 resource "aws_instance" "servers" {
   count = var.servers
