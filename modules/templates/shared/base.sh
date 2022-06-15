@@ -128,7 +128,7 @@ echo "--> Adding hostname to /etc/hosts"
 sudo tee -a /etc/hosts > /dev/null <<EOF
 
 # For local resolution
-$(private_ip)  ${node_name}.node.consul
+$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)  ${node_name}.node.consul
 EOF
 
 

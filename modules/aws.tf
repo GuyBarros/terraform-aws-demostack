@@ -192,6 +192,7 @@ tags = local.common_tags
     to_port     = 5500
     protocol    = "tcp"
     cidr_blocks = [ingress.value]
+    # cidr_blocks = flatten([ingress.value,data.tfe_ip_ranges.addresses.api])
   }
   }
 
@@ -203,6 +204,7 @@ tags = local.common_tags
     to_port     = 9300
     protocol    = "tcp"
     cidr_blocks = [ingress.value]
+    # cidr_blocks = flatten([ingress.value,data.tfe_ip_ranges.addresses.api])
   }
   }
 
@@ -214,6 +216,7 @@ tags = local.common_tags
     to_port     = 9999
     protocol    = "tcp"
     cidr_blocks = [ingress.value]
+    # cidr_blocks = flatten([ingress.value,data.tfe_ip_ranges.addresses.api])
   }
   }
 
@@ -225,6 +228,7 @@ tags = local.common_tags
     to_port     = 4999
     protocol    = "tcp"
     cidr_blocks = [ingress.value]
+    # cidr_blocks = flatten([ingress.value,data.tfe_ip_ranges.addresses.api])
   }
   }
 
@@ -237,6 +241,7 @@ tags = local.common_tags
     to_port     = 32000
     protocol    = "tcp"
     cidr_blocks = [ingress.value]
+    # cidr_blocks = flatten([ingress.value,data.tfe_ip_ranges.addresses.api])
   }
   }
 

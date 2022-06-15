@@ -41,9 +41,9 @@ enable_debug = true
 bind_addr = "0.0.0.0"
 /*
 advertise {
-  http = "$(private_ip):4646"
-  rpc  = "$(private_ip):4647"
-  serf = "$(private_ip):4648"
+  http = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646"
+  rpc  = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4647"
+  serf = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4648"
 }
 */
 datacenter = "$AWS_AZ"
@@ -134,7 +134,7 @@ Restart=on-failure
 LimitNOFILE=65536
 #Enterprise License
 Environment=NOMAD_LICENSE=${nomadlicense}
-Environment=VAULT_TOKEN="$(vault token create -field=token -policy=superuser -policy=nomad-server -display-name=${node_name} -period=72h)"
+Environment=VAULT_TOKEN="$(echo $NOMAD_VAULT_TOKEN)"
 
 [Install]
 WantedBy=multi-user.target
@@ -145,12 +145,12 @@ sudo systemctl start nomad
 sleep 5
 
 echo "--> Waiting for Nomad leader"
-while ! curl -s -k https://$(private_ip):4646/v1/status/leader --show-error; do
+while ! curl -s -k https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/leader --show-error; do
   sleep 2
 done
 
 echo "--> Waiting for a list of Nomad peers"
-while ! curl -s -k https://$(private_ip):4646/v1/status/peers --show-error; do
+while ! curl -s -k https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/peers --show-error; do
   sleep 2
 done
 

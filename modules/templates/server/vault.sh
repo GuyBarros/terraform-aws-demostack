@@ -15,7 +15,7 @@ sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
 
 storage "consul" {
-  address = "http://$(private_ip):8500"
+  address = "http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500"
   path = "vault/"
   service = "vault"
   token="${consul_master_token}"
@@ -43,7 +43,7 @@ replication {
       resolver_discover_servers = false
 }
 
-api_addr = "https://$(private_ip):8200"
+api_addr = "https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 # api_addr = "https://vault.service.${region}.consul:8200"
 # api_addr = "${vault_api_addr}"
 plugin_directory = "/etc/vault.d/plugins"

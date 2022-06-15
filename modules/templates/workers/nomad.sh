@@ -27,9 +27,9 @@ datacenter = "$AWS_AZ"
 region = "$AWS_REGION"
 /*
 advertise {
-  http = "$(private_ip):4646"
-  rpc  = "$(private_ip):4647"
-  serf = "$(private_ip):4648"
+  http = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646"
+  rpc  = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4647"
+  serf = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4648"
 }
 */
 

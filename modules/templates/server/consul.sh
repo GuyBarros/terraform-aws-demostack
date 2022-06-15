@@ -14,9 +14,9 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
   "bootstrap_expect": ${consul_servers},
-  "advertise_addr": "$(private_ip)",
-  "advertise_addr_wan": "$(public_ip)",
-  "client_addr": "$(private_ip) 127.0.0.1",
+  "advertise_addr": "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)",
+  "advertise_addr_wan": "$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)",
+  "client_addr": "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4) 127.0.0.1",
   "data_dir": "/mnt/consul",
   "encrypt": "${consul_gossip_key}",
   "leave_on_terminate": true,
@@ -97,7 +97,7 @@ sudo systemctl enable consul
 sudo systemctl restart consul
 
 export CONSUL_HTTP_TOKEN=${consul_master_token}
-export CONSUL_HTTP_ADDR=http://$(private_ip):8500
+export CONSUL_HTTP_ADDR=http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
 
 
 #TODO - CONSUL ACL Bootstrap
@@ -154,7 +154,7 @@ while [ "$(consul members 2>&1 | grep "server" | grep "alive" | wc -l)" -lt "${c
 done
 
 echo "--> Waiting for Consul leader #1 "
-while [ -z "$(curl -skfS http://$(private_ip):8500/v1/status/leader)" ]; do
+while [ -z "$(curl -skfS http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500/v1/status/leader)" ]; do
   sleep 3
 done
 
@@ -184,7 +184,7 @@ systemctl restart systemd-resolved
 
 
 echo "--> Waiting for Consul leader #2"
-while [ -z "$(curl -skfS http://$(private_ip):8500/v1/status/leader)" ]; do
+while [ -z "$(curl -skfS http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500/v1/status/leader)" ]; do
   sleep 3
 done
 

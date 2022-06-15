@@ -54,6 +54,7 @@ data "template_cloudinit_config" "servers" {
     # Consul
     consul_master_token   = var.consul_master_token
     # Vault
+    vaultlicense  = var.vaultlicense
     namespace     = var.namespace
     vault_root_token = random_id.vault-root-token.hex
     vault_servers    = var.servers

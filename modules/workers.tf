@@ -30,7 +30,8 @@ data "template_cloudinit_config" "workers" {
   part {
     content_type = "text/x-shellscript"
     content      = templatefile("${path.module}/templates/workers/consul.sh",{
-    node_name  = "${var.namespace}-worker-${count.index}" #"
+    node_name  = "${var.namespace}-worker-${count.index}"
+    region = var.region
      # Consul
     consullicense = var.consullicense
     consul_gossip_key     = var.consul_gossip_key
@@ -38,7 +39,7 @@ data "template_cloudinit_config" "workers" {
     consul_join_tag_value = var.consul_join_tag_value
     consul_master_token   = var.consul_master_token
     })
-  } 
+  }
 
    #nomad
   part {
@@ -68,7 +69,7 @@ data "template_cloudinit_config" "workers" {
     aws_ebs_volume_shared_id     = aws_ebs_volume.shared.id
     })
   }
-#end  
+#end
 }
 
 resource "aws_instance" "workers" {

@@ -1,6 +1,6 @@
 echo "--> Configuring EBS mounts"
 
-export NOMAD_ADDR=https://$(private_ip):4646
+# export NOMAD_ADDR=https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646
 
 echo "--> Create EBS CSI plugin job"
 {
