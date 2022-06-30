@@ -1,6 +1,6 @@
 
 # Gzip cloud-init config
-data "template_cloudinit_config" "workers" {
+data "cloudinit_config" "workers" {
   count = var.workers
 
   gzip          = true
@@ -105,5 +105,5 @@ resource "aws_instance" "workers" {
   )
 
 
-  user_data = element(data.template_cloudinit_config.workers.*.rendered, count.index)
+  user_data = element(data.cloudinit_config.workers.*.rendered, count.index)
 }
