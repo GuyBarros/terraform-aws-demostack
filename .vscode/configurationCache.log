@@ -1,0 +1,1 @@
+{"buildTargets":[".PHONY","all","apply","console","demostack","deploy","destroy","doormat_aws","doormat_creds","init","login"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

@@ -1,0 +1,11 @@
+make.exe --dry-run --always-make --keep-going --print-directory
+make: Entering directory 'e:/Dropbox/GIT_ROOT/terraform-aws-demostack'
+doormat login
+ 
+terraform init
+doormat aws --account se_demos_dev tf-push --local
+terraform init
+terraform plan
+terraform apply
+make: Leaving directory 'e:/Dropbox/GIT_ROOT/terraform-aws-demostack'
+ 
