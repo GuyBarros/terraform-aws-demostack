@@ -28,6 +28,14 @@ resource "aws_lb_target_group_attachment" "boundary-controller-servers" {
   port             = 9200
 }
 
+resource "aws_lb_target_group_attachment" "boundary-controller-workers" {
+  count            = var.workers
+  target_group_arn = aws_lb_target_group.boundary-controller.arn
+  target_id        = aws_instance.workers[count.index].id
+  port             = 9200
+}
+
+
 resource "aws_lb_listener" "boundary-controller" {
   load_balancer_arn = aws_lb.boundary-controller.arn
   port              = "9200"
