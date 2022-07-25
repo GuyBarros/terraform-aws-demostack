@@ -12,3 +12,5 @@
 *.tfvars
 
 backend.hcl
+
+*/.vscode/*
