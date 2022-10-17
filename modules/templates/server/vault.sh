@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+echo "--> clean up any default config."
+sudo rm  /etc/vault.d/*
+
+
+
 echo "==> Vault (server)"
 # Vault expects the key to be concatenated with the CA
 sudo mkdir -p /etc/vault.d/tls/
@@ -88,7 +93,7 @@ sleep 2
 export VAULT_ADDR="https://127.0.0.1:8200"
 export VAULT_SKIP_VERIFY=true
 if ! vault operator init -status >/dev/null; then
-  vault operator init  -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1 > /tmp/out.txt
+  vault operator init  -recovery-shares=1 -recovery-threshold=1  > /tmp/out.txt
   cat /tmp/out.txt | grep "Recovery Key 1" | sed 's/Recovery Key 1: //' | consul kv put service/vault/recovery-key -
    cat /tmp/out.txt | grep "Initial Root Token" | sed 's/Initial Root Token: //' | consul kv put service/vault/root-token -
 
