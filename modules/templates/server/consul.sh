@@ -143,11 +143,6 @@ kv "" {
 
 EOF
 
- consul acl policy create -name consul_${node_name} -rules @/etc/consul.d/acl_policies/${node_name}.hcl
- consul acl token create -format=json -description "consul ${node_name} agent token" -policy-name consul_${node_name} > /etc/consul.d/consul_${node_name}_token.json
-
-##################################
-
 echo "--> Waiting for all Consul servers"
 while [ "$(consul members 2>&1 | grep "server" | grep "alive" | wc -l)" -lt "${consul_servers}" ]; do
   sleep 3
@@ -157,6 +152,12 @@ echo "--> Waiting for Consul leader #1 "
 while [ -z "$(curl -skfS http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500/v1/status/leader)" ]; do
   sleep 3
 done
+ consul acl policy create -name consul_${node_name} -rules @/etc/consul.d/acl_policies/${node_name}.hcl
+ consul acl token create -format=json -description "consul ${node_name} agent token" -policy-name consul_${node_name} > /etc/consul.d/consul_${node_name}_token.json
+
+##################################
+
+
 
 
 
@@ -181,7 +182,10 @@ systemctl restart systemd-resolved
 
  sleep 3
 
-
+echo "--> Waiting for all Consul servers"
+while [ "$(consul members 2>&1 | grep "server" | grep "alive" | wc -l)" -lt "${consul_servers}" ]; do
+  sleep 3
+done
 
 echo "--> Waiting for Consul leader #2"
 while [ -z "$(curl -skfS http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500/v1/status/leader)" ]; do

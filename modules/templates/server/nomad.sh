@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+echo "--> clean up any default config."
+sudo rm  /etc/nomad.d/*
+
+
 echo "--> Waiting for Vault leader"
 while ! host active.vault.service.consul &> /dev/null; do
   sleep 5
