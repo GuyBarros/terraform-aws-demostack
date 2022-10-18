@@ -61,7 +61,7 @@ resource "tls_cert_request" "server" {
 resource "tls_locally_signed_cert" "server" {
   count              = var.servers
   cert_request_pem   = element(tls_cert_request.server.*.cert_request_pem, count.index)
-  ca_key_algorithm   = var.ca_key_algorithm
+  #ca_key_algorithm   = var.ca_key_algorithm
   ca_private_key_pem = var.ca_private_key_pem
   ca_cert_pem        = var.ca_cert_pem
 
@@ -147,7 +147,7 @@ resource "tls_locally_signed_cert" "workers" {
   count            = var.workers
   cert_request_pem = element(tls_cert_request.workers.*.cert_request_pem, count.index)
 
-  ca_key_algorithm   = var.ca_key_algorithm
+  #ca_key_algorithm   = var.ca_key_algorithm
   ca_private_key_pem = var.ca_private_key_pem
   ca_cert_pem        = var.ca_cert_pem
 
