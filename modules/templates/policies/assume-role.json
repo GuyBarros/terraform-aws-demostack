@@ -12,7 +12,7 @@
      {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:sts::711129375688:assumed-role/se_demos_dev-developer/guy@hashicorp.com"
+        "AWS": "arn:aws:sts::711129375688:assumed-role/se_demos_dev-developer/andre@hashicorp.com"
       },
       "Action": "sts:AssumeRole"
     }

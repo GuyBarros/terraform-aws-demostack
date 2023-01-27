@@ -10,7 +10,7 @@ resource "tls_private_key" "server" {
 # Server signing request
 resource "tls_cert_request" "server" {
   count           = var.servers
-  key_algorithm   = element(tls_private_key.server.*.algorithm, count.index)
+  #key_algorithm   = element(tls_private_key.server.*.algorithm, count.index)
   private_key_pem = element(tls_private_key.server.*.private_key_pem, count.index)
 
   subject {
@@ -49,9 +49,9 @@ resource "tls_cert_request" "server" {
     # Common
     "localhost",
     "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}",
-    "server-0.eu-guystack.original.aws.hashidemos.io",
-    "server-1.eu-guystack.original.aws.hashidemos.io",
-    "server-2.eu-guystack.original.aws.hashidemos.io",
+    "server-0.eu-andrestack.original.aws.hashidemos.io",
+    "server-1.eu-andrestack.original.aws.hashidemos.io",
+    "server-2.eu-andrestack.original.aws.hashidemos.io",
   ]
 
   // ip_addresses = ["${aws_eip.server_ips.*.public_ip }"]
@@ -61,7 +61,7 @@ resource "tls_cert_request" "server" {
 resource "tls_locally_signed_cert" "server" {
   count              = var.servers
   cert_request_pem   = element(tls_cert_request.server.*.cert_request_pem, count.index)
-  ca_key_algorithm   = var.ca_key_algorithm
+  #ca_key_algorithm   = var.ca_key_algorithm
   ca_private_key_pem = var.ca_private_key_pem
   ca_cert_pem        = var.ca_cert_pem
 
@@ -93,7 +93,7 @@ resource "tls_private_key" "workers" {
 # Client signing request
 resource "tls_cert_request" "workers" {
   count           = var.workers
-  key_algorithm   = element(tls_private_key.workers.*.algorithm, count.index)
+  #key_algorithm   = element(tls_private_key.workers.*.algorithm, count.index)
   private_key_pem = element(tls_private_key.workers.*.private_key_pem, count.index)
 
   subject {
@@ -147,7 +147,7 @@ resource "tls_locally_signed_cert" "workers" {
   count            = var.workers
   cert_request_pem = element(tls_cert_request.workers.*.cert_request_pem, count.index)
 
-  ca_key_algorithm   = var.ca_key_algorithm
+  #ca_key_algorithm   = var.ca_key_algorithm
   ca_private_key_pem = var.ca_private_key_pem
   ca_cert_pem        = var.ca_cert_pem
 
