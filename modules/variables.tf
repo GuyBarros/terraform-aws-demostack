@@ -124,6 +124,7 @@ variable "instance_type_worker" {
   default     = "t2.xlarge"
 }
 
+/*
 variable "ca_key_algorithm" {
   default = ""
 }
@@ -135,6 +136,7 @@ variable "ca_private_key_pem" {
 variable "ca_cert_pem" {
   default = ""
 }
+*/
 
 variable "consul_gossip_key" {
   default = ""
@@ -153,7 +155,7 @@ variable "nomad_gossip_key" {
 }
 
 variable "run_nomad_jobs" {
-  default = "0"
+  default = "1"
 }
 
 variable "host_access_ip" {

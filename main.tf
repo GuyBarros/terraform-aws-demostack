@@ -3,9 +3,9 @@
 provider "aws" {
   #  region  = var.primary_region
   #  alias   = "primary"
-  default_tags {
-    tags = local.common_tags
-  }
+   # default_tags {
+   #   tags = local.common_tags
+  #  }
 }
 
 
@@ -32,23 +32,40 @@ module "cluster" {
   cidr_blocks          = var.cidr_blocks
   instance_type_server = var.instance_type_server
   instance_type_worker = var.instance_type_worker
-  zone_id              = data.terraform_remote_state.dns.outputs.aws_sub_zone_id
+  zone_id              = var.zone_id
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
   primary_datacenter   = each.value.namespace
 
   # EMEA-SE-PLAYGROUND
-  ca_key_algorithm      = data.terraform_remote_state.tls.outputs.ca_key_algorithm
-  ca_private_key_pem    = data.terraform_remote_state.tls.outputs.ca_private_key_pem
-  ca_cert_pem           = data.terraform_remote_state.tls.outputs.ca_cert_pem
-  consul_join_tag_value = "${each.value.namespace}-${data.terraform_remote_state.tls.outputs.consul_join_tag_value}"
-  consul_gossip_key     = data.terraform_remote_state.tls.outputs.consul_gossip_key
+  consul_join_tag_value = "${each.value.namespace}-${random_id.consul_join_tag_value.hex}"
+  consul_gossip_key     = random_id.consul_gossip_key.hex
   #consul_master_token   = data.terraform_remote_state.tls.outputs.consul_master_token
   #consul_master_token   = "5fder467-5gf5-8ju7-1q2w-y6gj78kl9gfd"
   consul_master_token = uuid()
-  nomad_gossip_key    = data.terraform_remote_state.tls.outputs.nomad_gossip_key
+  nomad_gossip_key    = random_id.nomad_gossip_key.hex
 
   #F5 Creds
   f5_username = var.f5_username
   f5_password = var.f5_password
+}
+
+# Consul gossip encryption key
+resource "random_id" "consul_gossip_key" {
+  byte_length = 16
+}
+
+# Consul master token
+resource "random_id" "consul_master_token" {
+  byte_length = 16
+}
+
+# Consul join key
+resource "random_id" "consul_join_tag_value" {
+  byte_length = 16
+}
+
+# Nomad gossip encryption key
+resource "random_id" "nomad_gossip_key" {
+  byte_length = 16
 }

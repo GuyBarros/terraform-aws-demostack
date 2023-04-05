@@ -3,7 +3,7 @@ terraform {
     hostname     = "app.terraform.io"
     organization = "emea-se-playground-2019"
     workspaces {
-      name = "Andre-AWS-demostack"
+      name = "Guy-AWS-Demostack"
     }
   }
 }

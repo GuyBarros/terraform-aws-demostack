@@ -13,7 +13,7 @@ data "cloudinit_config" "servers" {
     region = var.region
     enterprise    = var.enterprise
     node_name     = "${var.namespace}-server-${count.index}"
-    me_ca      = var.ca_cert_pem
+    me_ca      = tls_self_signed_cert.root.cert_pem
     me_cert    = element(tls_locally_signed_cert.server.*.cert_pem, count.index)
     me_key     = element(tls_private_key.server.*.private_key_pem, count.index)
     public_key = var.public_key

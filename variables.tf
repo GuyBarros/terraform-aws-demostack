@@ -142,17 +142,6 @@ variable "instance_type_worker" {
   default     = "t2.medium"
 }
 
-variable "ca_key_algorithm" {
-  default = ""
-}
-
-variable "ca_private_key_pem" {
-  default = ""
-}
-
-variable "ca_cert_pem" {
-  default = ""
-}
 
 variable "consul_gossip_key" {
   default = ""

@@ -11,9 +11,9 @@ data "cloudinit_config" "workers" {
     content_type = "text/x-shellscript"
     content      = templatefile("${path.module}/templates/shared/base.sh",{
     region     = var.region
-    node_name  = "${var.namespace}-worker-${count.index}"
     enterprise = var.enterprise
-    me_ca      = var.ca_cert_pem
+    node_name  = "${var.namespace}-worker-${count.index}"
+    me_ca      = tls_self_signed_cert.root.cert_pem
     me_cert    = element(tls_locally_signed_cert.workers.*.cert_pem, count.index)
     me_key     = element(tls_private_key.workers.*.private_key_pem, count.index)
     public_key = var.public_key

@@ -83,6 +83,12 @@ telemetry {
   publish_node_metrics = true
   prometheus_metrics = true
 }
+
+plugin "qemu" {
+  config {
+    image_paths = ["/tmp"]
+  }
+}
 EOF
 
 echo "--> Writing profile"
