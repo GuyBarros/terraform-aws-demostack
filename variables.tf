@@ -164,19 +164,11 @@ variable "run_nomad_jobs" {
 }
 
 
-variable "primary_datacenter" {
-  description = "the primary datacenter for mesh gateways"
-  default     = ""
-}
+# variable "primary_datacenter" {
+#   description = "the primary datacenter for mesh gateways"
+#   default     = ""
+# }
 
-variable "dns-workspace-name" {
-  description = "the workspace name to access dns configuration for this deployment"
-}
-
-variable "tls-workspace-name" {
-  description = "the workspace name to access dns configuration for this deployment"
-  default     = "tls-root-certificate"
-}
 variable "f5_username" {
   description = "F5 username"
   default     = "admin"

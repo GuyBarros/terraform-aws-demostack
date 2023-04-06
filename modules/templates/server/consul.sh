@@ -8,8 +8,7 @@ sudo mkdir -p /etc/consul.d/acl_policies
 echo "--> clean up any default config."
 sudo rm  /etc/consul.d/*
 
-#"primary_datacenter":  "${primary_datacenter}", "bind_addr": "0.0.0.0",
-# "client_addr": "$(private_ip) 127.0.0.1",
+
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
