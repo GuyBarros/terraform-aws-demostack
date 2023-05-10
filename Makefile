@@ -1,7 +1,5 @@
 all: login init demostack apply
 .PHONY: all doormat_creds doormat_aws deploy destroy console
-TFC_ORG = emea-se-playground-2019
-WORKSPACE_DEMOSTACK = Guy-AWS-Demostack
 DOORMAT_AWS_ACCOUNT = aws_guy_test
 login:
 		doormat login

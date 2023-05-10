@@ -61,7 +61,7 @@ net.bridge.bridge-nf-call-iptables = 1
 EOF
 
 echo "--> updated version of Nodejs"
-curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 
 echo "--> Adding Hashicorp repo"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -

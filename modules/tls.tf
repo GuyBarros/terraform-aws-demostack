@@ -75,9 +75,7 @@ resource "tls_cert_request" "server" {
     # Common
     "localhost",
     "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}",
-    "server-0.eu-Guystack.original.aws.hashidemos.io",
-    "server-1.eu-Guystack.original.aws.hashidemos.io",
-    "server-2.eu-Guystack.original.aws.hashidemos.io",
+
   ]
 
   // ip_addresses = ["${aws_eip.server_ips.*.public_ip }"]

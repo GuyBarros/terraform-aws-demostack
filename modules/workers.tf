@@ -50,7 +50,6 @@ data "cloudinit_config" "workers" {
     cni_plugin_url   = var.cni_plugin_url
     })
   }
-
       #EBS
   part {
     content_type = "text/x-shellscript"

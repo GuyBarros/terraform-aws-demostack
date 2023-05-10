@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 echo "--> Configuring EBS mounts"
 
 # export NOMAD_ADDR=https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646
@@ -154,6 +155,7 @@ EOF
 if [ ${index} == ${count} ]
 then
 echo "--> last worker, lets do this"
+sleep 120
 nomad run  /etc/nomad.d/default_jobs/plugin-ebs-controller.nomad
 nomad run  /etc/nomad.d/default_jobs/plugin-ebs-nodes.nomad
 

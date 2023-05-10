@@ -38,6 +38,7 @@ client {
    options {
     "driver.raw_exec.enable" = "1"
      "docker.privileged.enabled" = "true"
+      "qemu.config.image_paths"  = "/tmp"
   }
   meta {
     "type" = "worker",

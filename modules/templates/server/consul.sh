@@ -25,7 +25,8 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "ports":{
     "http": 8500,
     "https": 8501,
-    "grpc": 8502
+    "grpc": 8502,
+    "grpc_tls": 8503
   },
   "connect":{
     "enabled": true
