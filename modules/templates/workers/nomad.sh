@@ -80,7 +80,7 @@ consul {
 vault {
   enabled          = true
   tls_skip_verify  = true
-  address          = "${vault_api_addr}"
+  address          = "https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
   ca_file          = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file        = "/etc/ssl/certs/me.crt"
   key_file         = "/etc/ssl/certs/me.key"

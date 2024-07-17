@@ -5,7 +5,7 @@ sudo rm  /etc/nomad.d/*
 
 
 echo "--> Waiting for Vault to be active"
-VAULT_ADDR="${vault_api_addr}"
+VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 URL="$VAULT_ADDR/v1/sys/health"
 HTTP_STATUS=0
 
@@ -22,7 +22,7 @@ export CONSUL_HTTP_ADDR=http://$(private_ip):8500
 echo "--> Generating Vault token..."
 export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
 export NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
-  VAULT_ADDR="${vault_api_addr}" \
+  VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200" \
   VAULT_SKIP_VERIFY=true \
   vault token create -field=token -policy=superuser -policy=nomad-server -display-name=${node_name} -id=${node_name} -period=72h)"
 
@@ -113,7 +113,7 @@ consul {
 vault {
   enabled          = true
   tls_skip_verify  = true
-  address          = "${vault_api_addr}"
+  address          = "https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
   ca_file          = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file        = "/etc/ssl/certs/me.crt"
   key_file         = "/etc/ssl/certs/me.key"

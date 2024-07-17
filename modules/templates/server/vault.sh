@@ -58,7 +58,7 @@ EOF
 echo "--> Writing profile"
 sudo tee /etc/profile.d/vault.sh > /dev/null <<"EOF"
 alias vualt="vault"
-export VAULT_ADDR="${vault_api_addr}"
+export VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 EOF
 source /etc/profile.d/vault.sh
 
@@ -89,7 +89,7 @@ export CONSUL_HTTP_TOKEN=${consul_master_token}
 consul lock -name=vault-init tmp/vault/lock "$(cat <<"EOF"
 set -e
 sleep 2
-export VAULT_ADDR="https://127.0.0.1:8200"
+export VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 export VAULT_SKIP_VERIFY=true
 if ! vault operator init -status >/dev/null; then
   vault operator init  -recovery-shares=1 -recovery-threshold=1  > /tmp/out.txt
@@ -102,7 +102,7 @@ echo "ROOT TOKEN: $VAULT_TOKEN"
 sudo systemctl enable vault
 sudo systemctl restart vault
 else
-export VAULT_ADDR="https://127.0.0.1:8200"
+export VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 export VAULT_SKIP_VERIFY=true
 export VAULT_TOKEN=$(consul kv get service/vault/root-token)
 echo "ROOT TOKEN: $VAULT_TOKEN"
@@ -116,12 +116,12 @@ EOF
 
 
 echo "--> Waiting for Vault to be active"
-VAULT_ADDR="${vault_api_addr}"
+VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 URL="$VAULT_ADDR/v1/sys/health"
 HTTP_STATUS=0
 
 while [[ $HTTP_STATUS -ne 200 && $HTTP_STATUS -ne 473 && $HTTP_STATUS -ne 429 ]]; do
-  HTTP_STATUS=$(curl -s -o /dev/null -w "%%{http_code}" $URL)
+  HTTP_STATUS=$(curl -k -o /dev/null -w "%%{http_code}" $URL)
   sleep 1
 done
 
@@ -133,7 +133,7 @@ echo "--> Attempting to create nomad role"
   echo "--> Retrieving root token..."
  export VAULT_TOKEN=$(consul kv get service/vault/root-token)
 
-  export VAULT_ADDR="${vault_api_addr}"
+  export VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
   export VAULT_SKIP_VERIFY=true
 
   vault policy write nomad-server - <<EOR
