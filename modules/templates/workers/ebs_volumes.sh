@@ -155,7 +155,22 @@ EOF
 if [ ${index} == ${count} ]
 then
 echo "--> last worker, lets do this"
-sleep 120
+####
+echo "--> Waiting for Nomad leader"
+while ! curl -s -k https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/leader --show-error; do
+  sleep 2
+done
+
+echo "--> Waiting for a list of Nomad peers"
+while ! curl -s -k https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/peers --show-error; do
+  sleep 2
+done
+
+echo "--> Waiting for all Nomad servers"
+while [ "$(nomad server members 2>&1 | grep "alive" | wc -l)" -lt "${nomad_servers}" ]; do
+  sleep 5
+done
+####
 nomad run  /etc/nomad.d/default_jobs/plugin-ebs-controller.nomad
 nomad run  /etc/nomad.d/default_jobs/plugin-ebs-nodes.nomad
 

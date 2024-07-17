@@ -4,17 +4,23 @@ echo "--> clean up any default config."
 sudo rm  /etc/nomad.d/*
 
 
-echo "--> Waiting for Vault leader"
-while ! host active.vault.service.consul &> /dev/null; do
-  sleep 5
+echo "--> Waiting for Vault to be active"
+VAULT_ADDR="${vault_api_addr}"
+URL="$VAULT_ADDR/v1/sys/health"
+HTTP_STATUS=0
+
+while [[ $HTTP_STATUS -ne 200 && $HTTP_STATUS -ne 473  && $HTTP_STATUS -ne 429]]; do
+  HTTP_STATUS=$(curl -k -o /dev/null -w "%%{http_code}" $URL)
+  sleep 1
 done
+
 
 export CONSUL_HTTP_ADDR=http://$(private_ip):8500
 
 echo "--> Generating Vault token..."
 export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
 export NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
-  VAULT_ADDR="https://active.vault.service.consul:8200" \
+  VAULT_ADDR="${vault_api_addr}" \
   VAULT_SKIP_VERIFY=true \
   vault token create -field=token -policy=superuser -policy=nomad-server -display-name=${node_name} -id=${node_name} -period=72h)"
 
@@ -34,8 +40,13 @@ echo "--> Writing configuration"
 sudo mkdir -p /mnt/nomad
 sudo mkdir -p /etc/nomad.d
 
+
 echo "--> clean up any default config."
 sudo rm  /etc/nomad.d/*
+
+echo "--> creating directories for host volumes"
+sudo mkdir -p /etc/nomad.d/host-volumes/wp-runner
+sudo mkdir -p /etc/nomad.d/host-volumes/wp-server
 
 
 sudo tee /etc/nomad.d/nomad.hcl > /dev/null <<EOF
@@ -59,6 +70,17 @@ server {
 }
 client {
   enabled = true
+
+  host_volume wp-server-vol {
+      path = "/etc/nomad.d/host-volumes/wp-server"
+      read_only = false
+    }
+  host_volume wp-runner-vol {
+      path = "/etc/nomad.d/host-volumes/wp-runner"
+      read_only = false
+    }
+  
+
    options {
     "driver.raw_exec.enable" = "1"
      "docker.privileged.enabled" = "true"
@@ -88,7 +110,8 @@ consul {
 }
 vault {
   enabled          = true
-  address          = "https://active.vault.service.consul:8200"
+  tls_skip_verify  = true
+  address          = "${vault_api_addr}"
   ca_file          = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file        = "/etc/ssl/certs/me.crt"
   key_file         = "/etc/ssl/certs/me.key"
@@ -150,12 +173,12 @@ sudo systemctl start nomad
 sleep 5
 
 echo "--> Waiting for Nomad leader"
-while ! curl -s -k https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/leader --show-error; do
+while ! curl  -k https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/leader --show-error; do
   sleep 2
 done
 
 echo "--> Waiting for a list of Nomad peers"
-while ! curl -s -k https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/peers --show-error; do
+while ! curl  -k https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/peers --show-error; do
   sleep 2
 done
 

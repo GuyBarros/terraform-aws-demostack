@@ -68,6 +68,7 @@ data "cloudinit_config" "servers" {
     content      = templatefile("${path.module}/templates/server/nomad.sh",{
     node_name     = "${var.namespace}-server-${count.index}"
     # Nomad
+    vault_api_addr = "https://${aws_route53_record.vault.fqdn}:8200"
     nomad_gossip_key = var.nomad_gossip_key
     nomad_servers    = var.servers
     cni_plugin_url   = var.cni_plugin_url

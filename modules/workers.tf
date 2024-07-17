@@ -46,6 +46,7 @@ data "cloudinit_config" "workers" {
     content_type = "text/x-shellscript"
     content      = templatefile("${path.module}/templates/workers/nomad.sh",{
     node_name  = "${var.namespace}-worker-${count.index}"
+    vault_api_addr = "https://${aws_route53_record.vault.fqdn}:8200"
     # Nomad
     cni_plugin_url   = var.cni_plugin_url
     })
@@ -56,6 +57,7 @@ data "cloudinit_config" "workers" {
     content      = templatefile("${path.module}/templates/workers/ebs_volumes.sh",{
     region     = var.region
     run_nomad_jobs = var.run_nomad_jobs
+    nomad_servers    = var.servers
     # Nomad EBS Volumes
     index                        = count.index + 1
     count                        = var.workers

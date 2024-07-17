@@ -27,13 +27,15 @@ storage "consul" {
 }
 
 
+plugin_directory = "/etc/vault.d/plugins"
+
+
 listener "tcp" {
   address       = "0.0.0.0:8200"
   tls_cert_file = "/etc/vault.d/tls/vault.crt"
   tls_key_file  = "/etc/ssl/certs/me.key"
    tls-skip-verify = true
 }
-
 
 seal "awskms" {
   region = "${region}"
@@ -43,23 +45,20 @@ telemetry {
   prometheus_retention_time = "30s",
   disable_hostname = true
 }
-
 replication {
       resolver_discover_servers = false
 }
-
 api_addr = "https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
-# api_addr = "https://vault.service.${region}.consul:8200"
 # api_addr = "${vault_api_addr}"
-plugin_directory = "/etc/vault.d/plugins"
 disable_mlock = true
 ui = true
+raw_storage_endpoint = true
 EOF
 
 echo "--> Writing profile"
 sudo tee /etc/profile.d/vault.sh > /dev/null <<"EOF"
 alias vualt="vault"
-export VAULT_ADDR="https://active.vault.service.consul:8200"
+export VAULT_ADDR="${vault_api_addr}"
 EOF
 source /etc/profile.d/vault.sh
 
@@ -116,10 +115,17 @@ EOF
 
 
 
-echo "--> Waiting for Vault leader"
-while ! host active.vault.service.consul &> /dev/null; do
-  sleep 5
+echo "--> Waiting for Vault to be active"
+VAULT_ADDR="${vault_api_addr}"
+URL="$VAULT_ADDR/v1/sys/health"
+HTTP_STATUS=0
+
+while [[ $HTTP_STATUS -ne 200 && $HTTP_STATUS -ne 473 && $HTTP_STATUS -ne 429 ]]; do
+  HTTP_STATUS=$(curl -s -o /dev/null -w "%%{http_code}" $URL)
+  sleep 1
 done
+
+echo "HTTP status code is either 200 or 473. Continuing with the script..."
 
 echo "--> Attempting to create nomad role"
 
@@ -127,7 +133,7 @@ echo "--> Attempting to create nomad role"
   echo "--> Retrieving root token..."
  export VAULT_TOKEN=$(consul kv get service/vault/root-token)
 
-  export VAULT_ADDR="https://active.vault.service.consul:8200"
+  export VAULT_ADDR="${vault_api_addr}"
   export VAULT_SKIP_VERIFY=true
 
   vault policy write nomad-server - <<EOR

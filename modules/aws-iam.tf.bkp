@@ -1,0 +1,68 @@
+############################## Boundary ##########################
+
+data "aws_caller_identity" "current" {}
+
+data "aws_region" "current" {}
+
+data "aws_iam_policy" "demo_user_permissions_boundary" {
+  name = "DemoUser"
+}
+
+locals {
+  my_email = split("/", data.aws_caller_identity.current.arn)[2]
+}
+
+# Create the user to be used in Boundary for dynamic host discovery. Then attach the policy to the user.
+resource "aws_iam_user" "boundary_dynamic_host_catalog" {
+  name                 = "${var.namespace}-bdhc"
+  permissions_boundary = data.aws_iam_policy.demo_user_permissions_boundary.arn
+  force_destroy        = true
+}
+
+resource "aws_iam_user_policy" "boundary_dynamic_host_catalog" {
+  user   = aws_iam_user.boundary_dynamic_host_catalog.name
+  policy = data.aws_iam_policy.demo_user_permissions_boundary.policy
+  name   = "DemoUserInlinePolicy"
+}
+
+# Generate some secrets to pass in to the Boundary configuration.
+# WARNING: These secrets are not encrypted in the state file. Ensure that you do not commit your state file!
+resource "aws_iam_access_key" "boundary_dynamic_host_catalog" {
+  user = aws_iam_user.boundary_dynamic_host_catalog.name
+}
+
+############################## Vault ##########################
+
+
+resource "aws_iam_user" "vault_mount_user" {
+  name                 = "demo-${var.namespace}-vault-user"
+  permissions_boundary = data.aws_iam_policy.demo_user_permissions_boundary.arn
+  force_destroy        = true
+}
+
+resource "aws_iam_user_policy" "vault_mount_user" {
+  user   = aws_iam_user.vault_mount_user.name
+  policy = data.aws_iam_policy.demo_user_permissions_boundary.policy
+  name   = "DemoUserInlinePolicy"
+}
+
+resource "aws_iam_access_key" "vault_mount_user" {
+  user = aws_iam_user.vault_mount_user.name
+}
+
+# Vault Mount AWS Role Setup
+
+data "aws_iam_policy_document" "vault_dynamic_iam_user_policy" {
+  statement {
+    sid       = "VaultDemoUserDescribeEC2Regions"
+    actions   = ["ec2:DescribeRegions"]
+    resources = ["*"]
+  }
+}
+
+data "aws_iam_role" "vault_target_iam_role" {
+  name = "vault-assumed-role-credentials-demo"
+}
+
+############################## Terraform Platform ##########################
+

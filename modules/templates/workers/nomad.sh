@@ -17,6 +17,11 @@ sudo mkdir -p /etc/nomad.d/default_jobs
 echo "--> clean up any default config."
 sudo rm  /etc/nomad.d/*
 
+echo "--> creating directories for host volumes"
+sudo mkdir -p /etc/nomad.d/host-volumes/wp-runner
+sudo mkdir -p /etc/nomad.d/host-volumes/wp-server
+
+
 sudo tee /etc/nomad.d/config.hcl > /dev/null <<EOF
 name         = "${node_name}"
 data_dir     = "/mnt/nomad"
@@ -25,6 +30,7 @@ bind_addr = "0.0.0.0"
 
 datacenter = "$AWS_AZ"
 region = "$AWS_REGION"
+
 /*
 advertise {
   http = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646"
@@ -35,6 +41,15 @@ advertise {
 
 client {
   enabled = true
+    host_volume wp-server-vol {
+      path = "/etc/nomad.d/host-volumes/wp-server"
+      read_only = false
+    }
+  host_volume wp-runner-vol {
+      path = "/etc/nomad.d/host-volumes/wp-runner"
+      read_only = false
+    }
+  
    options {
     "driver.raw_exec.enable" = "1"
      "docker.privileged.enabled" = "true"
@@ -64,7 +79,8 @@ consul {
 }
 vault {
   enabled          = true
-  address          = "https://active.vault.service.consul:8200"
+  tls_skip_verify  = true
+  address          = "${vault_api_addr}"
   ca_file          = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file        = "/etc/ssl/certs/me.crt"
   key_file         = "/etc/ssl/certs/me.key"
