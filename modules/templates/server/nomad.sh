@@ -9,6 +9,8 @@ VAULT_ADDR="${vault_api_addr}"
 URL="$VAULT_ADDR/v1/sys/health"
 HTTP_STATUS=0
 
+echo "Vault API ADDRESS:" $VAULT_ADDR
+
 while [[ $HTTP_STATUS -ne 200 && $HTTP_STATUS -ne 473  && $HTTP_STATUS -ne 429]]; do
   HTTP_STATUS=$(curl -k -o /dev/null -w "%%{http_code}" $URL)
   sleep 1
