@@ -4,17 +4,19 @@ echo "--> clean up any default config."
 sudo rm  /etc/nomad.d/*
 
 
-echo "--> Waiting for Vault to be active"
+
+echo "NOMAD --> Waiting for Vault to be active"
 VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 URL="$VAULT_ADDR/v1/sys/health"
 HTTP_STATUS=0
 
 echo "Vault API ADDRESS:" $VAULT_ADDR
 
-while [[ $HTTP_STATUS -ne 200 && $HTTP_STATUS -ne 473  && $HTTP_STATUS -ne 429]]; do
+while [[ $HTTP_STATUS -ne 200 && $HTTP_STATUS -ne 473 && $HTTP_STATUS -ne 429 ]]; do
   HTTP_STATUS=$(curl -k -o /dev/null -w "%%{http_code}" $URL)
   sleep 1
 done
+
 
 
 export CONSUL_HTTP_ADDR=http://$(private_ip):8500
