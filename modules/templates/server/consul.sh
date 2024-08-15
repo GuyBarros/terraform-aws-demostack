@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+echo "==> getting the aws metadata token"
+export TOKEN=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+echo "==> check token was set"
+echo $TOKEN
+
 echo "--> Writing configuration"
 sudo mkdir -p /mnt/consul
 sudo mkdir -p /etc/consul.d
@@ -13,9 +19,9 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
   "bootstrap_expect": ${consul_servers},
-  "advertise_addr": "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)",
-  "advertise_addr_wan": "$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)",
-  "client_addr": "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4) 127.0.0.1",
+  "advertise_addr": "$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4)",
+  "advertise_addr_wan": "$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/public-ipv4)",
+  "client_addr": "$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4) 127.0.0.1",
   "data_dir": "/mnt/consul",
   "encrypt": "${consul_gossip_key}",
   "leave_on_terminate": true,
@@ -97,7 +103,7 @@ sudo systemctl enable consul
 sudo systemctl restart consul
 
 export CONSUL_HTTP_TOKEN=${consul_master_token}
-export CONSUL_HTTP_ADDR=http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
+export CONSUL_HTTP_ADDR=http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
 
 
 #TODO - CONSUL ACL Bootstrap
@@ -149,7 +155,7 @@ while [ "$(consul members 2>&1 | grep "server" | grep "alive" | wc -l)" -lt "${c
 done
 
 echo "--> Waiting for Consul leader #1 "
-while [ -z "$(curl -skfS http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500/v1/status/leader)" ]; do
+while [ -z "$(curl -skfS http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500/v1/status/leader)" ]; do
   sleep 3
 done
  consul acl policy create -name consul_${node_name} -rules @/etc/consul.d/acl_policies/${node_name}.hcl
@@ -188,7 +194,7 @@ while [ "$(consul members 2>&1 | grep "server" | grep "alive" | wc -l)" -lt "${c
 done
 
 echo "--> Waiting for Consul leader #2"
-while [ -z "$(curl -skfS http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500/v1/status/leader)" ]; do
+while [ -z "$(curl -skfS http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500/v1/status/leader)" ]; do
   sleep 3
 done
 

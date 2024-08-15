@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+
+echo "==> getting the aws metadata token"
+export TOKEN=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+echo "==> check token was set"
+echo $TOKEN
+
+
 echo "--> clean up any default config."
 sudo rm  /etc/vault.d/*
 
@@ -20,7 +28,7 @@ sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
 
 storage "consul" {
-  address = "http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500"
+  address = "http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500"
   path = "vault/"
   service = "vault"
   token="${consul_master_token}"
@@ -48,7 +56,7 @@ telemetry {
 replication {
       resolver_discover_servers = false
 }
-api_addr = "https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
+api_addr = "https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 # api_addr = "${vault_api_addr}"
 disable_mlock = true
 ui = true
@@ -58,7 +66,7 @@ EOF
 echo "--> Writing profile"
 sudo tee /etc/profile.d/vault.sh > /dev/null <<"EOF"
 alias vualt="vault"
-export VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
+export VAULT_ADDR="https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 EOF
 source /etc/profile.d/vault.sh
 
@@ -89,7 +97,7 @@ export CONSUL_HTTP_TOKEN=${consul_master_token}
 consul lock -name=vault-init tmp/vault/lock "$(cat <<"EOF"
 set -e
 sleep 2
-export VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
+export VAULT_ADDR="https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 export VAULT_SKIP_VERIFY=true
 if ! vault operator init -status >/dev/null; then
   vault operator init  -recovery-shares=1 -recovery-threshold=1  > /tmp/out.txt
@@ -102,7 +110,7 @@ echo "ROOT TOKEN: $VAULT_TOKEN"
 sudo systemctl enable vault
 sudo systemctl restart vault
 else
-export VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
+export VAULT_ADDR="https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 export VAULT_SKIP_VERIFY=true
 export VAULT_TOKEN=$(consul kv get service/vault/root-token)
 echo "ROOT TOKEN: $VAULT_TOKEN"
@@ -116,7 +124,7 @@ EOF
 
 
 echo "--> Waiting for Vault to be active"
-VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
+VAULT_ADDR="https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
 URL="$VAULT_ADDR/v1/sys/health"
 HTTP_STATUS=0
 
@@ -133,7 +141,7 @@ echo "--> Attempting to create nomad role"
   echo "--> Retrieving root token..."
  export VAULT_TOKEN=$(consul kv get service/vault/root-token)
 
-  export VAULT_ADDR="https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
+  export VAULT_ADDR="https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
   export VAULT_SKIP_VERIFY=true
 
   vault policy write nomad-server - <<EOR

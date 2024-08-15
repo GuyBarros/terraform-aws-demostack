@@ -3,6 +3,13 @@ set -x
 
 echo "==> Base"
 
+echo "==> getting the aws metadata token"
+export TOKEN=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+echo "==> check token was set"
+echo $TOKEN
+
+
 echo "==> libc6 issue workaround"
 echo 'libc6 libraries/restart-without-asking boolean true' | sudo debconf-set-selections
 
@@ -21,11 +28,11 @@ function install_from_url {
 echo "--> Adding helper for IP retrieval"
 sudo tee /etc/profile.d/ips.sh > /dev/null <<EOF
 function private_ip {
-  curl -s http://169.254.169.254/latest/meta-data/local-ipv4
+  curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4
 }
 
 function public_ip {
-  curl -s http://169.254.169.254/latest/meta-data/public-ipv4
+  curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/public-ipv4
 }
 EOF
 source /etc/profile.d/ips.sh
@@ -115,7 +122,7 @@ apt-get install -y \
 
 else
 apt-get install -y \
-vault-enterprise \
+  vault-enterprise \
   consul-enterprise \
   nomad-enterprise  \
   &>/dev/null
@@ -136,7 +143,7 @@ echo "--> Adding hostname to /etc/hosts"
 sudo tee -a /etc/hosts > /dev/null <<EOF
 
 # For local resolution
-$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)  ${node_name}.node.consul
+$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4)  ${node_name}.node.consul
 EOF
 
 

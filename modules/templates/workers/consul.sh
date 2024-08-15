@@ -2,6 +2,14 @@
 echo "==> Consul (client)"
 
 
+echo "==> getting the aws metadata token"
+export TOKEN=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+echo "==> check token was set"
+echo $TOKEN
+
+
+
 echo "--> Writing configuration"
 sudo mkdir -p /mnt/consul
 sudo mkdir -p /etc/consul.d
@@ -13,9 +21,9 @@ sudo rm  /etc/consul.d/*
 sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 {
   "datacenter": "${region}",
-  "advertise_addr": "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)",
-  "advertise_addr_wan": "$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)",
-  "client_addr": "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4) 127.0.0.1",
+  "advertise_addr": "$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4)",
+  "advertise_addr_wan": "$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/public-ipv4)",
+  "client_addr": "$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4) 127.0.0.1",
   "data_dir": "/mnt/consul",
   "encrypt": "${consul_gossip_key}",
   "leave_on_terminate": true,
@@ -102,7 +110,7 @@ EOF
 sudo systemctl enable consul
 sudo systemctl start consul
 
-export CONSUL_HTTP_ADDR=http://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
+export CONSUL_HTTP_ADDR=http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
 
 echo "--> setting up resolv.conf"
 ##################################

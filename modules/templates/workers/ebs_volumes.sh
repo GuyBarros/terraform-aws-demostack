@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
+
+echo "==> getting the aws metadata token"
+export TOKEN=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+echo "==> check token was set"
+echo $TOKEN
+
 echo "--> Configuring EBS mounts"
 
-# export NOMAD_ADDR=https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646
+# export NOMAD_ADDR=https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):4646
 
 echo "--> Create EBS CSI plugin job"
 {
@@ -157,12 +164,12 @@ then
 echo "--> last worker, lets do this"
 ####
 echo "--> Waiting for Nomad leader"
-while ! curl -s -k https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/leader --show-error; do
+while ! curl -s -k https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/leader --show-error; do
   sleep 2
 done
 
 echo "--> Waiting for a list of Nomad peers"
-while ! curl -s -k https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/peers --show-error; do
+while ! curl -s -k https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/peers --show-error; do
   sleep 2
 done
 

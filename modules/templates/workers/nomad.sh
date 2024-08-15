@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
 echo "==> Nomad (client)"
 
+echo "==> getting the aws metadata token"
+export TOKEN=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+echo "==> check token was set"
+echo $TOKEN
+
 
 echo "--> Installing CNI plugin"
 sudo mkdir -p /opt/cni/bin/
 wget -O cni.tgz ${cni_plugin_url}
 sudo tar -xzf cni.tgz -C /opt/cni/bin/
 
-export AWS_REGION=$(curl -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone |  sed 's/[a-z]$//')
-export AWS_AZ=$(curl http://169.254.169.254/latest/meta-data/placement/availability-zone)
+export AWS_REGION=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone |  sed 's/[a-z]$//')
+export AWS_AZ=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/availability-zone)
 
 echo "--> Installing"
 sudo mkdir -p /mnt/nomad
@@ -33,9 +39,9 @@ region = "$AWS_REGION"
 
 /*
 advertise {
-  http = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4646"
-  rpc  = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4647"
-  serf = "$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):4648"
+  http = "$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):4646"
+  rpc  = "$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):4647"
+  serf = "$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):4648"
 }
 */
 
@@ -80,7 +86,7 @@ consul {
 vault {
   enabled          = true
   tls_skip_verify  = true
-  address          = "https://$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
+  address          = "https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
   ca_file          = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file        = "/etc/ssl/certs/me.crt"
   key_file         = "/etc/ssl/certs/me.key"
