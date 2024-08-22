@@ -16,6 +16,8 @@ data "cloudinit_config" "servers" {
     me_ca      = tls_self_signed_cert.root.cert_pem
     me_cert    = element(tls_locally_signed_cert.server.*.cert_pem, count.index)
     me_key     = element(tls_private_key.server.*.private_key_pem, count.index)
+    vault0_cert    = tls_locally_signed_cert.server.0.cert_pem
+    vault0_key     = tls_private_key.server.0.private_key_pem
     public_key = var.public_key
     })
    }
@@ -59,6 +61,8 @@ data "cloudinit_config" "servers" {
     vault_root_token = random_id.vault-root-token.hex
     vault_servers    = var.servers
     vault_api_addr = "https://${aws_route53_record.vault.fqdn}:8200"
+    vault_join_tag_key   = "VaultJoin"
+    vault_join_tag_value = var.consul_join_tag_value
     })
    }
 
@@ -102,6 +106,7 @@ resource "aws_instance" "servers" {
 
 
   tags = merge(local.common_tags ,{
+   VaultJoin     = "${var.consul_join_tag_value}" ,
    ConsulJoin     = "${var.consul_join_tag_value}" ,
    Purpose        = "demostack" ,
    function       = "server" ,

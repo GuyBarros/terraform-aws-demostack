@@ -14,6 +14,7 @@ sudo rm  /etc/vault.d/*
 
 echo "==> Vault (server)"
 # Vault expects the key to be concatenated with the CA
+sudo mkdir -p /mnt/vault
 sudo mkdir -p /etc/vault.d/tls/
 sudo mkdir -p /etc/vault.d/plugins/
 sudo tee /etc/vault.d/tls/vault.crt > /dev/null <<EOF
@@ -27,11 +28,31 @@ sudo mkdir -p /etc/vault.d
 sudo tee /etc/vault.d/config.hcl > /dev/null <<EOF
 cluster_name = "${namespace}-demostack"
 
-storage "consul" {
+# storage "consul" {
+#   address = "http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500"
+#   path = "vault/"
+#   service = "vault"
+#   token="${consul_master_token}"
+# }
+
+service_registration "consul" {
   address = "http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500"
-  path = "vault/"
   service = "vault"
   token="${consul_master_token}"
+}
+
+
+  storage "raft" {
+  path    = "/mnt/vault"
+  node_id = "vault_${node_name}"
+  retry_join {
+    auto_join = "provider=aws tag_key=${vault_join_tag_key} tag_value=${vault_join_tag_value} addr_type=private_v4"
+    leader_tls_servername = "${namespace}-server-0.node.consul"
+    leader_ca_cert_file = "/usr/local/share/ca-certificates/01-me.crt"
+    leader_client_cert_file = "/etc/vault.d/tls/vault.crt"
+    leader_client_key_file = "/etc/ssl/certs/me.key"
+  }
+
 }
 
 
@@ -42,7 +63,7 @@ listener "tcp" {
   address       = "0.0.0.0:8200"
   tls_cert_file = "/etc/vault.d/tls/vault.crt"
   tls_key_file  = "/etc/ssl/certs/me.key"
-   tls-skip-verify = true
+  # tls-skip-verify = true
 }
 
 seal "awskms" {
@@ -57,6 +78,7 @@ replication {
       resolver_discover_servers = false
 }
 api_addr = "https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
+cluster_addr = "https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8201"
 # api_addr = "${vault_api_addr}"
 disable_mlock = true
 ui = true
@@ -91,8 +113,9 @@ EOF
 sudo systemctl enable vault
 sudo systemctl start vault
 sleep 8
-
-echo "--> Initializing vault"
+if [ "${node_name}" == "${namespace}-server-0" ]
+then
+echo "--> Initializing vault from server 0"
 export CONSUL_HTTP_TOKEN=${consul_master_token}
 consul lock -name=vault-init tmp/vault/lock "$(cat <<"EOF"
 set -e
@@ -120,6 +143,7 @@ fi
 sleep 8
 EOF
 )"
+fi
 
 
 

@@ -16,6 +16,8 @@ data "cloudinit_config" "workers" {
     me_ca      = tls_self_signed_cert.root.cert_pem
     me_cert    = element(tls_locally_signed_cert.workers.*.cert_pem, count.index)
     me_key     = element(tls_private_key.workers.*.private_key_pem, count.index)
+    vault0_cert    = tls_locally_signed_cert.workers.0.cert_pem
+    vault0_key     = tls_private_key.workers.0.private_key_pem
     public_key = var.public_key
     })
    }

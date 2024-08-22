@@ -53,6 +53,12 @@ EOF
 sudo tee /etc/ssl/certs/me.key > /dev/null <<EOF
 ${me_key}
 EOF
+sudo tee /etc/ssl/certs/vault0_cert.crt > /dev/null <<EOF
+${vault0_cert}
+EOF
+sudo tee /etc/ssl/certs/vault0_key.key > /dev/null <<EOF
+${vault0_key}
+EOF
 
 
 echo "--> Setting iptables for bridge networking"
