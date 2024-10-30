@@ -50,7 +50,7 @@ data "cloudinit_config" "workers" {
     node_name  = "${var.namespace}-worker-${count.index}"
     vault_api_addr = "https://${aws_route53_record.vault.fqdn}:8200"
     # Nomad
-    cni_plugin_url   = var.cni_plugin_url
+    cni_version   = var.cni_version
     })
   }
       #EBS

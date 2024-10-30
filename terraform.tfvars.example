@@ -24,7 +24,7 @@ nomad_url      = "https://releases.hashicorp.com/nomad/0.12.5/nomad_0.12.5_linux
 nomad_ent_url  = "https://releases.hashicorp.com/nomad/0.12.5+ent/nomad_0.12.5+ent_linux_amd64.zip"
 vault_url      = "https://releases.hashicorp.com/vault/1.5.4/vault_1.5.4_linux_amd64.zip"
 vault_ent_url  = "https://releases.hashicorp.com/vault/1.5.4+ent/vault_1.5.4+ent_linux_amd64.zip"
-cni_plugin_url = "https://github.com/containernetworking/plugins/releases/download/v0.8.6/cni-plugins-linux-amd64-v0.8.6.tgz"
+cni_version = "1.6.0"
 #####################
 #AWS
 #####################

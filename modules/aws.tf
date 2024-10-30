@@ -9,25 +9,21 @@ data "aws_route53_zone" "fdqn" {
 }
 
 
-data "aws_ami" "ubuntu" {
-  most_recent = true
+ data "aws_ami" "ubuntu" {
+   most_recent = true
+   filter {
+     name = "name"
+     # values = ["ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"]
+     values = ["ubuntu/images/*ubuntu-jammy-22.04-arm64-server-*"]
+   }
 
-# ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*
-#ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*
-  filter {
-    name   = "name"
-    # values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
-    #  values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-      values = ["ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"]
-  }
+   filter {
+     name   = "virtualization-type"
+     values = ["hvm"]
+   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["099720109477"] # Canonical
-}
+   owners = ["099720109477"] # Canonical
+ }
 
 resource "aws_vpc" "demostack" {
   cidr_block           = var.vpc_cidr_block
@@ -233,13 +229,13 @@ tags = local.common_tags
   }
   }
 
-  #More nomad ports
+  #More nomad ports & Boundary
 
   dynamic "ingress" {
     for_each = var.host_access_ip
     content {
-    from_port   = 20000
-    to_port     = 32000
+     from_port   = 20000
+    to_port     = 65535
     protocol    = "tcp"
     cidr_blocks = [ingress.value]
     # cidr_blocks = flatten([ingress.value,data.tfe_ip_ranges.addresses.api])

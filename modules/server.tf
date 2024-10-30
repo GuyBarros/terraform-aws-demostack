@@ -75,7 +75,7 @@ data "cloudinit_config" "servers" {
     vault_api_addr = "https://${aws_route53_record.vault.fqdn}:8200"
     nomad_gossip_key = var.nomad_gossip_key
     nomad_servers    = var.servers
-    cni_plugin_url   = var.cni_plugin_url
+    cni_version   = var.cni_version
     nomadlicense     = var.nomadlicense
     })
    }

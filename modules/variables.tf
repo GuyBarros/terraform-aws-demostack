@@ -43,9 +43,9 @@ variable "fabio_url" {
 }
 
 
-variable "cni_plugin_url" {
-  description = "The url to download teh CNI plugin for nomad."
-  default     = "https://github.com/containernetworking/plugins/releases/download/v0.8.2/cni-plugins-linux-amd64-v0.8.2.tgz"
+variable "cni_version" {
+  description = "The version of the CNI plugin for nomad."
+  default     = "1.6.0"
 }
 
 
@@ -116,12 +116,16 @@ variable "nomadlicense" {
 
 variable "instance_type_server" {
   description = "The type(size) of data servers (consul, nomad, etc)."
-  default     = "r4.large"
+  default     = "t4g.xlarge"
 }
 
 variable "instance_type_worker" {
-  description = "The type(size) of data servers (consul, nomad, etc)."
-  default     = "t2.xlarge"
+  description = "The type(size) of data workers (consul, nomad, etc)."
+  default     = "t4g.xlarge"
+}
+variable "windows_instance_type_worker" {
+  description = "The type(size) of data worker (consul, nomad, etc)."
+  default     = "t3.medium"
 }
 
 

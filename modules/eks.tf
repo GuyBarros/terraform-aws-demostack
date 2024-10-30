@@ -90,6 +90,7 @@ resource "aws_eks_node_group" "eks-node" {
   node_role_arn   = aws_iam_role.eks-node.arn
   subnet_ids      = aws_subnet.demostack.*.id
   instance_types  =  [var.instance_type_worker]
+  ami_type       = "AL2_ARM_64"
 
   scaling_config {
     desired_size = 2

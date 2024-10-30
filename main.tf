@@ -24,7 +24,7 @@ module "cluster" {
   nomadlicense         = var.nomadlicense
   enterprise           = var.enterprise
   fabio_url            = var.fabio_url
-  cni_plugin_url       = var.cni_plugin_url
+  cni_version       = var.cni_version
   created-by           = var.created-by
   sleep-at-night       = var.sleep-at-night
   TTL                  = var.TTL

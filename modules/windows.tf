@@ -19,7 +19,7 @@ data "aws_ami" "windows" {
 resource "aws_instance" "windows" {
 
   ami           = data.aws_ami.windows.id
-  instance_type = var.instance_type_worker
+  instance_type = var.windows_instance_type_worker
   key_name      = aws_key_pair.demostack.id
 
   subnet_id              = aws_subnet.demostack.0.id

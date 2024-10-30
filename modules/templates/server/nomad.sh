@@ -39,8 +39,10 @@ consul kv put service/vault/${node_name}-token $NOMAD_VAULT_TOKEN
 
 echo "--> Installing CNI plugin"
 sudo mkdir -p /opt/cni/bin/
-wget -O cni.tgz ${cni_plugin_url}
-sudo tar -xzf cni.tgz -C /opt/cni/bin/
+export ARCH_CNI=$( [ $(uname -m) = aarch64 ] && echo arm64 || echo amd64)
+export CNI_PLUGIN_VERSION=${cni_version}
+sudo wget "https://github.com/containernetworking/plugins/releases/download/$${CNI_PLUGIN_VERSION}/cni-plugins-linux-$${ARCH_CNI}-$${CNI_PLUGIN_VERSION}".tgz && \
+sudo tar -xzf cni-plugins-linux-$${ARCH_CNI}-v$${CNI_PLUGIN_VERSION}.tgz -C /opt/cni/bin/
 
 export AWS_REGION=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone |  sed 's/[a-z]$//')
 export AWS_AZ=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/availability-zone)
