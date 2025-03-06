@@ -64,7 +64,14 @@ listener "tcp" {
   tls_cert_file = "/etc/vault.d/tls/vault.crt"
   tls_key_file  = "/etc/ssl/certs/me.key"
   # tls-skip-verify = true
-}
+  http_idle_timeout = 1m
+  custom_response_headers {
+    "default" = {
+      "Clear-Site-Data" = ["*"]
+    }
+  }
+ }
+
 
 seal "awskms" {
   region = "${region}"
