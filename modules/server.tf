@@ -49,6 +49,8 @@ data "cloudinit_config" "servers" {
   part {
     content_type = "text/x-shellscript"
     content      = templatefile("${path.module}/templates/server/vault.sh",{
+      index                        = count.index + 1
+    count                        = var.servers
     region = var.region
     enterprise    = var.enterprise
     node_name     = "${var.namespace}-server-${count.index}"
@@ -63,6 +65,8 @@ data "cloudinit_config" "servers" {
     vault_api_addr = "https://${aws_route53_record.vault.fqdn}:8200"
     vault_join_tag_key   = "VaultJoin"
     vault_join_tag_value = var.consul_join_tag_value
+    # Nomad
+    NOMAD_LB        = "$https://${aws_route53_record.nomad.fqdn}:4646"
     })
    }
 

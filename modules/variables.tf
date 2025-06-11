@@ -176,3 +176,43 @@ variable "f5_ami_search_name" {
   type        = string
   default     = "F5 BIGIP-16.1.0* PAYG-Good 25Mbps*"
 }
+
+variable "postgres_username" {
+  description = "Username that will be used to create the AWS Postgres instance"
+  default     = "postgresql"
+}
+
+variable "postgres_password" {
+  description = "Password that will be used to create the AWS Postgres instance"
+  default     = "YourPwdShouldBeLongAndSecure!"
+}
+
+  variable "postgres_db_name" {
+  description = "Db_name that will be used to create the AWS Postgres instance"
+  default     = "postgress"
+}
+
+variable "mysql_username" {
+  description = "Username that will be used to create the AWS mysql instance"
+  default     = "foo"
+}
+
+variable "mysql_password" {
+  description = "Password that will be used to create the AWS mysql instance"
+  default     = "YourPwdShouldBeLongAndSecure!"
+}
+
+  variable "mysql_db_name" {
+  description = "Db_name that will be used to create the AWS mysql instance"
+  default     = "mydb"
+}
+
+variable "documentdb_master_username" {
+  description = "Username that will be used to create the AWS Postgres instance"
+  default     = "postgresql"
+}
+
+variable "documentdb_master__password" {
+  description = "Password that will be used to create the AWS Postgres instance"
+  default     = "YourPwdShouldBeLongAndSecure!"
+}
