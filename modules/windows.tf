@@ -1,19 +1,31 @@
 #AMI Filter for Windows Server 2019 Base
-data "aws_ami" "windows" {
-  most_recent = true
+# data "aws_ami" "windows" {
+#   most_recent = true
 
+#   filter {
+#     name   = "name"
+#     values = ["Windows_Server-2019-English-Full-Base-*"]
+#   }
+
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
+
+#   owners = ["801119661308"] # Canonical
+
+# }
+data "aws_ami" "windows" {
   filter {
     name   = "name"
-    values = ["Windows_Server-2019-English-Full-Base-*"]
+    values = ["hc-base-windows-server-2025-x64-*"]
   }
-
   filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
+    name   = "state"
+    values = ["available"]
   }
-
-  owners = ["801119661308"] # Canonical
-
+  most_recent = true
+  owners      = ["888995627335"] # hc-ami_prod
 }
 
 resource "aws_instance" "windows" {

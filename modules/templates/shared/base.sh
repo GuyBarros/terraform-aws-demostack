@@ -70,38 +70,48 @@ echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://
 
 
 echo "--> updated version of Nodejs"
-curl -sL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_25.x | sudo -E bash -
 
 sudo apt update
 
-echo "--> Installing common dependencies"
+#changing this due to  kauditd hold queue overflow
+echo "--> Installing common dependencies 0"
 sudo apt-get install -y \
-  build-essential \
   nodejs \
   curl \
-  emacs \
+  emacs &>/dev/null
+  echo "--> Installing common dependencies 1"
+sudo apt-get install -y \
   git \
   jq \
   tmux \
   unzip \
-  vim \
+  vim &>/dev/null
+  echo "--> Installing common dependencies 2"
+sudo apt-get install -y \
   wget \
   tree \
   nfs-kernel-server \
-  nfs-common \
+  nfs-common &>/dev/null
+  echo "--> Installing common dependencies 3"
+sudo apt-get install -y \
   python3-pip \
   ruby-full \
   apt-transport-https \
-  ca-certificates \
+  ca-certificates &>/dev/null
+  echo "--> Installing common dependencies 4"
+sudo apt-get install -y \
   curl \
   gnupg-agent \
   software-properties-common \
-  openjdk-17-jdk-headless \
+  openjdk-25-jdk-headless &>/dev/null
+  echo "--> Installing common dependencies 5"
+sudo apt-get install -y \
   prometheus-node-exporter \
   golang-go \
   alien \
-  waypoint \
   qemu-system \
+  consul-cni \
   &>/dev/null
 
 

@@ -1,0 +1,78 @@
+global:
+  enabled: true
+  datacenter: dc1
+  name: consul
+  image: hashicorp/consul-enterprise:1.18.2-ent
+  imageK8S: hashicorp/consul-k8s-control-plane:1.4.3
+  logLevel: debug
+  tls:
+    enabled: true
+    enableAutoEncrypt: true
+    verify: false
+  acls:
+    manageSystemACLs: true
+    bootstrapToken:
+      secretName: consul-bootstrap-token
+      secretKey: token
+  peering:
+    enabled: true
+  adminPartitions:
+    enabled: true
+  metrics:
+    enabled: true
+    enableGatewayMetrics: true
+  enableConsulNamespaces: true
+  enterpriseLicense:
+    secretName: consul-ent-license
+    secretKey: key
+server:
+  enabled: true
+  replicas: 3
+  bootstrapExpect: 3
+  # affinity:
+  exposeService:
+    type: NodePort
+    nodePort:
+      http: 31001
+      https: 31443
+
+ui:
+  enabled: true
+  service:
+    enabled: true
+    type: NodePort
+    nodePort:
+      http: 30001
+      https: 30443
+
+meshGateway:
+  enabled: true
+  enableHealthChecks: false
+  replicas: 1
+  service:
+    enabled: true
+    type: NodePort
+    nodePort: 32443
+
+
+connectInject:
+  enabled: true
+  transparentProxy:
+    defaultEnabled: true
+  consulNamespaces:
+    mirroringK8S: true
+  apiGateway:
+    managedGatewayClass:
+      serviceType: NodePort
+      nodeSelector: |
+        kubernetes.io/hostname: "server"
+
+client:
+  enabled: false
+  grpc: true
+
+controller:
+  enabled: true
+
+prometheus:
+  enabled: true

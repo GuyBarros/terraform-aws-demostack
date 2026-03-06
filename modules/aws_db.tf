@@ -9,7 +9,8 @@ resource "aws_db_instance" "mysql" {
   allocated_storage    = 10
   engine               = "mysql"
   engine_version       = "8.0"
-  instance_class       = "db.t3.micro"
+  #instance_class       = "db.t3.micro"
+  instance_class       = "db.t3.large"
   db_name                 = var.mysql_db_name
   username             = var.mysql_username
   password             = var.mysql_password
@@ -29,7 +30,8 @@ resource "aws_db_instance" "postgres" {
 identifier           = "${var.namespace}-postgres"
 engine               = "postgres"
 engine_version         = "17"
-instance_class         = "db.t3.micro"
+#instance_class         = "db.t3.micro"
+instance_class       = "db.t3.large"
 
  allocated_storage      = 5
 storage_encrypted     = true

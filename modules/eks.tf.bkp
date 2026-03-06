@@ -33,6 +33,7 @@ resource "aws_iam_role_policy_attachment" "eks-AmazonEKSServicePolicy" {
 resource "aws_eks_cluster" "eks" {
   name     = "${var.namespace}-eks"
   role_arn = aws_iam_role.eks.arn
+  version  = "1.33"
 
   vpc_config {
     security_group_ids = [aws_security_group.demostack.id]
@@ -101,6 +102,6 @@ resource "aws_eks_node_group" "eks-node" {
   depends_on = [
     aws_iam_role_policy_attachment.eks-node-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.eks-node-AmazonEKS_CNI_Policy,
-    aws_iam_role_policy_attachment.eks-node-AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.eks-node-AmazonEC2ContainerRegistryReadOnly
   ]
 }
