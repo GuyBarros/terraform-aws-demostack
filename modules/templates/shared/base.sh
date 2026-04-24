@@ -76,37 +76,37 @@ sudo apt update
 
 #changing this due to  kauditd hold queue overflow
 echo "--> Installing common dependencies 0"
-sudo apt-get install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   nodejs \
   curl \
   emacs &>/dev/null
   echo "--> Installing common dependencies 1"
-sudo apt-get install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   git \
   jq \
   tmux \
   unzip \
   vim &>/dev/null
   echo "--> Installing common dependencies 2"
-sudo apt-get install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   wget \
   tree \
   nfs-kernel-server \
   nfs-common &>/dev/null
   echo "--> Installing common dependencies 3"
-sudo apt-get install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   python3-pip \
   ruby-full \
   apt-transport-https \
   ca-certificates &>/dev/null
   echo "--> Installing common dependencies 4"
-sudo apt-get install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   curl \
   gnupg-agent \
   software-properties-common \
   openjdk-25-jdk-headless &>/dev/null
   echo "--> Installing common dependencies 5"
-sudo apt-get install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   prometheus-node-exporter \
   golang-go \
   alien \
@@ -123,25 +123,20 @@ source /etc/profile.d/checkpoint.sh
 
 if [ ${enterprise} == 0 ]
 then
-sudo apt-get install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   vault \
   consul \
   nomad  \
   &>/dev/null
 
 else
-sudo apt-get install -y \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   vault-enterprise \
   consul-enterprise \
   nomad-enterprise  \
   &>/dev/null
 
 fi
-
-# echo "--> Install Envoy"
-#  curl -L https://getenvoy.io/cli | sudo bash -s -- -b /usr/local/bin
-#  getenvoy run standard:1.16.0 -- --version
-#  sudo cp ~/.getenvoy/builds/standard/1.16.0/linux_glibc/bin/envoy /usr/bin/
 
 
 echo "==> Base is done!"

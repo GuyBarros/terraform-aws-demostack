@@ -168,7 +168,7 @@ tags = local.common_tags
   dynamic "ingress" {
     for_each = var.host_access_ip
     content {
-    from_port   = 3000
+    from_port   = 2999
     to_port     = 4999
     protocol    = "tcp"
     # cidr_blocks = [ingress.value]

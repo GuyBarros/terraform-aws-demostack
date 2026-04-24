@@ -16,13 +16,22 @@ resource "aws_alb_target_group" "vault" {
   protocol = "HTTPS"
 
   health_check {
-    interval          = "5"
-    timeout           = "2"
-    path              = "/v1/sys/health"
-    port              = "8200"
+    interval          = "300"
+    timeout           = "120"
+    path = format("/v1/sys/health?standbyok=%s&perfstandbyok=%s&activecode=%s&standbycode=%s&drsecondarycode=%s&performancestandbycode=%s&sealedcode=%s&uninitcode=%s",
+      var.vault_health_endpoints["standbyok"],
+      var.vault_health_endpoints["perfstandbyok"],
+      var.vault_health_endpoints["activecode"],
+      var.vault_health_endpoints["standbycode"],
+      var.vault_health_endpoints["drsecondarycode"],
+      var.vault_health_endpoints["performancestandbycode"],
+      var.vault_health_endpoints["sealedcode"],
+    var.vault_health_endpoints["uninitcode"])
+    port     = "traffic-port"
     protocol          = "HTTPS"
     matcher           = "200,472,473"
     healthy_threshold = 2
+    unhealthy_threshold = 10
   }
 }
 
@@ -77,13 +86,14 @@ resource "aws_alb_target_group" "vault_cluster" {
   protocol = "HTTPS"
 
   health_check {
-    interval          = "5"
-    timeout           = "2"
+    interval          = "300"
+    timeout           = "120"
     path              = "/v1/sys/health"
     port              = "8200"
     protocol          = "HTTPS"
     matcher           = "200"
     healthy_threshold = 2
+    unhealthy_threshold = 10
   }
 }
 

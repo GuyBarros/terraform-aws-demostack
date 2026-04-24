@@ -216,3 +216,20 @@ variable "documentdb_master__password" {
   description = "Password that will be used to create the AWS Postgres instance"
   default     = "YourPwdShouldBeLongAndSecure!"
 }
+
+variable "vault_health_endpoints" {
+  type        = map(string)
+  description = "The status codes to return when querying Vault's sys/health endpoint"
+  default = {
+    standbyok              = "true"
+    perfstandbyok          = "true"
+    activecode             = "200"
+    standbycode            = "429"
+    drsecondarycode        = "472"
+    performancestandbycode = "473"
+    sealedcode             = "503"
+
+    # Allow unitialized clusters to be considered healthy. Default is 501.
+    uninitcode = "200"
+  }
+}
