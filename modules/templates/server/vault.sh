@@ -63,7 +63,7 @@ listener "tcp" {
   address       = "0.0.0.0:8200"
   tls_cert_file = "/etc/vault.d/tls/vault.crt"
   tls_key_file  = "/etc/ssl/certs/me.key"
-  tls_min_version = "tls13"
+  # tls_min_version = "tls13"
   # tls-skip-verify = true
   http_idle_timeout = "30s"
   redact_version = true
@@ -116,6 +116,7 @@ ExecStart=/usr/bin/vault server -config="/etc/vault.d/config.hcl"
 ExecReload=/bin/kill -HUP $MAINPID
 #Enterprise License
 Environment=VAULT_LICENSE=${vaultlicense}
+Environment=VAULT_ENABLE_FILE_PERMISSIONS_CHECK=true
 KillSignal=SIGINT
 [Install]
 WantedBy=multi-user.target
