@@ -1,0 +1,129 @@
+
+
+
+resource "aws_alb" "vault_cert" {
+  name = "${var.namespace}-vault-cert"
+
+  security_groups = [aws_security_group.demostack.id]
+  subnets         = aws_subnet.demostack.*.id
+
+    tags = local.common_tags
+}
+
+resource "aws_alb_target_group" "vault_cert" {
+   name = "${var.namespace}-vault-cert"
+  tags = local.common_tags  
+  
+  port     = "8200"
+  vpc_id   = aws_vpc.demostack.id
+  protocol = "HTTPS"
+
+  health_check {
+    interval          = "300"
+    timeout           = "120"
+    path = format("/v1/sys/health?standbyok=%s&perfstandbyok=%s&activecode=%s&standbycode=%s&drsecondarycode=%s&performancestandbycode=%s&sealedcode=%s&uninitcode=%s",
+      var.vault_health_endpoints["standbyok"],
+      var.vault_health_endpoints["perfstandbyok"],
+      var.vault_health_endpoints["activecode"],
+      var.vault_health_endpoints["standbycode"],
+      var.vault_health_endpoints["drsecondarycode"],
+      var.vault_health_endpoints["performancestandbycode"],
+      var.vault_health_endpoints["sealedcode"],
+    var.vault_health_endpoints["uninitcode"])
+    port     = "traffic-port"
+    protocol          = "HTTPS"
+    matcher           = "200,472,473"
+    healthy_threshold = 2
+    unhealthy_threshold = 10
+  }
+}
+
+
+resource "aws_alb_listener" "vault_cert" {
+  depends_on = [
+    aws_acm_certificate.vault_cert
+  ]
+
+  load_balancer_arn = aws_alb.vault_cert.arn
+
+  port            = "8200"
+  protocol        = "HTTPS"
+  certificate_arn = aws_acm_certificate.vault_cert.arn
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
+  default_action {
+    target_group_arn = aws_alb_target_group.vault_cert.arn
+    type             = "forward"
+  }
+
+}
+
+
+resource "aws_alb_target_group_attachment" "vault_cert" {
+  count            = var.servers
+  target_group_arn = aws_alb_target_group.vault_cert.arn
+  target_id        = element(aws_instance.servers.*.id, count.index)
+  port             = "8200"
+  
+}
+
+##########################################################
+
+
+resource "aws_alb" "vault_cert_cluster" {
+  name = "${var.namespace}-vault-cert-cluster"
+
+  security_groups = [aws_security_group.demostack.id]
+  subnets         = aws_subnet.demostack.*.id
+
+   tags = local.common_tags
+}
+
+
+
+resource "aws_alb_target_group" "vault_cert_cluster" {
+  name = "${var.namespace}-vault-cert-cluster"
+  tags = local.common_tags
+
+  port     = "8201"
+  vpc_id   = aws_vpc.demostack.id
+  protocol = "HTTPS"
+
+  health_check {
+    interval          = "300"
+    timeout           = "120"
+    path              = "/v1/sys/health"
+    port              = "8200"
+    protocol          = "HTTPS"
+    matcher           = "200"
+    healthy_threshold = 2
+    unhealthy_threshold = 10
+  }
+}
+
+
+resource "aws_alb_listener" "vault_cert_cluster" {
+  depends_on = [
+    aws_acm_certificate.vault_cert
+  ]
+
+  load_balancer_arn = aws_alb.vault_cert_cluster.arn
+  
+  port            = "8201"
+  protocol        = "HTTPS"
+  certificate_arn = aws_acm_certificate.vault_cert.arn
+  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
+  default_action {
+    target_group_arn = aws_alb_target_group.vault_cert_cluster.arn
+    type             = "forward"
+  }
+
+}
+
+
+resource "aws_alb_target_group_attachment" "vault_cert_cluster" {
+  count            = var.servers
+  target_group_arn = aws_alb_target_group.vault_cert_cluster.arn
+  target_id        = element(aws_instance.servers.*.id, count.index)
+  port             = "8201"
+  
+}

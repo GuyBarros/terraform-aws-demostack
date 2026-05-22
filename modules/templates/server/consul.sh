@@ -59,11 +59,13 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 EOF
 
 
-# Set up ACLs.
+# Enable ACLs with deny default — matches the server ACL configuration.
+# Clients must NOT use initial_management (server-only); use default so the
+# agent can authenticate until the per-worker agent token is applied below.
 cat <<EOF > /etc/consul.d/acl.hcl
 acl = {
   enabled = true
-  default_policy = "allow"
+  default_policy = "deny"
   enable_token_persistence = true
   tokens {
     initial_management = "${consul_master_token}"
@@ -106,9 +108,10 @@ export CONSUL_HTTP_TOKEN=${consul_master_token}
 export CONSUL_HTTP_ADDR=http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
 
 
-#TODO - CONSUL ACL Bootstrap
 echo "--> setting up ACL system"
 ############################################
+
+# Per-node server policy — broad write access needed for demo server operations.
 sudo tee /etc/consul.d/acl_policies/${node_name}.hcl > /dev/null <<EOF
 node "${node_name}" {
   policy = "write"
@@ -129,25 +132,85 @@ kv "" {
 
 EOF
 
-sudo tee /etc/consul.d/acl_policies/anonymous.hcl > /dev/null <<EOF
-node "${node_name}" {
+# Anonymous policy — read-only access for service discovery and UI browsing without a token.
+sudo tee /etc/consul.d/acl_policies/anonymous.hcl > /dev/null <<"POLICYEOF"
+node_prefix "" {
+  policy = "read"
+}
+
+service_prefix "" {
+  policy = "read"
+}
+
+query_prefix "" {
+  policy = "read"
+}
+POLICYEOF
+
+# Vault policy — allows Vault to register its service and manage its KV path.
+sudo tee /etc/consul.d/acl_policies/vault-service.hcl > /dev/null <<"POLICYEOF"
+agent_prefix "" {
+  policy = "read"
+}
+
+node_prefix "" {
+  policy = "read"
+}
+
+service "vault" {
   policy = "write"
+}
+
+session_prefix "" {
+  policy = "write"
+}
+
+key_prefix "service/vault" {
+  policy = "write"
+}
+POLICYEOF
+
+# Nomad server policy — allows Nomad servers to register services and access shared KV paths.
+sudo tee /etc/consul.d/acl_policies/nomad-server.hcl > /dev/null <<"POLICYEOF"
+agent_prefix "" {
+  policy = "read"
+}
+
+node_prefix "" {
+  policy = "read"
 }
 
 service_prefix "" {
   policy = "write"
 }
 
-query_prefix ""{
+key_prefix "service/vault" {
+  policy = "read"
+}
+
+key_prefix "service/nomad" {
   policy = "write"
 }
 
-kv "" {
-  policy = "write"
+key_prefix "service/consul" {
+  policy = "read"
+}
+POLICYEOF
+
+# Nomad client policy — allows Nomad worker agents to register job services.
+sudo tee /etc/consul.d/acl_policies/nomad-client.hcl > /dev/null <<"POLICYEOF"
+agent_prefix "" {
+  policy = "read"
 }
 
+node_prefix "" {
+  policy = "read"
+}
 
-EOF
+service_prefix "" {
+  policy = "write"
+}
+POLICYEOF
 
 echo "--> Waiting for all Consul servers"
 while [ "$(consul members 2>&1 | grep "server" | grep "alive" | wc -l)" -lt "${consul_servers}" ]; do
@@ -158,20 +221,68 @@ echo "--> Waiting for Consul leader #1 "
 while [ -z "$(curl -skfS http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500/v1/status/leader)" ]; do
   sleep 3
 done
- consul acl policy create -name consul_${node_name} -rules @/etc/consul.d/acl_policies/${node_name}.hcl
- consul acl token create -format=json -description "consul ${node_name} agent token" -policy-name consul_${node_name} > /etc/consul.d/consul_${node_name}_token.json
+
+# Create per-node agent policy and token. Policy create is idempotent via fallback to update.
+consul acl policy create -name consul_${node_name} -rules @/etc/consul.d/acl_policies/${node_name}.hcl || \
+  consul acl policy update -name consul_${node_name} -rules @/etc/consul.d/acl_policies/${node_name}.hcl
+consul acl token create -format=json -description "consul ${node_name} agent token" -policy-name consul_${node_name} > /etc/consul.d/consul_${node_name}_token.json
+
+# Apply the per-node agent token so this agent can register itself and services.
+AGENT_TOKEN=$(jq -r '.SecretID' /etc/consul.d/consul_${node_name}_token.json)
+if [ -z "$AGENT_TOKEN" ] || [ "$AGENT_TOKEN" = "null" ]; then
+  echo "ERROR: failed to obtain agent token for ${node_name}" >&2
+  exit 1
+fi
+consul acl set-agent-token agent "$AGENT_TOKEN"
+
+# On server-0: create shared service tokens for Vault, Nomad, and the anonymous token.
+if [ "${node_name}" == "${namespace}-server-0" ]; then
+  echo "--> Creating shared ACL policies and tokens"
+
+  # Vault service registration token
+  consul acl policy create -name vault-service \
+    -rules @/etc/consul.d/acl_policies/vault-service.hcl || echo "--> vault-service policy already exists"
+  VAULT_CONSUL_TOKEN=$(consul acl token create -format=json \
+    -description "Vault service registration token" \
+    -policy-name vault-service | jq -r '.SecretID')
+  consul kv put service/consul/vault-token "$VAULT_CONSUL_TOKEN"
+
+  # Nomad server token
+  consul acl policy create -name nomad-server \
+    -rules @/etc/consul.d/acl_policies/nomad-server.hcl || echo "--> nomad-server policy already exists"
+  NOMAD_SERVER_CONSUL_TOKEN=$(consul acl token create -format=json \
+    -description "Nomad server Consul token" \
+    -policy-name nomad-server | jq -r '.SecretID')
+  consul kv put service/consul/nomad-server-token "$NOMAD_SERVER_CONSUL_TOKEN"
+
+  # Nomad client token
+  consul acl policy create -name nomad-client \
+    -rules @/etc/consul.d/acl_policies/nomad-client.hcl || echo "--> nomad-client policy already exists"
+  NOMAD_CLIENT_CONSUL_TOKEN=$(consul acl token create -format=json \
+    -description "Nomad client Consul token" \
+    -policy-name nomad-client | jq -r '.SecretID')
+  consul kv put service/consul/nomad-client-token "$NOMAD_CLIENT_CONSUL_TOKEN"
+
+  # Apply anonymous policy to the built-in anonymous token so the UI is browsable without login.
+  consul acl policy create -name anonymous \
+    -rules @/etc/consul.d/acl_policies/anonymous.hcl || \
+    consul acl policy update -name anonymous \
+      -rules @/etc/consul.d/acl_policies/anonymous.hcl
+  consul acl token update \
+    -id 00000000-0000-0000-0000-000000000002 \
+    -description "Anonymous Token" \
+    -policy-name anonymous
+
+  echo "--> Consul shared service tokens stored in KV"
+fi
 
 ##################################
-
-
-
-
 
 echo "--> setting up resolv.conf"
 ##################################
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
-mkdir /etc/systemd/resolved.conf.d
+mkdir -p /etc/systemd/resolved.conf.d
 touch /etc/systemd/resolved.conf.d/forward-consul-domains.conf
 
 IPV4=$(ec2metadata --local-ipv4)

@@ -1,0 +1,378 @@
+# =============================================================================
+# HashiCorp Vault PKI Secrets Engine — TLS Certificate Management
+# Replaces: tls_private_key, tls_self_signed_cert, tls_cert_request,
+#           tls_locally_signed_cert with Vault PKI for dynamic, short-lived,
+#           audited certificate lifecycle management.
+# =============================================================================
+
+terraform {
+  required_providers {
+    vault = {
+      source  = "hashicorp/vault"
+      version = ">= 4.0.0"
+    }
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 5.0.0"
+    }
+  }
+}
+
+# =============================================================================
+# PKI Secrets Engine — Root CA
+# =============================================================================
+
+resource "vault_mount" "pki_root" {
+  path                      = "pki_root"
+  type                      = "pki"
+  description               = "Root CA for ${var.namespace} demostack"
+  default_lease_ttl_seconds = 31536000 # 1 year
+  max_lease_ttl_seconds     = 87600 * 3600 # 10 years
+}
+
+resource "vault_pki_secret_backend_root_cert" "root" {
+  backend              = vault_mount.pki_root.path
+  type                 = "internal"
+  common_name          = var.namespace
+  organization         = "HashiCorp Demos"
+  key_type             = "ec"
+  key_bits             = 521
+  ttl                  = "87600h" # 10 years
+  issuer_name          = "${var.namespace}-root"
+  format               = "pem"
+  private_key_format   = "der"
+
+  depends_on = [vault_mount.pki_root]
+}
+
+# Configure CRL and issuing endpoints for the Root CA
+resource "vault_pki_secret_backend_config_urls" "root" {
+  backend                 = vault_mount.pki_root.path
+  issuing_certificates    = ["${var.vault_addr}/v1/${vault_mount.pki_root.path}/ca"]
+  crl_distribution_points = ["${var.vault_addr}/v1/${vault_mount.pki_root.path}/crl"]
+}
+
+# =============================================================================
+# PKI Secrets Engine — Intermediate CA
+# Using a separate intermediate CA is best practice — the root CA key stays
+# offline / unexported; only the intermediate issues leaf certs.
+# =============================================================================
+
+resource "vault_mount" "pki_int" {
+  path                      = "pki_int"
+  type                      = "pki"
+  description               = "Intermediate CA for ${var.namespace} demostack"
+  default_lease_ttl_seconds = 2592000  # 30 days
+  max_lease_ttl_seconds     = 8760 * 3600 # 1 year
+}
+
+resource "vault_pki_secret_backend_intermediate_cert_request" "csr" {
+  backend     = vault_mount.pki_int.path
+  type        = "internal"
+  common_name = "${var.namespace} Intermediate CA"
+  key_type    = "ec"
+  key_bits    = 521
+  format      = "pem"
+}
+
+resource "vault_pki_secret_backend_root_sign_intermediate" "intermediate" {
+  backend              = vault_mount.pki_root.path
+  csr                  = vault_pki_secret_backend_intermediate_cert_request.csr.csr
+  common_name          = "${var.namespace} Intermediate CA"
+  organization         = "HashiCorp Demos"
+  ttl                  = "43800h" # 5 years
+  format               = "pem_bundle"
+  revoke               = true
+
+  depends_on = [vault_pki_secret_backend_root_cert.root]
+}
+
+resource "vault_pki_secret_backend_intermediate_set_signed" "set" {
+  backend     = vault_mount.pki_int.path
+  certificate = vault_pki_secret_backend_root_sign_intermediate.intermediate.certificate
+}
+
+resource "vault_pki_secret_backend_config_urls" "intermediate" {
+  backend                 = vault_mount.pki_int.path
+  issuing_certificates    = ["${var.vault_addr}/v1/${vault_mount.pki_int.path}/ca"]
+  crl_distribution_points = ["${var.vault_addr}/v1/${vault_mount.pki_int.path}/crl"]
+}
+
+# =============================================================================
+# PKI Role — Server Certificates (Consul, Nomad, Vault nodes)
+# =============================================================================
+
+resource "vault_pki_secret_backend_role" "server" {
+  backend          = vault_mount.pki_int.path
+  name             = "${var.namespace}-server"
+  organization     = ["HashiCorp Demostack"]
+  ttl              = "720h"   # 30 days — matches original validity_period_hours
+  max_ttl          = "8760h"  # 1 year hard cap
+
+  key_type         = "ec"
+  key_bits         = 521
+  allow_ip_sans    = true
+  allow_subdomains = true
+  allow_glob_domains = true
+
+  allowed_domains = [
+    "${var.namespace}.${data.aws_route53_zone.aws_fdqn.name}",
+    "node.consul",
+    "node.${var.region}.consul",
+    "service.consul",
+    "service.${var.region}.consul",
+    "query.consul",
+    "global.nomad",
+    "localhost",
+  ]
+
+  # Key usages matching original tls_locally_signed_cert allowed_uses
+  key_usage = [
+    "DigitalSignature",
+    "KeyAgreement",
+    "KeyEncipherment",
+  ]
+  ext_key_usage = [
+    "ServerAuth",
+    "ClientAuth",
+  ]
+
+  server_flag = true
+  client_flag = true
+
+  depends_on = [vault_pki_secret_backend_intermediate_set_signed.set]
+}
+
+# =============================================================================
+# PKI Role — Worker/Client Certificates (Nomad clients, etc.)
+# =============================================================================
+
+resource "vault_pki_secret_backend_role" "worker" {
+  backend          = vault_mount.pki_int.path
+  name             = "${var.namespace}-worker"
+  organization     = ["HashiCorp Demostack"]
+  ttl              = "720h"
+  max_ttl          = "8760h"
+
+  key_type           = "ec"
+  key_bits           = 521
+  allow_ip_sans      = true
+  allow_subdomains   = true
+  allow_glob_domains = true
+
+  allowed_domains = [
+    "${var.namespace}.${data.aws_route53_zone.aws_fdqn.name}",
+    "node.consul",
+    "node.${var.region}.consul",
+    "service.consul",
+    "service.${var.region}.consul",
+    "query.consul",
+    "global.nomad",
+    "localhost",
+  ]
+
+  key_usage = [
+    "DigitalSignature",
+    "KeyAgreement",
+    "KeyEncipherment",
+  ]
+  ext_key_usage = [
+    "ServerAuth",
+    "ClientAuth",
+  ]
+
+  server_flag = true
+  client_flag = true
+
+  depends_on = [vault_pki_secret_backend_intermediate_set_signed.set]
+}
+
+# =============================================================================
+# Issue Server Certificates
+# One certificate per server node, with all required SANs for
+# Consul, Nomad, and Vault service discovery.
+# =============================================================================
+
+resource "vault_pki_secret_backend_cert" "server" {
+  count   = var.servers
+  backend = vault_mount.pki_int.path
+  name    = vault_pki_secret_backend_role.server.name
+
+  common_name = "${var.namespace}-server-${count.index}.node.consul"
+  ttl         = "720h"
+
+  alt_names = [
+    # Consul
+    "${var.namespace}-server-${count.index}.node.consul",
+    "${var.namespace}-server-${count.index}.node.${var.region}.consul",
+    "*.service.consul",
+    "*.service.${var.region}.consul",
+    "*.query.consul",
+    "consul.service.consul",
+    # Nomad
+    "nomad.service.consul",
+    "nomad.service.${var.region}.consul",
+    "client.global.nomad",
+    "server.global.nomad",
+    # Vault
+    "vault.service.consul",
+    "vault.query.consul",
+    "active.vault.service.consul",
+    "active.vault.service.${var.region}.consul",
+    "standby.vault.service.consul",
+    "standby.vault.service.${var.region}.consul",
+    "performance-standby.vault.service.consul",
+    "performance-standby.vault.service.${var.region}.consul",
+    # Wildcard
+    "localhost",
+    "*.${var.namespace}.${data.aws_route53_zone.aws_fdqn.name}",
+  ]
+
+  auto_renew            = true
+  min_seconds_remaining = 604800 # Renew when < 7 days remain
+
+  depends_on = [vault_pki_secret_backend_role.server]
+}
+
+# =============================================================================
+# Issue Worker/Client Certificates
+# =============================================================================
+
+resource "vault_pki_secret_backend_cert" "workers" {
+  count   = var.workers
+  backend = vault_mount.pki_int.path
+  name    = vault_pki_secret_backend_role.worker.name
+
+  common_name = "${var.namespace}-worker-${count.index}.node.consul"
+  ttl         = "720h"
+
+  alt_names = [
+    # Consul
+    "${var.namespace}-worker-${count.index}.node.consul",
+    "${var.namespace}-worker-${count.index}.node.${var.region}.consul",
+    "*.service.consul",
+    "*.service.${var.region}.consul",
+    "*.query.consul",
+    "consul.service.consul",
+    # Nomad
+    "nomad.service.consul",
+    "nomad.service.${var.region}.consul",
+    "client.global.nomad",
+    "server.global.nomad",
+    # Vault
+    "vault.service.consul",
+    "vault.query.consul",
+    "active.vault.service.consul",
+    "active.vault.service.${var.region}.consul",
+    "standby.vault.service.consul",
+    "standby.vault.service.${var.region}.consul",
+    "performance-standby.vault.service.consul",
+    "performance-standby.vault.service.${var.region}.consul",
+    # Wildcard
+    "localhost",
+    "*.${var.namespace}.${data.aws_route53_zone.aws_fdqn.name}",
+  ]
+
+  auto_renew            = true
+  min_seconds_remaining = 604800
+
+  depends_on = [vault_pki_secret_backend_role.worker]
+}
+
+# =============================================================================
+# Vault Policies — Scoped access for nodes to renew their own certificates
+# =============================================================================
+
+resource "vault_policy" "server_pki" {
+  name = "${var.namespace}-server-pki"
+
+  policy = <<-EOT
+    # Allow servers to issue and renew their own certs via the PKI role
+    path "${vault_mount.pki_int.path}/issue/${vault_pki_secret_backend_role.server.name}" {
+      capabilities = ["create", "update"]
+    }
+
+    # Allow reading the CA chain for verification
+    path "${vault_mount.pki_int.path}/ca/pem" {
+      capabilities = ["read"]
+    }
+
+    path "${vault_mount.pki_int.path}/cert/ca_chain" {
+      capabilities = ["read"]
+    }
+
+    # Allow CRL fetching
+    path "${vault_mount.pki_int.path}/crl/rotate" {
+      capabilities = ["create", "update"]
+    }
+  EOT
+}
+
+resource "vault_policy" "worker_pki" {
+  name = "${var.namespace}-worker-pki"
+
+  policy = <<-EOT
+    path "${vault_mount.pki_int.path}/issue/${vault_pki_secret_backend_role.worker.name}" {
+      capabilities = ["create", "update"]
+    }
+
+    path "${vault_mount.pki_int.path}/ca/pem" {
+      capabilities = ["read"]
+    }
+
+    path "${vault_mount.pki_int.path}/cert/ca_chain" {
+      capabilities = ["read"]
+    }
+  EOT
+}
+
+
+
+# =============================================================================
+# AWS ACM — Import Vault-issued wildcard cert for ALB
+# Replaces aws_acm_certificate + DNS validation with a Vault-signed cert
+# imported directly into ACM.
+# =============================================================================
+
+resource "vault_pki_secret_backend_cert" "alb_wildcard" {
+  backend     = vault_mount.pki_int.path
+  name        = vault_pki_secret_backend_role.server.name
+  common_name = "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}"
+  ttl         = "720h"
+
+  alt_names = [
+    "*.${var.namespace}.${data.aws_route53_zone.fdqn.name}",
+  ]
+
+  auto_renew            = true
+  min_seconds_remaining = 604800
+
+  depends_on = [vault_pki_secret_backend_role.server]
+}
+
+resource "aws_acm_certificate" "vault_cert" {
+  private_key       = vault_pki_secret_backend_cert.alb_wildcard.private_key
+  certificate_body  = vault_pki_secret_backend_cert.alb_wildcard.certificate
+  certificate_chain = vault_pki_secret_backend_cert.alb_wildcard.ca_chain
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name      = "${var.namespace}-alb-cert"
+    ManagedBy = "vault-pki"
+    Namespace = var.namespace
+  }
+}
+
+# No DNS validation record needed — cert is already signed by our CA
+# The aws_acm_certificate_validation resource is also not needed for imported certs
+
+# =============================================================================
+# Data Sources
+# =============================================================================
+
+data "aws_route53_zone" "aws_fdqn" {
+  zone_id = var.zone_id
+}

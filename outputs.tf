@@ -1,5 +1,27 @@
 ////////////////////// Main //////////////////////////
 
+output "Consul_Master_token" {
+  value = {
+    for k, consul in module.cluster :
+    k => consul.consul_master_token
+  }
+  sensitive = false
+}
+
+output "Nomad_Master_token" {
+  value = {
+    for k, nomad in module.cluster :
+    k => nomad.nomad_master_token
+  }
+}
+
+output "Vault_Root_token" {
+  value = {
+    for k, vault in module.cluster :
+    k => vault.vault_root_token
+  }
+  sensitive = false
+}
 output "Consul" {
   value = [
     for consul in module.cluster :

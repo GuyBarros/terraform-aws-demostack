@@ -33,6 +33,22 @@ resource "aws_route" "internet_access" {
 
 data "aws_availability_zones" "available" {}
 
+data "aws_caller_identity" "current" {}
+
+resource "aws_s3_bucket" "bootstrap_scripts" {
+  bucket        = "${var.namespace}-bootstrap-${data.aws_caller_identity.current.account_id}"
+  force_destroy = true
+  tags          = local.common_tags
+}
+
+resource "aws_s3_bucket_public_access_block" "bootstrap_scripts" {
+  bucket                  = aws_s3_bucket.bootstrap_scripts.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_subnet" "demostack" {
   count                   = length(var.cidr_blocks)
   vpc_id                  = aws_vpc.demostack.id
@@ -127,6 +143,21 @@ data "aws_iam_policy_document" "vault-server" {
     ]
 
     resources = ["*"]
+  }
+
+  statement {
+    sid    = "BootstrapScriptsRead"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      aws_s3_bucket.bootstrap_scripts.arn,
+      "${aws_s3_bucket.bootstrap_scripts.arn}/*",
+    ]
   }
 
 }

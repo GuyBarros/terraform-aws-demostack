@@ -8,7 +8,9 @@ provider "aws" {
   #  }
 }
 
-
+provider "vault" {
+  address = var.vault_addr
+}
 
 module "cluster" {
   source               = "./modules"
@@ -36,6 +38,7 @@ module "cluster" {
   run_nomad_jobs       = var.run_nomad_jobs
   host_access_ip       = var.host_access_ip
   primary_datacenter   = each.value.namespace
+  vault_addr           = var.vault_addr
 
   # EMEA-SE-PLAYGROUND
   consul_join_tag_value = "${each.value.namespace}-${random_id.consul_join_tag_value.hex}"

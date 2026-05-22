@@ -233,3 +233,13 @@ variable "vault_health_endpoints" {
     uninitcode = "200"
   }
 }
+
+variable "vault_addr" {
+  description = "Vault cluster address (e.g. 'https://vault.example.com:8200')"
+  type        = string
+
+  validation {
+    condition     = can(regex("^https?://", var.vault_addr))
+    error_message = "vault_addr must be a full URL starting with http:// or https://"
+  }
+}

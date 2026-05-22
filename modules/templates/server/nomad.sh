@@ -23,9 +23,8 @@ while [[ $HTTP_STATUS -ne 200 && $HTTP_STATUS -ne 473 && $HTTP_STATUS -ne 429 ]]
   sleep 1
 done
 
-
-
-export CONSUL_HTTP_ADDR=http://$(private_ip):8500
+export CONSUL_HTTP_TOKEN=${consul_master_token}
+export CONSUL_HTTP_ADDR=http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
 
 echo "--> Generating Vault token..."
 export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
@@ -36,7 +35,14 @@ export NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
 
 consul kv put service/vault/${node_name}-token $NOMAD_VAULT_TOKEN
 
-
+# Retrieve the Nomad server Consul token — created by server-0's consul.sh.
+echo "--> Waiting for Nomad server Consul token"
+NOMAD_SERVER_CONSUL_TOKEN=""
+until [ -n "$NOMAD_SERVER_CONSUL_TOKEN" ]; do
+  NOMAD_SERVER_CONSUL_TOKEN=$(consul kv get service/consul/nomad-server-token 2>/dev/null)
+  [ -z "$NOMAD_SERVER_CONSUL_TOKEN" ] && sleep 5
+done
+echo "--> Got Nomad server Consul token"
 
 export AWS_REGION=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone |  sed 's/[a-z]$//')
 export AWS_AZ=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/availability-zone)
@@ -89,7 +95,7 @@ client {
       path = "/etc/nomad.d/host-volumes/wp-runner"
       read_only = false
     }
-  
+
 
    options {
     "driver.raw_exec.enable" = "1"
@@ -101,6 +107,9 @@ client {
     "name" = "${node_name}"
   }
 
+}
+acl {
+  enabled = true
 }
 tls {
   rpc  = true
@@ -117,6 +126,7 @@ consul {
     auto_advertise = true
     server_auto_join = true
     client_auto_join = true
+    token = "$NOMAD_SERVER_CONSUL_TOKEN"
 }
 vault {
   enabled          = true
@@ -200,6 +210,39 @@ echo "--> Waiting for all Nomad servers"
 while [ "$(nomad server members 2>&1 | grep "alive" | wc -l)" -lt "${nomad_servers}" ]; do
   sleep 5
 done
+
+# Bootstrap Nomad ACL on server-0 only.
+# ACL must be enabled in the config (above) before bootstrapping.
+if [ "${node_name}" == "${namespace}-server-0" ]; then
+  if [ -z "$(consul kv get service/nomad/bootstrap-token 2>/dev/null)" ]; then
+    echo "--> Bootstrapping Nomad ACL"
+    NOMAD_BOOTSTRAP_TOKEN=""
+    until echo "$NOMAD_BOOTSTRAP_TOKEN" | grep -qE '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; do
+      NOMAD_BOOTSTRAP_TOKEN=$(nomad acl bootstrap -json 2>/dev/null | jq -r '.SecretID // empty')
+      [ -z "$NOMAD_BOOTSTRAP_TOKEN" ] && echo "--> Waiting for Nomad leader to accept bootstrap..." && sleep 3
+    done
+    consul kv put service/nomad/bootstrap-token "$NOMAD_BOOTSTRAP_TOKEN"
+    export NOMAD_TOKEN="$NOMAD_BOOTSTRAP_TOKEN"
+
+    # Anonymous read policy so the UI and CLI work without a token for basic inspection.
+    nomad acl policy apply -description "Anonymous read-only access" anonymous - <<"NOMADPOLICY"
+namespace "*" {
+  policy = "read"
+}
+agent {
+  policy = "read"
+}
+node {
+  policy = "read"
+}
+NOMADPOLICY
+
+    echo "--> Nomad ACL bootstrapped and anonymous policy applied"
+  else
+    echo "--> Nomad ACL already bootstrapped"
+    export NOMAD_TOKEN="$(consul kv get service/nomad/bootstrap-token)"
+  fi
+fi
 
 echo "--> Configure Nomad WIF"
 
@@ -302,6 +345,11 @@ path "kv/metadata/{{identity.entity.aliases.AUTH_METHOD_ACCESSOR.metadata.nomad_
 
 path "kv/metadata/*" {
   capabilities = ["list"]
+}
+
+# Allow Nomad workloads to obtain short-lived Consul tokens via Vault Consul secrets engine.
+path "consul/creds/nomad-workloads" {
+  capabilities = ["read"]
 }
 
 EOR

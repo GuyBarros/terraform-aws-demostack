@@ -183,3 +183,9 @@ variable "f5_password" {
   default     = "admin"
   sensitive = true
 }
+
+variable "vault_addr" {
+  description = "Vault cluster address (e.g. 'https://vault.example.com:8200')"
+  type        = string
+  default = ""
+}

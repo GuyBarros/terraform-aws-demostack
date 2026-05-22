@@ -13,6 +13,7 @@ echo $TOKEN
 echo "--> Writing configuration"
 sudo mkdir -p /mnt/consul
 sudo mkdir -p /etc/consul.d
+sudo mkdir -p /etc/consul.d/acl_policies
 
 echo "--> clean up any default config."
 sudo rm  /etc/consul.d/*
@@ -59,14 +60,16 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
 EOF
 
 
-# Set up ACLs.
+# Enable ACLs with deny default — matches the server ACL configuration.
+# Clients must NOT use initial_management (server-only); use default so the
+# agent can authenticate until the per-worker agent token is applied below.
 cat <<EOF > /etc/consul.d/acl.hcl
 acl = {
   enabled = true
-  default_policy = "allow"
+  default_policy = "deny"
   enable_token_persistence = true
   tokens {
-    initial_management = "${consul_master_token}"
+    default = "${consul_master_token}"
   }
   down_policy = "extend-cache"
 }
@@ -79,7 +82,6 @@ alias conslu="consul"
 alias ocnsul="consul"
 EOF
 source /etc/profile.d/consul.sh
-
 
 
 
@@ -110,13 +112,52 @@ EOF
 sudo systemctl enable consul
 sudo systemctl start consul
 
+export CONSUL_HTTP_TOKEN=${consul_master_token}
 export CONSUL_HTTP_ADDR=http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
+
+echo "--> Waiting for Consul cluster to be reachable"
+while ! consul members 2>/dev/null | grep -q "alive"; do
+  sleep 3
+done
+
+echo "--> Waiting for Consul leader"
+while [ -z "$(curl -s http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500/v1/status/leader)" ]; do
+  sleep 3
+done
+
+echo "--> Creating per-worker ACL policy and agent token"
+
+sudo tee /etc/consul.d/acl_policies/${node_name}.hcl > /dev/null <<EOF
+node "${node_name}" {
+  policy = "write"
+}
+
+service_prefix "" {
+  policy = "write"
+}
+
+query_prefix "" {
+  policy = "read"
+}
+EOF
+
+consul acl policy create -name "consul_${node_name}" \
+  -rules @/etc/consul.d/acl_policies/${node_name}.hcl || \
+  consul acl policy update -name "consul_${node_name}" \
+    -rules @/etc/consul.d/acl_policies/${node_name}.hcl
+
+WORKER_TOKEN=$(consul acl token create -format=json \
+  -description "consul ${node_name} agent token" \
+  -policy-name "consul_${node_name}" | jq -r '.SecretID')
+
+# Apply agent token so this worker can register its node and Nomad-allocated services.
+consul acl set-agent-token agent "$WORKER_TOKEN"
 
 echo "--> setting up resolv.conf"
 ##################################
 ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
 
-mkdir /etc/systemd/resolved.conf.d
+mkdir -p /etc/systemd/resolved.conf.d
 touch /etc/systemd/resolved.conf.d/forward-consul-domains.conf
 
 IPV4=$(ec2metadata --local-ipv4)

@@ -22,6 +22,22 @@ $(cat /etc/ssl/certs/me.crt)
 $(cat /usr/local/share/ca-certificates/01-me.crt)
 EOF
 
+# Retrieve the dedicated Vault service-registration token from Consul KV.
+# consul.sh (server-0) creates this token; all servers wait here until it exists.
+echo "--> Waiting for Consul and vault service token"
+export CONSUL_HTTP_TOKEN=${consul_master_token}
+export CONSUL_HTTP_ADDR=http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
+
+while ! consul members &>/dev/null; do
+  sleep 2
+done
+
+VAULT_CONSUL_TOKEN=""
+until [ -n "$VAULT_CONSUL_TOKEN" ]; do
+  VAULT_CONSUL_TOKEN=$(consul kv get service/consul/vault-token 2>/dev/null)
+  [ -z "$VAULT_CONSUL_TOKEN" ] && sleep 5
+done
+echo "--> Got Vault service token from Consul KV"
 
 echo "--> Writing configuration"
 sudo mkdir -p /etc/vault.d
@@ -38,7 +54,7 @@ cluster_name = "${namespace}-demostack"
 service_registration "consul" {
   address = "http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500"
   service = "vault"
-  token="${consul_master_token}"
+  token="$VAULT_CONSUL_TOKEN"
 }
 
 
@@ -376,5 +392,37 @@ vault write -namespace=boundary  -f  transit/keys/worker-auth
   echo "--> worker-auth key already exists, moving on"
 }
 
+# Vault Consul Secrets Engine — allows Vault to dynamically generate short-lived Consul tokens.
+# Nomad workloads can call consul/creds/nomad-workloads via their Vault token.
+echo "==> Configuring Consul Secrets Engine in Vault"
+{
+  vault secrets enable consul
+} || {
+  echo "--> Consul secrets engine already enabled, moving on"
+}
+
+vault write consul/config/access \
+  address="http://127.0.0.1:8500" \
+  token="${consul_master_token}"
+
+{
+  vault write consul/roles/nomad-workloads \
+    policies=nomad-client \
+    ttl=1h \
+    max_ttl=24h
+} || {
+  echo "--> consul/roles/nomad-workloads already configured, moving on"
+}
+
+{
+  vault write consul/roles/operator \
+    policies=nomad-server \
+    ttl=1h \
+    max_ttl=24h
+} || {
+  echo "--> consul/roles/operator already configured, moving on"
+}
+
+echo "==> Consul Secrets Engine configured!"
 
 echo "==> Vault is done!"

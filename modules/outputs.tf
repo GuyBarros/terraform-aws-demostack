@@ -1,5 +1,21 @@
 ////////////////////// Module //////////////////////////
 
+output "consul_master_token" {
+  value     = var.consul_master_token
+  sensitive = false
+}
+
+output "vault_root_token" {
+  value     = random_id.vault-root-token.hex
+  sensitive = false
+}
+
+# Nomad bootstrap token is generated at runtime via `nomad acl bootstrap` on server-0
+# and stored in Consul KV at service/nomad/bootstrap-token — not available as a Terraform value.
+output "nomad_master_token" {
+  value     = "retrieve via: consul kv get service/nomad/bootstrap-token"
+  sensitive = false
+}
 output "servers" {
   value = aws_route53_record.servers.*.fqdn
 }

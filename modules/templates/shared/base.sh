@@ -44,10 +44,8 @@ function install_from_url {
   }
 }
 
-source /etc/profile.d/ips.sh
-
 echo "--> Updating apt-cache"
-ssh-apt update
+sudo apt-get update
 
 
 
@@ -79,41 +77,29 @@ echo "--> Installing common dependencies 0"
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   nodejs \
   curl \
-  emacs &>/dev/null
-  echo "--> Installing common dependencies 1"
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  emacs \
   git \
   jq \
   tmux \
   unzip \
-  vim &>/dev/null
-  echo "--> Installing common dependencies 2"
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  vim  \
   wget \
   tree \
   nfs-kernel-server \
-  nfs-common &>/dev/null
-  echo "--> Installing common dependencies 3"
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  nfs-common  \
   python3-pip \
   ruby-full \
   apt-transport-https \
-  ca-certificates &>/dev/null
-  echo "--> Installing common dependencies 4"
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  ca-certificates  \
   curl \
   gnupg-agent \
   software-properties-common \
-  openjdk-25-jdk-headless &>/dev/null
-  echo "--> Installing common dependencies 5"
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  openjdk-21-jdk-headless  \
   prometheus-node-exporter \
   golang-go \
   alien \
   qemu-system \
-  consul-cni \
-  &>/dev/null
-
+  consul-cni  &>/dev/null
 
 echo "--> Disabling checkpoint"
 sudo tee /etc/profile.d/checkpoint.sh > /dev/null <<"EOF"
@@ -126,15 +112,16 @@ then
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
   vault \
   consul \
-  nomad  \
-  &>/dev/null
+  nomad
 
 else
+# Enterprise packages are amd64-only in the HashiCorp apt repo; fall back to OSS on arm64.
+# The enterprise license is applied at runtime via CONSUL_LICENSE / VAULT_LICENSE / NOMAD_LICENSE
+# environment variables already set in each systemd unit.
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
-  vault-enterprise \
-  consul-enterprise \
-  nomad-enterprise  \
-  &>/dev/null
+  vault-enterprise consul-enterprise nomad-enterprise || \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  vault consul nomad
 
 fi
 

@@ -18,6 +18,18 @@ sudo tar -xzf cni-plugins-linux-$${ARCH_CNI}-$${CNI_PLUGIN_VERSION}.tgz -C /opt/
 export AWS_REGION=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone |  sed 's/[a-z]$//')
 export AWS_AZ=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/availability-zone)
 
+# Retrieve the Nomad client Consul token — created by server-0's consul.sh.
+export CONSUL_HTTP_TOKEN=${consul_master_token}
+export CONSUL_HTTP_ADDR=http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
+
+echo "--> Waiting for Nomad client Consul token"
+NOMAD_CLIENT_CONSUL_TOKEN=""
+until [ -n "$NOMAD_CLIENT_CONSUL_TOKEN" ]; do
+  NOMAD_CLIENT_CONSUL_TOKEN=$(consul kv get service/consul/nomad-client-token 2>/dev/null)
+  [ -z "$NOMAD_CLIENT_CONSUL_TOKEN" ] && sleep 5
+done
+echo "--> Got Nomad client Consul token"
+
 echo "--> Installing"
 sudo mkdir -p /mnt/nomad
 sudo mkdir -p /etc/nomad.d/default_jobs
@@ -60,7 +72,7 @@ client {
       path = "/etc/nomad.d/host-volumes/wp-runner"
       read_only = false
     }
-  
+
    options {
     "driver.raw_exec.enable" = "1"
      "docker.privileged.enabled" = "true"
@@ -70,6 +82,10 @@ client {
     "type" = "worker",
     "name" = "${node_name}"
   }
+}
+
+acl {
+  enabled = true
 }
 
 tls {
@@ -87,6 +103,7 @@ consul {
     auto_advertise = true
     server_auto_join = true
     client_auto_join = true
+    token = "$NOMAD_CLIENT_CONSUL_TOKEN"
 }
 vault {
   enabled          = true
