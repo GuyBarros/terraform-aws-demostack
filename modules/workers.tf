@@ -47,6 +47,7 @@ resource "aws_s3_object" "worker_nomad" {
     vault_api_addr      = "https://${aws_route53_record.vault.fqdn}:8200"
     consul_master_token = var.consul_master_token
     cni_version         = var.cni_version
+    nomad_servers       = var.servers - 1
   })
 }
 

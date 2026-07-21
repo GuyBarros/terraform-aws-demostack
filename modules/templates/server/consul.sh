@@ -170,14 +170,15 @@ key_prefix "service/vault" {
 }
 POLICYEOF
 
-# Nomad server policy — allows Nomad servers to register services and access shared KV paths.
+# Nomad server policy — allows Nomad servers to register services, access shared KV paths,
+# and manage ACL auth methods/binding rules + service mesh config entries for workload identity.
 sudo tee /etc/consul.d/acl_policies/nomad-server.hcl > /dev/null <<"POLICYEOF"
 agent_prefix "" {
   policy = "read"
 }
 
 node_prefix "" {
-  policy = "read"
+  policy = "write"
 }
 
 service_prefix "" {
@@ -195,6 +196,9 @@ key_prefix "service/nomad" {
 key_prefix "service/consul" {
   policy = "read"
 }
+
+acl = "write"
+mesh = "write"
 POLICYEOF
 
 # Nomad client policy — allows Nomad worker agents to register job services.
@@ -204,7 +208,7 @@ agent_prefix "" {
 }
 
 node_prefix "" {
-  policy = "read"
+  policy = "write"
 }
 
 service_prefix "" {

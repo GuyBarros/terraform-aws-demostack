@@ -74,7 +74,7 @@ resource "aws_s3_object" "server_nomad" {
     consul_master_token = var.consul_master_token
     vault_api_addr      = "https://${aws_route53_record.vault.fqdn}:8200"
     nomad_gossip_key    = var.nomad_gossip_key
-    nomad_servers       = var.servers
+    nomad_servers       = var.servers - 1
     cni_version         = var.cni_version
     nomadlicense        = var.nomadlicense
   })

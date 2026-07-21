@@ -26,15 +26,6 @@ done
 export CONSUL_HTTP_TOKEN=${consul_master_token}
 export CONSUL_HTTP_ADDR=http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
 
-echo "--> Generating Vault token..."
-export VAULT_TOKEN="$(consul kv get service/vault/root-token)"
-export NOMAD_VAULT_TOKEN="$(VAULT_TOKEN="$VAULT_TOKEN" \
-  VAULT_ADDR="https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200" \
-  VAULT_SKIP_VERIFY=true \
-  vault token create -field=token -policy=superuser -policy=nomad-server -display-name=${node_name} -id=${node_name} -period=72h)"
-
-consul kv put service/vault/${node_name}-token $NOMAD_VAULT_TOKEN
-
 # Retrieve the Nomad server Consul token — created by server-0's consul.sh.
 echo "--> Waiting for Nomad server Consul token"
 NOMAD_SERVER_CONSUL_TOKEN=""
@@ -44,8 +35,17 @@ until [ -n "$NOMAD_SERVER_CONSUL_TOKEN" ]; do
 done
 echo "--> Got Nomad server Consul token"
 
+echo "--> Waiting for Vault root token"
+VAULT_ROOT_TOKEN=""
+until [ -n "$VAULT_ROOT_TOKEN" ]; do
+  VAULT_ROOT_TOKEN=$(consul kv get service/vault/root-token 2>/dev/null)
+  [ -z "$VAULT_ROOT_TOKEN" ] && sleep 5
+done
+echo "--> Got Vault root token"
+
 export AWS_REGION=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -fsq http://169.254.169.254/latest/meta-data/placement/availability-zone |  sed 's/[a-z]$//')
 export AWS_AZ=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/availability-zone)
+LOCAL_IP=$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4)
 
 
 echo "--> Writing configuration"
@@ -127,15 +127,23 @@ consul {
     server_auto_join = true
     client_auto_join = true
     token = "$NOMAD_SERVER_CONSUL_TOKEN"
+    service_identity {
+      aud = ["consul.io"]
+      ttl = "1h"
+    }
+    task_identity {
+      aud = ["consul.io"]
+      ttl = "1h"
+    }
 }
 vault {
   enabled          = true
   tls_skip_verify  = true
   address          = "https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
+  token            = "$VAULT_ROOT_TOKEN"
   ca_file          = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file        = "/etc/ssl/certs/me.crt"
   key_file         = "/etc/ssl/certs/me.key"
-  # create_from_role = "nomad-cluster"
   default_identity {
     aud = ["vault.io"]
     ttl = "1h"
@@ -186,7 +194,6 @@ Restart=on-failure
 LimitNOFILE=65536
 #Enterprise License
 Environment=NOMAD_LICENSE=${nomadlicense}
-Environment=VAULT_TOKEN="$(echo $NOMAD_VAULT_TOKEN)"
 
 [Install]
 WantedBy=multi-user.target
@@ -197,34 +204,42 @@ sudo systemctl start nomad
 sleep 5
 
 echo "--> Waiting for Nomad leader"
-while ! curl  -k https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/leader --show-error; do
+while ! curl -k "https://localhost:4646/v1/status/leader" --show-error; do
   sleep 2
 done
 
 echo "--> Waiting for a list of Nomad peers"
-while ! curl  -k https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):4646/v1/status/peers --show-error; do
+while ! curl -k "https://localhost:4646/v1/status/peers" --show-error; do
   sleep 2
 done
 
 echo "--> Waiting for all Nomad servers"
-while [ "$(nomad server members 2>&1 | grep "alive" | wc -l)" -lt "${nomad_servers}" ]; do
+while [ "$(curl -sk https://localhost:4646/v1/status/peers | jq 'length')" -lt "${nomad_servers}" ]; do
   sleep 5
 done
 
 # Bootstrap Nomad ACL on server-0 only.
 # ACL must be enabled in the config (above) before bootstrapping.
+# Use localhost (present in cert SANs) so no Consul DNS dependency during early boot.
+export NOMAD_ADDR="https://localhost:4646"
+
 if [ "${node_name}" == "${namespace}-server-0" ]; then
   if [ -z "$(consul kv get service/nomad/bootstrap-token 2>/dev/null)" ]; then
     echo "--> Bootstrapping Nomad ACL"
     NOMAD_BOOTSTRAP_TOKEN=""
     until echo "$NOMAD_BOOTSTRAP_TOKEN" | grep -qE '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'; do
-      NOMAD_BOOTSTRAP_TOKEN=$(nomad acl bootstrap -json 2>/dev/null | jq -r '.SecretID // empty')
-      [ -z "$NOMAD_BOOTSTRAP_TOKEN" ] && echo "--> Waiting for Nomad leader to accept bootstrap..." && sleep 3
+      RESULT=$(nomad acl bootstrap -json 2>&1)
+      NOMAD_BOOTSTRAP_TOKEN=$(echo "$RESULT" | jq -r '.SecretID // empty' 2>/dev/null)
+      if [ -z "$NOMAD_BOOTSTRAP_TOKEN" ]; then
+        echo "--> Waiting for Nomad leader to accept bootstrap... ($RESULT)"
+        sleep 3
+      fi
     done
     consul kv put service/nomad/bootstrap-token "$NOMAD_BOOTSTRAP_TOKEN"
     export NOMAD_TOKEN="$NOMAD_BOOTSTRAP_TOKEN"
 
-    # Anonymous read policy so the UI and CLI work without a token for basic inspection.
+    # Create the anonymous read policy then attach it to the built-in anonymous token.
+    # The anonymous token always has accessor 00000000-0000-0000-0000-000000000000.
     nomad acl policy apply -description "Anonymous read-only access" anonymous - <<"NOMADPOLICY"
 namespace "*" {
   policy = "read"
@@ -236,6 +251,9 @@ node {
   policy = "read"
 }
 NOMADPOLICY
+
+    nomad acl token update -policy=anonymous 00000000-0000-0000-0000-000000000000 \
+      || echo "--> Warning: could not attach anonymous policy to anonymous token"
 
     echo "--> Nomad ACL bootstrapped and anonymous policy applied"
   else
@@ -256,11 +274,11 @@ echo "==> Configure Nomad WIF"
 echo "--> mounting nomad jwt auth method"
 {
 vault auth enable -path 'jwt-nomad' 'jwt'
-
- }||
-{
+} || {
   echo "--> nomad jwt auth method already exists, moving on"
 }
+
+JWT_NOMAD_ACCESSOR=$(vault auth list -format=json | jq -r '.["jwt-nomad/"].accessor')
 
 echo "--> configuring nomad jwt auth method"
 {
@@ -331,15 +349,15 @@ path "boundary/*" {
     capabilities = ["create", "read", "update", "delete", "list", "sudo"]
 }
 
-path "kv/data/{{identity.entity.aliases.AUTH_METHOD_ACCESSOR.metadata.nomad_namespace}}/{{identity.entity.aliases.AUTH_METHOD_ACCESSOR.metadata.nomad_job_id}}/*" {
+path "kv/data/{{identity.entity.aliases.$JWT_NOMAD_ACCESSOR.metadata.nomad_namespace}}/{{identity.entity.aliases.$JWT_NOMAD_ACCESSOR.metadata.nomad_job_id}}/*" {
   capabilities = ["read"]
 }
 
-path "kv/data/{{identity.entity.aliases.AUTH_METHOD_ACCESSOR.metadata.nomad_namespace}}/{{identity.entity.aliases.AUTH_METHOD_ACCESSOR.metadata.nomad_job_id}}" {
+path "kv/data/{{identity.entity.aliases.$JWT_NOMAD_ACCESSOR.metadata.nomad_namespace}}/{{identity.entity.aliases.$JWT_NOMAD_ACCESSOR.metadata.nomad_job_id}}" {
   capabilities = ["read"]
 }
 
-path "kv/metadata/{{identity.entity.aliases.AUTH_METHOD_ACCESSOR.metadata.nomad_namespace}}/*" {
+path "kv/metadata/{{identity.entity.aliases.$JWT_NOMAD_ACCESSOR.metadata.nomad_namespace}}/*" {
   capabilities = ["list"]
 }
 
@@ -360,5 +378,84 @@ EOR
 }
 
 echo "==> Nomad WIF is done!"
+
+echo "==> Configure Nomad WIF for Consul"
+
+export CONSUL_HTTP_TOKEN=${consul_master_token}
+export CONSUL_HTTP_ADDR=http://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8500
+
+echo "--> configuring nomad-workloads Consul JWT auth method"
+{
+sudo tee consul-auth-method-nomad-workloads.json > /dev/null <<"EOF"
+{
+  "JWKSURL": "https://nomad-server.service.consul:4646/.well-known/jwks.json",
+  "JWTSupportedAlgs": ["RS256"],
+  "BoundAudiences": ["consul.io"],
+  "ClaimMappings": {
+    "nomad_namespace": "nomad_namespace",
+    "nomad_job_id": "nomad_job_id",
+    "nomad_task": "nomad_task",
+    "nomad_service": "nomad_service"
+  }
+}
+EOF
+
+consul acl auth-method create \
+  -name 'nomad-workloads' \
+  -type 'jwt' \
+  -description 'JWT auth method for Nomad workload identities' \
+  -config @consul-auth-method-nomad-workloads.json
+
+ }||
+{
+  echo "--> nomad-workloads Consul auth method already exists, moving on"
+}
+
+echo "--> creating Consul binding rule for Nomad service identities"
+{
+consul acl binding-rule create \
+  -method 'nomad-workloads' \
+  -bind-type 'service' \
+  -bind-name '$${value.nomad_service}' \
+  -selector '"nomad_service" in value'
+
+ }||
+{
+  echo "--> service binding rule already exists, moving on"
+}
+
+echo "--> configuring nomad-tasks Consul policy and role"
+{
+consul acl policy create -name nomad-tasks \
+  -rules 'key_prefix "" { policy = "read" }
+service_prefix "" { policy = "read" }'
+
+ }||
+{
+  echo "--> nomad-tasks Consul policy already exists, moving on"
+}
+
+{
+consul acl role create -name 'nomad-tasks-default' -policy-name nomad-tasks
+
+ }||
+{
+  echo "--> nomad-tasks-default Consul role already exists, moving on"
+}
+
+echo "--> creating Consul binding rule for Nomad task identities"
+{
+consul acl binding-rule create \
+  -method 'nomad-workloads' \
+  -bind-type 'role' \
+  -bind-name 'nomad-tasks-$${value.nomad_namespace}' \
+  -selector '"nomad_service" not in value'
+
+ }||
+{
+  echo "--> task binding rule already exists, moving on"
+}
+
+echo "==> Nomad Consul WIF is done!"
 
 echo "==> Nomad is done!"

@@ -1,5 +1,19 @@
 
+resource "aws_acm_certificate" "vault_cert" {
+  private_key       = vault_pki_secret_backend_cert.alb_wildcard.private_key
+  certificate_body  = vault_pki_secret_backend_cert.alb_wildcard.certificate
+  certificate_chain = vault_pki_secret_backend_cert.alb_wildcard.ca_chain
 
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  tags = {
+    Name      = "${var.namespace}-alb-cert"
+    ManagedBy = "vault-pki"
+    Namespace = var.namespace
+  }
+}
 
 resource "aws_alb" "vault_cert" {
   name = "${var.namespace}-vault-cert"

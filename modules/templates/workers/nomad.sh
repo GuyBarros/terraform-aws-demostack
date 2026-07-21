@@ -30,6 +30,14 @@ until [ -n "$NOMAD_CLIENT_CONSUL_TOKEN" ]; do
 done
 echo "--> Got Nomad client Consul token"
 
+echo "--> Waiting for Vault root token"
+VAULT_ROOT_TOKEN=""
+until [ -n "$VAULT_ROOT_TOKEN" ]; do
+  VAULT_ROOT_TOKEN=$(consul kv get service/vault/root-token 2>/dev/null)
+  [ -z "$VAULT_ROOT_TOKEN" ] && sleep 5
+done
+echo "--> Got Vault root token"
+
 echo "--> Installing"
 sudo mkdir -p /mnt/nomad
 sudo mkdir -p /etc/nomad.d/default_jobs
@@ -108,11 +116,15 @@ consul {
 vault {
   enabled          = true
   tls_skip_verify  = true
-  address          = "https://$(curl -H "X-aws-ec2-metadata-token: $TOKEN" -s http://169.254.169.254/latest/meta-data/local-ipv4):8200"
+  address          = "${vault_api_addr}"
+  token            = "$VAULT_ROOT_TOKEN"
   ca_file          = "/usr/local/share/ca-certificates/01-me.crt"
   cert_file        = "/etc/ssl/certs/me.crt"
   key_file         = "/etc/ssl/certs/me.key"
-  create_from_role = "nomad-cluster"
+  default_identity {
+    aud = ["vault.io"]
+    ttl = "1h"
+  }
 }
 autopilot {
     cleanup_dead_servers = true

@@ -61,16 +61,18 @@ EOF
 
 
 # Enable ACLs with deny default — matches the server ACL configuration.
-# Clients must NOT use initial_management (server-only); use default so the
-# agent can authenticate until the per-worker agent token is applied below.
+# Do NOT set tokens.default to the master token: that token authorizes any
+# request presenting no token at all, so it would grant unauthenticated
+# callers on this agent's HTTP API full management access (e.g. registering
+# HTTP checks with attacker-controlled URLs -> SSRF). Leave it unset so
+# unauthenticated requests fall back to the cluster's read-only anonymous
+# token, same as the servers. The scoped per-worker token created below is
+# applied as the agent token, which is all this node needs.
 cat <<EOF > /etc/consul.d/acl.hcl
 acl = {
   enabled = true
   default_policy = "deny"
   enable_token_persistence = true
-  tokens {
-    default = "${consul_master_token}"
-  }
   down_policy = "extend-cache"
 }
 EOF

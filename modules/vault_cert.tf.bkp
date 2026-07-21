@@ -26,8 +26,8 @@ resource "vault_mount" "pki_root" {
   path                      = "pki_root"
   type                      = "pki"
   description               = "Root CA for ${var.namespace} demostack"
-  default_lease_ttl_seconds = 31536000 # 1 year
-  max_lease_ttl_seconds     = 87600 * 3600 # 10 years
+  default_lease_ttl_seconds = 2190 * 3600 # 90 days
+  max_lease_ttl_seconds     = 2190 * 3600 # 90 days
 }
 
 resource "vault_pki_secret_backend_root_cert" "root" {
@@ -37,7 +37,7 @@ resource "vault_pki_secret_backend_root_cert" "root" {
   organization         = "HashiCorp Demos"
   key_type             = "ec"
   key_bits             = 521
-  ttl                  = "87600h" # 10 years
+  ttl                  = "2190h" # 90 days
   issuer_name          = "${var.namespace}-root"
   format               = "pem"
   private_key_format   = "der"
@@ -63,7 +63,7 @@ resource "vault_mount" "pki_int" {
   type                      = "pki"
   description               = "Intermediate CA for ${var.namespace} demostack"
   default_lease_ttl_seconds = 2592000  # 30 days
-  max_lease_ttl_seconds     = 8760 * 3600 # 1 year
+  max_lease_ttl_seconds     = 2190 * 3600 # 90 days
 }
 
 resource "vault_pki_secret_backend_intermediate_cert_request" "csr" {
@@ -107,7 +107,7 @@ resource "vault_pki_secret_backend_role" "server" {
   name             = "${var.namespace}-server"
   organization     = ["HashiCorp Demostack"]
   ttl              = "720h"   # 30 days — matches original validity_period_hours
-  max_ttl          = "8760h"  # 1 year hard cap
+  max_ttl          = "2190h"  # 90 days hard cap
 
   key_type         = "ec"
   key_bits         = 521
@@ -152,7 +152,7 @@ resource "vault_pki_secret_backend_role" "worker" {
   name             = "${var.namespace}-worker"
   organization     = ["HashiCorp Demostack"]
   ttl              = "720h"
-  max_ttl          = "8760h"
+  max_ttl          = "2190h"
 
   key_type           = "ec"
   key_bits           = 521
@@ -350,21 +350,6 @@ resource "vault_pki_secret_backend_cert" "alb_wildcard" {
   depends_on = [vault_pki_secret_backend_role.server]
 }
 
-resource "aws_acm_certificate" "vault_cert" {
-  private_key       = vault_pki_secret_backend_cert.alb_wildcard.private_key
-  certificate_body  = vault_pki_secret_backend_cert.alb_wildcard.certificate
-  certificate_chain = vault_pki_secret_backend_cert.alb_wildcard.ca_chain
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  tags = {
-    Name      = "${var.namespace}-alb-cert"
-    ManagedBy = "vault-pki"
-    Namespace = var.namespace
-  }
-}
 
 # No DNS validation record needed — cert is already signed by our CA
 # The aws_acm_certificate_validation resource is also not needed for imported certs
